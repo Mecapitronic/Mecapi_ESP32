@@ -3,7 +3,9 @@
 
 #include <Arduino.h>
 
-#define LIDAR_SERIAL Serial2
+#define SERIAL_PC Serial
+#define SERIAL_LIDAR Serial2
+
 
 #include <LinkedList.h>
 #include "LD06.h"

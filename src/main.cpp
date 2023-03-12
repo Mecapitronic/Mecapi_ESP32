@@ -7,11 +7,11 @@ LD06 ld06;
 void setup()
 {
     // put your setup code here, to run once:
-    delay(10);
-    Serial.begin(115200);
-    Serial.print("Start PC ! ");
+    delay(500);
+    SERIAL_PC.begin(230400);
+    SERIAL_PC.print("Start PC ! ");
     ld06.Init();
-    Serial.print("Start Lidar ! ");
+    SERIAL_PC.print("Start Lidar ! ");
 
     // Lidar.Initialisation();
 }

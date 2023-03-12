@@ -1,6 +1,6 @@
 #include "LD06.h"
 
-void LD06::Init() { LIDAR_SERIAL.begin(230400); }
+void LD06::Init() { SERIAL_LIDAR.begin(230400); }
 
 void LD06::calc_lidar_data(LinkedList<uint32_t> &values)
 {
@@ -37,12 +37,12 @@ void LD06::calc_lidar_data(LinkedList<uint32_t> &values)
         confidences.add(values[8 + i * 3]);
         distances.add(int(values[8 + i * 3 - 1] << 8 | values[8 + i * 3 - 2]));
 
-        Serial.print((int)angles[i]);
-        Serial.print(";");
-        Serial.print((int)distances[i]);
-        Serial.print(";");
-        Serial.print((int)confidences[i]);
-        Serial.print('\n');
+        SERIAL_PC.print((int)angles[i]);
+        SERIAL_PC.print(";");
+        SERIAL_PC.print((int)distances[i]);
+        SERIAL_PC.print(";");
+        SERIAL_PC.print((int)confidences[i]);
+        SERIAL_PC.print('\n');
     }
 }
 
@@ -50,7 +50,7 @@ LinkedList<uint32_t> tmpChars;
 
 void LD06::Read_lidar_data()
 {
-    if (!LIDAR_SERIAL.available() > 0)
+    if (!SERIAL_LIDAR.available() > 0)
     {
         return;
     }
@@ -60,9 +60,9 @@ void LD06::Read_lidar_data()
 
     while (loopFlag)
     {
-        if (LIDAR_SERIAL.available() > 0)
+        if (SERIAL_LIDAR.available() > 0)
         {
-            tmpInt = LIDAR_SERIAL.read();
+            tmpInt = SERIAL_LIDAR.read();
 
             if (tmpInt == 0x54 && tmpChars.size() == 0)
             {
