@@ -1,13 +1,9 @@
 #include "LD06.h"
 
-// const int rxPin = 8;
-// const int txPin = 9;
-// SoftwareSerial serialPort(rxPin, txPin);
+void LD06::Init() { LIDAR_SERIAL.begin(230400); }
 
-void LD06::Init() { Serial2.begin(230400); }
-
-void LD06::calc_lidar_data(LinkedList<uint32_t> &values) {
-    // Serial.print("calc_lidar_data");
+void LD06::calc_lidar_data(LinkedList<uint32_t> &values)
+{
     start_byte = values[0];
     data_length = 0x1F & values[1];
     Speed = float(values[3] << 8 | values[2]) / 100;
@@ -16,13 +12,17 @@ void LD06::calc_lidar_data(LinkedList<uint32_t> &values) {
     time_stamp = int(values[values.size() - 2] << 8 | values[values.size() - 3]);
     CS = int(values[values.size() - 1]);
 
-    if (LSA - FSA > 0) {
+    if (LSA - FSA > 0)
+    {
         angle_step = (LSA - FSA) / (data_length - 1);
-    } else {
+    }
+    else
+    {
         angle_step = (LSA + (360 - FSA)) / (data_length - 1);
     }
 
-    if (angle_step > 20) {
+    if (angle_step > 20)
+    {
         return;
     }
 
@@ -30,59 +30,64 @@ void LD06::calc_lidar_data(LinkedList<uint32_t> &values) {
     confidences.clear();
     distances.clear();
 
-    for (int i = 0; i < data_length; i++) {
+    for (int i = 0; i < data_length; i++)
+    {
         float raw_deg = FSA + i * angle_step;
         angles.add(raw_deg <= 360 ? raw_deg : raw_deg - 360);
         confidences.add(values[8 + i * 3]);
         distances.add(int(values[8 + i * 3 - 1] << 8 | values[8 + i * 3 - 2]));
-        // Serial.print("angles : ");
+
         Serial.print((int)angles[i]);
         Serial.print(";");
-        // Serial.print("confidences : ");
-        // Serial.println(confidences[i]);
-        // Serial.print("distances : ");
         Serial.print((int)distances[i]);
+        Serial.print(";");
+        Serial.print((int)confidences[i]);
         Serial.print('\n');
     }
 }
 
 LinkedList<uint32_t> tmpChars;
 
-void LD06::Read_lidar_data() {
-    if (!Serial2.available() > 0) {
-        // Serial.write("Lidar KO ! ");
+void LD06::Read_lidar_data()
+{
+    if (!LIDAR_SERIAL.available() > 0)
+    {
         return;
     }
 
     bool loopFlag = true;
     uint32_t tmpInt;
 
-    while (loopFlag) {
-        tmpInt = Serial2.read();
+    while (loopFlag)
+    {
+        if (LIDAR_SERIAL.available() > 0)
+        {
+            tmpInt = LIDAR_SERIAL.read();
 
-        if (tmpInt == 0x54 && tmpChars.size() == 0) {
-            tmpChars.add(tmpInt);
-            // Serial.println();
-            continue;
-        } else if (tmpChars.size() == TOTAL_DATA_BYTE - 1) {
-            loopFlag = false;
-            calc_lidar_data(tmpChars);
-            tmpChars.clear();
-            continue;
-
-        } else if (tmpChars.size() > 0) {
-            if (tmpChars[0] == 0x54) {
+            if (tmpInt == 0x54 && tmpChars.size() == 0)
+            {
                 tmpChars.add(tmpInt);
+                continue;
             }
-            if (tmpChars.size() > 1) {
-                if (tmpChars[1] != 0x2C) {
-                    tmpChars.clear();
-                    // Serial.println();
-                } else {
-                    // Serial.print("0x");
-                    // Serial.print(tmpInt < 0x10 ? "0" : "");
-                    // Serial.print(tmpInt, HEX);
-                    // Serial.print(", ");
+            else if (tmpChars.size() == TOTAL_DATA_BYTE - 1)
+            {
+                loopFlag = false;
+                calc_lidar_data(tmpChars);
+                tmpChars.clear();
+                continue;
+            }
+            else if (tmpChars.size() > 0)
+            {
+                if (tmpChars[0] == 0x54)
+                {
+                    tmpChars.add(tmpInt);
+                }
+                if (tmpChars.size() > 1)
+                {
+                    if (tmpChars[1] != 0x2C)
+                    {
+                        tmpChars.clear();
+                    }
                 }
             }
         }
