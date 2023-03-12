@@ -13,20 +13,26 @@ private:
 
     void calc_lidar_data(LinkedList<uint32_t> &values);
 
-public:
-    LinkedList<float> angles;
-    LinkedList<float> distances;
-    LinkedList<int> confidences;
+    struct PointLidar
+    {
+        double angle;
+        int distance;
+        int confidence;
+        int timestamp;
+    };
 
-private:
-    char start_byte;
-    char data_length;
-    float Speed;
-    float FSA;
-    float LSA;
-    int time_stamp;
-    int CS;
-    float angle_step;
+    struct PacketLidar
+    {
+        byte header;
+        int dataLength;
+        int radarSpeed;
+        int startAngle;
+
+        PointLidar dataPoint[12];
+        int endAngle;
+        int timestamp;
+        byte crcCheck;
+    };
 
 public:
     void Init();

@@ -4,44 +4,44 @@ void LD06::Init() { SERIAL_LIDAR.begin(230400); }
 
 void LD06::calc_lidar_data(LinkedList<uint32_t> &values)
 {
-    start_byte = values[0];
-    data_length = 0x1F & values[1];
-    Speed = float(values[3] << 8 | values[2]) / 100;
-    FSA = float(values[5] << 8 | values[4]) / 100;
-    LSA = float(values[values.size() - 4] << 8 | values[values.size() - 5]) / 100;
-    time_stamp = int(values[values.size() - 2] << 8 | values[values.size() - 3]);
-    CS = int(values[values.size() - 1]);
+    PacketLidar data;
+    data.header = values[0];
+    data.dataLength = 0x1F & values[1];
+    data.radarSpeed = float(values[3] << 8 | values[2]) / 100;
+    data.startAngle = float(values[5] << 8 | values[4]) / 100;
+    data.endAngle = float(values[values.size() - 4] << 8 | values[values.size() - 5]) / 100;
+    data.timestamp = int(values[values.size() - 2] << 8 | values[values.size() - 3]);
+    data.crcCheck = int(values[values.size() - 1]);
 
-    if (LSA - FSA > 0)
+    float packetAngle = data.endAngle - data.startAngle;
+    float angleStep = (packetAngle / (data.dataLength - 1)); // Calculate the angle step
+
+    if (data.endAngle - data.startAngle > 0)
     {
-        angle_step = (LSA - FSA) / (data_length - 1);
+        angleStep = (data.endAngle - data.startAngle) / (data.dataLength - 1);
     }
     else
     {
-        angle_step = (LSA + (360 - FSA)) / (data_length - 1);
+        angleStep = (data.endAngle + (360 - data.startAngle)) / (data.dataLength - 1);
     }
 
-    if (angle_step > 20)
+    if (angleStep > 20)
     {
         return;
     }
 
-    angles.clear();
-    confidences.clear();
-    distances.clear();
-
-    for (int i = 0; i < data_length; i++)
+    for (int i = 0; i < data.dataLength; i++)
     {
-        float raw_deg = FSA + i * angle_step;
-        angles.add(raw_deg <= 360 ? raw_deg : raw_deg - 360);
-        confidences.add(values[8 + i * 3]);
-        distances.add(int(values[8 + i * 3 - 1] << 8 | values[8 + i * 3 - 2]));
+        float raw_deg = data.startAngle + i * angleStep;
+        data.dataPoint[i].angle = (raw_deg <= 360 ? raw_deg : raw_deg - 360);
+        data.dataPoint[i].confidence = (values[8 + i * 3]);
+        data.dataPoint[i].distance = (int(values[8 + i * 3 - 1] << 8 | values[8 + i * 3 - 2]));
 
-        SERIAL_PC.print((int)angles[i]);
+        SERIAL_PC.print((int)data.dataPoint[i].angle);
         SERIAL_PC.print(";");
-        SERIAL_PC.print((int)distances[i]);
+        SERIAL_PC.print((int)data.dataPoint[i].distance);
         SERIAL_PC.print(";");
-        SERIAL_PC.print((int)confidences[i]);
+        SERIAL_PC.print((int)data.dataPoint[i].confidence);
         SERIAL_PC.print('\n');
     }
 }

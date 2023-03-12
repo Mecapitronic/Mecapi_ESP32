@@ -1,7 +1,5 @@
 #include "main.h"
 
-// LD06Driver Lidar;
-
 LD06 ld06;
 
 void setup()
@@ -12,15 +10,10 @@ void setup()
     SERIAL_PC.print("Start PC ! ");
     ld06.Init();
     SERIAL_PC.print("Start Lidar ! ");
-
-    // Lidar.Initialisation();
 }
 
 void loop()
 {
     // put your main code here, to run repeatedly:
-    // Serial.println("data start");
     ld06.Read_lidar_data();
-
-    // Lidar.ReadLidarData();
 }
