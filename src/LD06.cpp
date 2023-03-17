@@ -9,34 +9,22 @@ void LD06::Calc_lidar_data(LinkedList<uint32_t> &values)
     PacketLidar data;
     data.header = values[0];
     data.dataLength = 0x1F & values[1];
-    data.radarSpeed = float(values[3] << 8 | values[2]) / 100;
-    data.startAngle = float(values[5] << 8 | values[4]) / 100;
-    data.endAngle = float(values[values.size() - 4] << 8 | values[values.size() - 5]) / 100;
-    data.timestamp = int(values[values.size() - 2] << 8 | values[values.size() - 3]);
-    data.crcCheck = int(values[values.size() - 1]);
+    data.radarSpeed = values[3] << 8 | values[2];
+    data.startAngle = values[5] << 8 | values[4];
+
+    data.endAngle = values[43] << 8 | values[42];
+    data.timestamp = values[45] << 8 | values[44];
+    data.crcCheck = values[46];
 
     float packetAngle = data.endAngle - data.startAngle;
-    float angleStep = (packetAngle / (data.dataLength - 1));  // Calculate the angle step
+    float angleStep = (packetAngle / float(PACKSIZE - 1));  // Calculate the angle step
 
-    if (angleStep <= 20.0)
+    for (int i = 0; i < PACKSIZE; i++)
     {
-        if (data.endAngle - data.startAngle > 0)
-        {
-            angleStep = (data.endAngle - data.startAngle) / (data.dataLength - 1);
-        }
-        else
-        {
-            angleStep = (data.endAngle + (360 - data.startAngle)) / (data.dataLength - 1);
-        }
-
-        for (int i = 0; i < data.dataLength; i++)
-        {
-            float raw_deg = data.startAngle + i * angleStep;
-            data.dataPoint[i].angle = (raw_deg <= 360 ? raw_deg : raw_deg - 360);
-            data.dataPoint[i].confidence = (values[8 + i * 3]);
-            data.dataPoint[i].distance = (int(values[8 + i * 3 - 1] << 8 | values[8 + i * 3 - 2]));
-            Print_lidar_data(data.dataPoint[i]);
-        }
+        data.dataPoint[i].angle = float(data.startAngle) + i * angleStep;
+        data.dataPoint[i].confidence = (values[8 + i * 3]);
+        data.dataPoint[i].distance = (int(values[8 + i * 3 - 1] << 8 | values[8 + i * 3 - 2]));
+        Print_lidar_data(data.dataPoint[i]);
     }
 }
 
