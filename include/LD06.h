@@ -5,7 +5,7 @@
 
 class LD06
 {
-   private:
+private:
     // note: 12 data *3 Byte
     const int DATA_BYTE = 36;
     // note: 1(Start)+2(Datalen)+2(Speed)+2(SAngle)+36(DataByte)+2(EAngle)+2(TimeStamp)+1(CRC)
@@ -13,7 +13,7 @@ class LD06
 
     const int PACKSIZE = 12;
 
-   public:
+public:
     struct PointLidar
     {
         double angle;
@@ -22,7 +22,7 @@ class LD06
         int timestamp;
     };
 
-   public:
+public:
     struct PacketLidar
     {
         byte header;
@@ -36,13 +36,13 @@ class LD06
         byte crcCheck;
     };
 
-   public:
+public:
     void Init();
 
-   public:
+public:
+    void Read_lidar_data();
     void Calc_lidar_data(LinkedList<uint32_t> &values);
     void Print_lidar_data(PointLidar data);
-    void Read_lidar_data();
 };
 
 #endif
