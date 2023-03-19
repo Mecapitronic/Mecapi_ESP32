@@ -18,6 +18,14 @@ public:
     const int MIN_QUALITY = 100;
 
 public:
+    struct PolarPoint
+    {
+        float angle;
+        uint16_t dist;
+        float x;
+        float y;
+    };
+
     struct PointLidar
     {
         double angle;
@@ -40,6 +48,23 @@ public:
         byte crcCheck;
     };
 
+    // Initialize lidar obstacle
+    static int const obs_length = 50;
+    static int const max_data_obs = 20;
+    static int const min_data_obs = 3;
+
+public:
+    struct Obstacle
+    {
+        PolarPoint data[LD06::max_data_obs];
+        int dataT;
+    } lidar_obstacle[LD06::obs_length];
+    typedef struct Point
+    {
+        float x;
+        float y;
+    } Point;
+
 public:
     void Init();
 
@@ -47,6 +72,8 @@ public:
     void Read_lidar_data();
     void Calc_lidar_data(LinkedList<uint32_t> &values);
     void Filter_lidar_data();
+    Point findCircle(Point p1, Point p2, Point p3);
+    Point findCircle(float x1, float y1, float x2, float y2, float x3, float y3);
     void Print_lidar_data(PointLidar data, float x, float y);
 };
 
