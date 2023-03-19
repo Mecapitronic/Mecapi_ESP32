@@ -65,16 +65,55 @@ void LD06::Calc_lidar_data(LinkedList<uint32_t> &values)
         data.dataPoint[i].angle = float(data.startAngle) + i * angleStep;
         data.dataPoint[i].confidence = (values[8 + i * 3]);
         data.dataPoint[i].distance = (int(values[8 + i * 3 - 1] << 8 | values[8 + i * 3 - 2]));
-        Print_lidar_data(data.dataPoint[i]);
+        // Print_lidar_data(data.dataPoint[i]);
+    }
+    Filter_lidar_data();
+}
+
+void LD06::Filter_lidar_data()
+{
+    for (int i = 0; i < PACKSIZE; i++)
+    {
+
+        auto node = data.dataPoint[i];
+        int dist = node.distance;  // mm
+        double angle = node.angle; // degrees
+
+        // Ignore too close points
+        if (dist < MIN_DISTANCE || node.confidence < MIN_QUALITY)
+            continue;
+
+        int robot_x = 0;
+        int robot_y = 0;
+        double robot_theta = 0;
+
+        // Compute detected position
+        const float lidar_x = robot_x + dist * cos((angle / 100 + robot_theta) * M_PI / 180);
+        const float lidar_y = robot_y + dist * sin((angle / 100 + robot_theta) * M_PI / 180);
+
+        // Ignore points outside of the table
+        bool filterTable = false;
+        if (filterTable)
+        {
+            const float table_margin = 0;
+            if (lidar_x < table_margin || lidar_x > 2000 - table_margin ||
+                lidar_y < table_margin || lidar_y > 3000 - table_margin)
+                continue;
+        }
+        Print_lidar_data(node, lidar_x, lidar_y);
     }
 }
 
-void LD06::Print_lidar_data(PointLidar data)
+void LD06::Print_lidar_data(PointLidar data, float x, float y)
 {
     SERIAL_PC.print(data.angle);
     SERIAL_PC.print(";");
     SERIAL_PC.print(data.distance);
     SERIAL_PC.print(";");
     SERIAL_PC.print(data.confidence);
+    SERIAL_PC.print(";");
+    SERIAL_PC.print(x);
+    SERIAL_PC.print(";");
+    SERIAL_PC.print(y);
     SERIAL_PC.print('\n');
 }

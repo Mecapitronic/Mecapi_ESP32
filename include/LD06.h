@@ -14,6 +14,10 @@ private:
     const int PACKSIZE = 12;
 
 public:
+    const int MIN_DISTANCE = 20;
+    const int MIN_QUALITY = 100;
+
+public:
     struct PointLidar
     {
         double angle;
@@ -42,7 +46,8 @@ public:
 public:
     void Read_lidar_data();
     void Calc_lidar_data(LinkedList<uint32_t> &values);
-    void Print_lidar_data(PointLidar data);
+    void Filter_lidar_data();
+    void Print_lidar_data(PointLidar data, float x, float y);
 };
 
 #endif
