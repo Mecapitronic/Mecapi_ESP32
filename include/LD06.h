@@ -5,15 +5,15 @@
 
 class LD06
 {
-private:
+   public:
     // note: 12 data *3 Byte
-    const int DATA_BYTE = 36;
+    static const int DATA_BYTE = 36;
     // note: 1(Start)+2(Datalen)+2(Speed)+2(SAngle)+36(DataByte)+2(EAngle)+2(TimeStamp)+1(CRC)
-    const int TOTAL_DATA_BYTE = 48;
+    static const int TOTAL_DATA_BYTE = 48;
 
-    const int PACKSIZE = 12;
+    static const int PACKET_SIZE = 12;
 
-public:
+   public:
     const int MIN_DISTANCE = 20;
     const int MIN_QUALITY = 100;
 
@@ -43,7 +43,7 @@ public:
         int radarSpeed;
         int startAngle;
 
-        PointLidar dataPoint[12];
+        PointLidar dataPoint[LD06::PACKET_SIZE];
         int endAngle;
         int timestamp;
         byte crcCheck;

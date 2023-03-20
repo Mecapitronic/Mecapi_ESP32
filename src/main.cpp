@@ -16,6 +16,6 @@ void loop()
 {
     // put your main code here, to run repeatedly:
     ld06.Read_lidar_data();
-        ld06.Calc_lidar_data();
-        ld06.Filter_lidar_data();
+    ld06.Calc_lidar_data();
+    ld06.Filter_lidar_data();
 }

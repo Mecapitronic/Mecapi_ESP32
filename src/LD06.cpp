@@ -1,6 +1,8 @@
 #include "LD06.h"
 
-LinkedList<uint32_t> tmpChars;
+// LinkedList<uint32_t> tmpChars;
+uint32_t tmpChars[LD06::TOTAL_DATA_BYTE];
+uint8_t cursor = 0;
 
 void LD06::Init()
 {
@@ -23,34 +25,35 @@ void LD06::Read_lidar_data()
 {
     bool loopFlag = true;
     uint32_t tmpInt;
-    tmpChars.clear();
+    cursor = 0;
+
     while (loopFlag)
     {
         if (SERIAL_LIDAR.available() > 0)
         {
             tmpInt = SERIAL_LIDAR.read();
 
-            if (tmpInt == 0x54 && tmpChars.size() == 0)
+            if (tmpInt == 0x54 && cursor == 0)
             {
-                tmpChars.add(tmpInt);
+                tmpChars[cursor++] = tmpInt;
                 continue;
             }
-            else if (tmpChars.size() == TOTAL_DATA_BYTE - 1)
+            else if (cursor == TOTAL_DATA_BYTE - 1)
             {
                 loopFlag = false;
                 continue;
             }
-            else if (tmpChars.size() > 0)
+            else if (cursor > 0)
             {
                 if (tmpChars[0] == 0x54)
                 {
-                    tmpChars.add(tmpInt);
+                    tmpChars[cursor++] = tmpInt;
                 }
-                if (tmpChars.size() > 1)
+                if (cursor > 1)
                 {
                     if (tmpChars[1] != 0x2C)
                     {
-                        tmpChars.clear();
+                        cursor = 0;
                     }
                 }
             }
@@ -70,12 +73,21 @@ void LD06::Calc_lidar_data()
     data.timestamp = tmpChars[45] << 8 | tmpChars[44];
     data.crcCheck = tmpChars[46];
 
-    float packetAngle = data.endAngle - data.startAngle;
-    float angleStep = (packetAngle / float(PACKSIZE - 1)); // Calculate the angle step
+    float angleStep = 0;
 
-    for (int i = 0; i < PACKSIZE; i++)
+    if (data.endAngle > data.startAngle)
     {
-        data.dataPoint[i].angle = float(data.startAngle) + i * angleStep;
+        angleStep = (data.endAngle - data.startAngle) / (data.dataLength - 1);
+    }
+    else
+    {
+        angleStep = (data.endAngle + (360 * 100 - data.startAngle)) / (data.dataLength - 1);
+    }
+
+    for (int i = 0; i < PACKET_SIZE; i++)
+    {
+        float raw_deg = data.startAngle + i * angleStep;
+        data.dataPoint[i].angle = (raw_deg <= 360 * 100 ? raw_deg : raw_deg - 360 * 100);
         data.dataPoint[i].confidence = (tmpChars[8 + i * 3]);
         data.dataPoint[i].distance = (int(tmpChars[8 + i * 3 - 1] << 8 | tmpChars[8 + i * 3 - 2]));
     }
@@ -85,7 +97,7 @@ void LD06::Filter_lidar_data()
 {
     int16_t dataN = 0;
     int16_t obsN = 0;
-    for (int i = 0; i < PACKSIZE; i++)
+    for (int i = 0; i < PACKET_SIZE; i++)
     {
 
         auto node = data.dataPoint[i];
