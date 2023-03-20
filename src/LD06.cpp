@@ -10,6 +10,7 @@ void LD06::Init()
         {
             lidar_obstacle[i].data[j].angle = 0;
             lidar_obstacle[i].data[j].dist = 0;
+            lidar_obstacle[i].data[j].conf = 0;
             lidar_obstacle[i].data[j].x = 0;
             lidar_obstacle[i].data[j].y = 0;
         }
@@ -22,7 +23,7 @@ void LD06::Read_lidar_data()
 {
     bool loopFlag = true;
     uint32_t tmpInt;
-
+    tmpChars.clear();
     while (loopFlag)
     {
         if (SERIAL_LIDAR.available() > 0)
@@ -37,8 +38,6 @@ void LD06::Read_lidar_data()
             else if (tmpChars.size() == TOTAL_DATA_BYTE - 1)
             {
                 loopFlag = false;
-                Calc_lidar_data(tmpChars);
-                tmpChars.clear();
                 continue;
             }
             else if (tmpChars.size() > 0)
@@ -60,16 +59,16 @@ void LD06::Read_lidar_data()
 }
 
 LD06::PacketLidar data;
-void LD06::Calc_lidar_data(LinkedList<uint32_t> &values)
+void LD06::Calc_lidar_data()
 {
-    data.header = values[0];
-    data.dataLength = 0x1F & values[1];
-    data.radarSpeed = values[3] << 8 | values[2];
-    data.startAngle = values[5] << 8 | values[4];
+    data.header = tmpChars[0];
+    data.dataLength = 0x1F & tmpChars[1];
+    data.radarSpeed = tmpChars[3] << 8 | tmpChars[2];
+    data.startAngle = tmpChars[5] << 8 | tmpChars[4];
 
-    data.endAngle = values[43] << 8 | values[42];
-    data.timestamp = values[45] << 8 | values[44];
-    data.crcCheck = values[46];
+    data.endAngle = tmpChars[43] << 8 | tmpChars[42];
+    data.timestamp = tmpChars[45] << 8 | tmpChars[44];
+    data.crcCheck = tmpChars[46];
 
     float packetAngle = data.endAngle - data.startAngle;
     float angleStep = (packetAngle / float(PACKSIZE - 1)); // Calculate the angle step
@@ -77,11 +76,9 @@ void LD06::Calc_lidar_data(LinkedList<uint32_t> &values)
     for (int i = 0; i < PACKSIZE; i++)
     {
         data.dataPoint[i].angle = float(data.startAngle) + i * angleStep;
-        data.dataPoint[i].confidence = (values[8 + i * 3]);
-        data.dataPoint[i].distance = (int(values[8 + i * 3 - 1] << 8 | values[8 + i * 3 - 2]));
-        // Print_lidar_data(data.dataPoint[i]);
+        data.dataPoint[i].confidence = (tmpChars[8 + i * 3]);
+        data.dataPoint[i].distance = (int(tmpChars[8 + i * 3 - 1] << 8 | tmpChars[8 + i * 3 - 2]));
     }
-    Filter_lidar_data();
 }
 
 void LD06::Filter_lidar_data()
@@ -94,6 +91,7 @@ void LD06::Filter_lidar_data()
         auto node = data.dataPoint[i];
         int dist = node.distance;  // mm
         double angle = node.angle; // degrees
+        int conf = node.confidence;  // 0-255
 
         // Ignore too close points
         if (dist < MIN_DISTANCE || node.confidence < MIN_QUALITY)
@@ -136,6 +134,7 @@ void LD06::Filter_lidar_data()
                         {
                             lidar_obstacle[obsN].data[d].angle = 0;
                             lidar_obstacle[obsN].data[d].dist = 0;
+                            lidar_obstacle[obsN].data[d].conf = 0;
                             lidar_obstacle[obsN].data[d].x = 0;
                             lidar_obstacle[obsN].data[d].y = 0;
                         }
@@ -152,6 +151,7 @@ void LD06::Filter_lidar_data()
                 // calculate the coord of current lidar point
                 lidar_obstacle[obsN].data[dataN].angle = angle;
                 lidar_obstacle[obsN].data[dataN].dist = dist;
+                lidar_obstacle[obsN].data[dataN].conf = conf;
                 lidar_obstacle[obsN].data[dataN].x = lidar_x;
                 lidar_obstacle[obsN].data[dataN].y = lidar_y;
                 // if (obstacle_debug)
@@ -187,6 +187,7 @@ void LD06::Filter_lidar_data()
             {
                 lidar_obstacle[o].data[d].angle = 0;
                 lidar_obstacle[o].data[d].dist = 0;
+                lidar_obstacle[o].data[d].conf = 0;
                 lidar_obstacle[o].data[d].x = 0;
                 lidar_obstacle[o].data[d].y = 0;
             }
@@ -202,6 +203,7 @@ void LD06::Filter_lidar_data()
             {
                 lidar_obstacle[obsN].data[d].angle = 0;
                 lidar_obstacle[obsN].data[d].dist = 0;
+                lidar_obstacle[obsN].data[d].conf = 0;
                 lidar_obstacle[obsN].data[d].x = 0;
                 lidar_obstacle[obsN].data[d].y = 0;
             }
@@ -216,6 +218,7 @@ void LD06::Filter_lidar_data()
                 {
                     lidar_obstacle[o].data[d].angle = 0;
                     lidar_obstacle[o].data[d].dist = 0;
+                    lidar_obstacle[o].data[d].conf = 0;
                     lidar_obstacle[o].data[d].x = 0;
                     lidar_obstacle[o].data[d].y = 0;
                 }
@@ -256,6 +259,8 @@ void LD06::Filter_lidar_data()
                     SERIAL_PC.print(";");
                     SERIAL_PC.print(lidar_obstacle[o].data[0].dist);
                     SERIAL_PC.print(";");
+                    SERIAL_PC.print(lidar_obstacle[o].data[0].conf);
+                    SERIAL_PC.print(";");
                     SERIAL_PC.print(mid.x);
                     SERIAL_PC.print(";");
                     SERIAL_PC.print(mid.y);
@@ -271,6 +276,8 @@ void LD06::Filter_lidar_data()
                     SERIAL_PC.print(lidar_obstacle[o].data[0].angle);
                     SERIAL_PC.print(";");
                     SERIAL_PC.print(lidar_obstacle[o].data[0].dist);
+                    SERIAL_PC.print(";");
+                    SERIAL_PC.print(lidar_obstacle[o].data[0].conf);
                     SERIAL_PC.print(";");
                     SERIAL_PC.print(center.x);
                     SERIAL_PC.print(";");

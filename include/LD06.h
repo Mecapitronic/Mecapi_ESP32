@@ -22,6 +22,7 @@ public:
     {
         float angle;
         uint16_t dist;
+        uint16_t conf;
         float x;
         float y;
     };
@@ -70,7 +71,7 @@ public:
 
 public:
     void Read_lidar_data();
-    void Calc_lidar_data(LinkedList<uint32_t> &values);
+    void Calc_lidar_data();
     void Filter_lidar_data();
     Point findCircle(Point p1, Point p2, Point p3);
     Point findCircle(float x1, float y1, float x2, float y2, float x3, float y3);
