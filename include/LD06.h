@@ -29,7 +29,7 @@ public:
 
     struct PointLidar
     {
-        double angle;
+        int angle;
         int distance;
         int confidence;
         int timestamp;
@@ -75,7 +75,8 @@ public:
     void Filter_lidar_data();
     Point findCircle(Point p1, Point p2, Point p3);
     Point findCircle(float x1, float y1, float x2, float y2, float x3, float y3);
-    void Print_lidar_data(PointLidar data, float x, float y);
+    void Print_lidar_data(PointLidar data);
+    void Print_lidar_data2(PointLidar data, float x, float y);
 };
 
 #endif

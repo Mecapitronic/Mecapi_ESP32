@@ -36,25 +36,19 @@ void LD06::Read_lidar_data()
             if (tmpInt == 0x54 && cursor == 0)
             {
                 tmpChars[cursor++] = tmpInt;
-                continue;
-            }
-            else if (cursor == TOTAL_DATA_BYTE - 1)
-            {
-                loopFlag = false;
-                continue;
+                // continue;
             }
             else if (cursor > 0)
             {
-                if (tmpChars[0] == 0x54)
+                tmpChars[cursor++] = tmpInt;
+
+                if (tmpChars[1] != 0x2C)
                 {
-                    tmpChars[cursor++] = tmpInt;
+                    cursor = 0;
                 }
-                if (cursor > 1)
+                if (cursor == TOTAL_DATA_BYTE)
                 {
-                    if (tmpChars[1] != 0x2C)
-                    {
-                        cursor = 0;
-                    }
+                    loopFlag = false;
                 }
             }
         }
@@ -73,7 +67,7 @@ void LD06::Calc_lidar_data()
     data.timestamp = tmpChars[45] << 8 | tmpChars[44];
     data.crcCheck = tmpChars[46];
 
-    float angleStep = 0;
+    int angleStep = 0;
 
     if (data.endAngle > data.startAngle)
     {
@@ -83,14 +77,16 @@ void LD06::Calc_lidar_data()
     {
         angleStep = (data.endAngle + (360 * 100 - data.startAngle)) / (data.dataLength - 1);
     }
-
+    // SERIAL_PC.print(angleStep);
+    // SERIAL_PC.println();
     for (int i = 0; i < PACKET_SIZE; i++)
     {
-        float raw_deg = data.startAngle + i * angleStep;
+        int raw_deg = data.startAngle + i * angleStep;
         data.dataPoint[i].angle = (raw_deg <= 360 * 100 ? raw_deg : raw_deg - 360 * 100);
         data.dataPoint[i].confidence = (tmpChars[8 + i * 3]);
         data.dataPoint[i].distance = (int(tmpChars[8 + i * 3 - 1] << 8 | tmpChars[8 + i * 3 - 2]));
     }
+    // Print_lidar_data(data.dataPoint[PACKET_SIZE / 2]);
 }
 
 void LD06::Filter_lidar_data()
@@ -357,7 +353,16 @@ LD06::Point LD06::findCircle(float x1, float y1, float x2, float y2, float x3, f
     return center;
 }
 
-void LD06::Print_lidar_data(PointLidar data, float x, float y)
+void LD06::Print_lidar_data(PointLidar data)
+{
+    SERIAL_PC.print(data.angle);
+    SERIAL_PC.print(";");
+    SERIAL_PC.print(data.distance);
+    SERIAL_PC.print(";");
+    SERIAL_PC.print(data.confidence);
+    SERIAL_PC.print('\n');
+}
+void LD06::Print_lidar_data2(PointLidar data, float x, float y)
 {
     SERIAL_PC.print(data.angle);
     SERIAL_PC.print(";");
