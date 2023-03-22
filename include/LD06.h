@@ -5,16 +5,17 @@
 
 class LD06
 {
-   public:
+public:
     // note: 12 data *3 Byte
     static const int DATA_BYTE = 36;
-    // note: 1(Start)+2(Datalen)+2(Speed)+2(SAngle)+36(DataByte)+2(EAngle)+2(TimeStamp)+1(CRC)
-    static const int TOTAL_DATA_BYTE = 48;
+    // note: 1(Start)+1(Datalen)+2(Speed)+2(SAngle)+36(DataByte)+2(EAngle)+2(TimeStamp)+1(CRC)
+    static const int TOTAL_DATA_BYTE = 47;
 
     static const int PACKET_SIZE = 12;
 
-   public:
-    const int MIN_DISTANCE = 20;
+public:
+    const int MIN_DISTANCE = 0;
+    const int MAX_DISTANCE = 500;
     const int MIN_QUALITY = 100;
 
 public:
