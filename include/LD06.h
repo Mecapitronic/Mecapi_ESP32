@@ -13,9 +13,11 @@ public:
 
     static const int PACKET_SIZE = 12;
 
+    static const int PACKET_NUMBER = 50;
+
 public:
     const int MIN_DISTANCE = 0;
-    const int MAX_DISTANCE = 500;
+    const int MAX_DISTANCE = 300;
     const int MIN_QUALITY = 100;
 
 public:
@@ -33,7 +35,6 @@ public:
         int angle;
         int distance;
         int confidence;
-        int timestamp;
     };
 
 public:

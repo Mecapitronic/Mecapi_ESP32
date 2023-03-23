@@ -54,125 +54,157 @@ void LD06::Read_lidar_data()
     }
 }
 
-LD06::PacketLidar data;
+LD06::PacketLidar data[LD06::PACKET_NUMBER];
+uint8_t cursorData = 0;
 void LD06::Calc_lidar_data()
 {
-    data.header = tmpChars[0];
-    data.dataLength = 0x1F & tmpChars[1];
-    data.radarSpeed = tmpChars[3] << 8 | tmpChars[2];
-    data.startAngle = tmpChars[5] << 8 | tmpChars[4];
+    data[cursorData].header = tmpChars[0];
+    data[cursorData].dataLength = 0x1F & tmpChars[1];
+    data[cursorData].radarSpeed = tmpChars[3] << 8 | tmpChars[2];
+    data[cursorData].startAngle = tmpChars[5] << 8 | tmpChars[4];
 
-    data.endAngle = tmpChars[43] << 8 | tmpChars[42];
-    data.timestamp = tmpChars[45] << 8 | tmpChars[44];
-    data.crcCheck = tmpChars[46];
+    data[cursorData].endAngle = tmpChars[43] << 8 | tmpChars[42];
+    data[cursorData].timestamp = tmpChars[45] << 8 | tmpChars[44];
+    data[cursorData].crcCheck = tmpChars[46];
 
     int angleStep = 0;
 
-    if (data.endAngle > data.startAngle)
+    if (data[cursorData].endAngle > data[cursorData].startAngle)
     {
-        angleStep = (data.endAngle - data.startAngle) / (data.dataLength - 1);
+        angleStep = (data[cursorData].endAngle - data[cursorData].startAngle) / (data[cursorData].dataLength - 1);
     }
     else
     {
-        angleStep = (data.endAngle + (360 * 100 - data.startAngle)) / (data.dataLength - 1);
+        angleStep = (data[cursorData].endAngle + (360 * 100 - data[cursorData].startAngle)) / (data[cursorData].dataLength - 1);
     }
+    // SERIAL_PC.print(angleStep);
+    // SERIAL_PC.println();
     for (int i = 0; i < PACKET_SIZE; i++)
     {
-        int raw_deg = data.startAngle + i * angleStep;
-        data.dataPoint[i].angle = (raw_deg <= 360 * 100 ? raw_deg : raw_deg - 360 * 100);
-        data.dataPoint[i].confidence = (tmpChars[8 + i * 3]);
-        data.dataPoint[i].distance = (int(tmpChars[8 + i * 3 - 1] << 8 | tmpChars[8 + i * 3 - 2]));
+        int raw_deg = data[cursorData].startAngle + i * angleStep;
+        data[cursorData].dataPoint[i].angle = (raw_deg <= 360 * 100 ? raw_deg : raw_deg - 360 * 100);
+        data[cursorData].dataPoint[i].confidence = (tmpChars[8 + i * 3]);
+        data[cursorData].dataPoint[i].distance = (int(tmpChars[8 + i * 3 - 1] << 8 | tmpChars[8 + i * 3 - 2]));
     }
+    cursorData++;
+    if (cursorData >= LD06::PACKET_NUMBER)
+    {
+        // for (size_t i = 0; i < 40; i++)
+        {
+            /*
+            uint8_t i = 0;
+            float a = 0;
+            SERIAL_PC.print("Start ");
+            a = data[i].startAngle / 100;
+            SERIAL_PC.println(a);
+            SERIAL_PC.print("End ");
+            a = data[i].endAngle / 100;
+            SERIAL_PC.println(a);
+            SERIAL_PC.println();*/
+            // for (int j = 0; j < PACKET_SIZE; j++)
+            //{
+            //     Print_lidar_data(data[i].dataPoint[j]);
+            // }
+        }
+        Filter_lidar_data();
+        cursorData = 0;
+    }
+    // Print_lidar_data(data.dataPoint[PACKET_SIZE / 2]);
 }
 
 void LD06::Filter_lidar_data()
 {
     int16_t dataN = 0;
     int16_t obsN = 0;
-    for (int i = 0; i < PACKET_SIZE; i++)
+    for (int i = 0; i < cursorData; i++)
     {
-
-        auto node = data.dataPoint[i];
-        int dist = node.distance;   // mm
-        double angle = node.angle;  // degrees
-        int conf = node.confidence; // 0-255
-
-        // Ignore too close points
-        if (dist < MIN_DISTANCE || dist > MAX_DISTANCE || node.confidence < MIN_QUALITY)
-            continue;
-
-        int robot_x = 0;
-        int robot_y = 0;
-        double robot_theta = 0;
-
-        // Compute detected position
-        const float lidar_x = robot_x + dist * cos((angle / 100 + robot_theta) * M_PI / 180);
-        const float lidar_y = robot_y + dist * sin((angle / 100 + robot_theta) * M_PI / 180);
-
-        // Ignore points outside of the table
-        bool filterTable = false;
-        if (filterTable)
+        for (int j = 0; j < PACKET_SIZE; j++)
         {
-            const float table_margin = 0;
-            if (lidar_x < table_margin || lidar_x > 2000 - table_margin ||
-                lidar_y < table_margin || lidar_y > 3000 - table_margin)
+
+            auto node = data[i].dataPoint[j];
+            int dist = node.distance;   // mm
+            double angle = node.angle;  // degrees
+            int conf = node.confidence; // 0-255
+
+            // Ignore too close points
+            if (dist < MIN_DISTANCE || dist > MAX_DISTANCE || node.confidence < MIN_QUALITY)
                 continue;
-        }
 
-        if (obsN < LD06::obs_length && dataN < LD06::max_data_obs)
-        {
-            // Start scan
+            int robot_x = 0;
+            int robot_y = 0;
+            double robot_theta = 0;
 
-            // Determine if it is a new obstacle
-            if (dataN > 0)
+            // Compute detected position
+            const float lidar_x = robot_x + dist * cos((angle / 100 + robot_theta) * M_PI / 180);
+            const float lidar_y = robot_y + dist * sin((angle / 100 + robot_theta) * M_PI / 180);
+
+            // Ignore points outside of the table
+            bool filterTable = false;
+            if (filterTable)
             {
-                // the limit of passing to new obstacle
-                if (fabsf(lidar_obstacle[obsN].data[dataN - 1].dist - dist) > 100 ||
-                    fabsf(lidar_obstacle[obsN].data[dataN - 1].angle) - fabsf(angle) > 5)
+                const float table_margin = 0;
+                if (lidar_x < table_margin || lidar_x > 2000 - table_margin ||
+                    lidar_y < table_margin || lidar_y > 3000 - table_margin)
+                    continue;
+            }
+
+            if (obsN < LD06::obs_length && dataN < LD06::max_data_obs)
+            {
+                // Start scan
+
+                // Determine if it is a new obstacle
+                if (dataN > 0)
                 {
-                    // if we have sufficient data for this obstacle
-                    if (dataN >= LD06::min_data_obs)
+                    // the limit of passing to new obstacle
+                    if (fabsf(lidar_obstacle[obsN].data[dataN - 1].dist - dist) > 100 ||
+                        fabsf(lidar_obstacle[obsN].data[dataN - 1].angle) - fabsf(angle) > 5)
                     {
-                        // Reset the rest of the data for this obstacle
-                        for (int16_t d = dataN; d < LD06::max_data_obs; d++)
+                        // if we have sufficient data for this obstacle
+                        if (dataN >= LD06::min_data_obs)
                         {
-                            lidar_obstacle[obsN].data[d].angle = 0;
-                            lidar_obstacle[obsN].data[d].dist = 0;
-                            lidar_obstacle[obsN].data[d].conf = 0;
-                            lidar_obstacle[obsN].data[d].x = 0;
-                            lidar_obstacle[obsN].data[d].y = 0;
+                            // Reset the rest of the data for this obstacle
+                            for (int16_t d = dataN; d < LD06::max_data_obs; d++)
+                            {
+                                lidar_obstacle[obsN].data[d].angle = 0;
+                                lidar_obstacle[obsN].data[d].dist = 0;
+                                lidar_obstacle[obsN].data[d].conf = 0;
+                                lidar_obstacle[obsN].data[d].x = 0;
+                                lidar_obstacle[obsN].data[d].y = 0;
+                            }
+                            lidar_obstacle[obsN].dataT = dataN;
+                            obsN++;
+                            dataN = 0;
                         }
-                        lidar_obstacle[obsN].dataT = dataN;
-                        obsN++;
-                        dataN = 0;
+                        else
+                            dataN = 0;
                     }
-                    else
-                        dataN = 0;
+                }
+                if (obsN < LD06::obs_length)
+                {
+                    // calculate the coord of current lidar point
+                    lidar_obstacle[obsN].data[dataN].angle = angle;
+                    lidar_obstacle[obsN].data[dataN].dist = dist;
+                    lidar_obstacle[obsN].data[dataN].conf = conf;
+                    lidar_obstacle[obsN].data[dataN].x = lidar_x;
+                    lidar_obstacle[obsN].data[dataN].y = lidar_y;
+                    dataN++;
                 }
             }
-            if (obsN < LD06::obs_length)
-            {
-                // calculate the coord of current lidar point
-                lidar_obstacle[obsN].data[dataN].angle = angle;
-                lidar_obstacle[obsN].data[dataN].dist = dist;
-                lidar_obstacle[obsN].data[dataN].conf = conf;
-                lidar_obstacle[obsN].data[dataN].x = lidar_x;
-                lidar_obstacle[obsN].data[dataN].y = lidar_y;
-                dataN++;
-            }
-        }
-        if (dataN >= max_data_obs)
-        {
-            lidar_obstacle[obsN].dataT = max_data_obs;
-            obsN++;
-            dataN = 0;
-        }
 
-        // Print_lidar_data(node, lidar_x, lidar_y);
+            if (dataN >= max_data_obs)
+            {
+                lidar_obstacle[obsN].dataT = max_data_obs;
+                obsN++;
+                dataN = 0;
+            }
+
+            // Print_lidar_data(node, lidar_x, lidar_y);
+        }
     }
 
     if (obsN == 0 && dataN == 0)
     {
+
         // Nothing found !
 
         // Reset all of the data
@@ -256,6 +288,8 @@ void LD06::Filter_lidar_data()
                     SERIAL_PC.print(";");
                     SERIAL_PC.print(lidar_obstacle[o].data[(int)((lidar_obstacle[o].dataT - 1) / 2)].conf);
                     SERIAL_PC.print(";");
+                    SERIAL_PC.print(o);
+                    SERIAL_PC.print(";");
                     SERIAL_PC.print(mid.x);
                     SERIAL_PC.print(";");
                     SERIAL_PC.print(mid.y);
@@ -273,6 +307,8 @@ void LD06::Filter_lidar_data()
                     SERIAL_PC.print(lidar_obstacle[o].data[(int)((lidar_obstacle[o].dataT - 1) / 2)].dist);
                     SERIAL_PC.print(";");
                     SERIAL_PC.print(lidar_obstacle[o].data[(int)((lidar_obstacle[o].dataT - 1) / 2)].conf);
+                    SERIAL_PC.print(";");
+                    SERIAL_PC.print(o);
                     SERIAL_PC.print(";");
                     SERIAL_PC.print(center.x);
                     SERIAL_PC.print(";");
