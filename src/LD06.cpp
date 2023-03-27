@@ -6,6 +6,9 @@ uint8_t cursorTmp = 0;
 
 void LD06::Init()
 {
+    queue = xQueueCreate(queueSize, sizeof(LD06::PointLidar));
+    if (queue == NULL) SERIAL_PC.println("Error creating the queue");
+
     for (size_t i = 0; i < obs_length; i++)
     {
         for (size_t j = 0; j < max_data_obs; j++)
@@ -86,7 +89,7 @@ void LD06::Calc_lidar_data()
         data[cursorData].dataPoint[i].confidence = (tmpChars[8 + i * 3]);
         data[cursorData].dataPoint[i].distance = (int(tmpChars[8 + i * 3 - 1] << 8 | tmpChars[8 + i * 3 - 2]));
     }
-    cursorData++;
+    // cursorData++;
     if (cursorData >= LD06::PACKET_NUMBER)
     {
         // for (size_t i = 0; i < 40; i++)
@@ -106,10 +109,27 @@ void LD06::Calc_lidar_data()
             //     Print_lidar_data(data[i].dataPoint[j]);
             // }
         }
-        Filter_lidar_data();
+        // Filter_lidar_data();
         cursorData = 0;
     }
     // Print_lidar_data(data.dataPoint[PACKET_SIZE / 2]);
+}
+
+void LD06::Send_queue_data()
+{
+    for (int i = 0; i < PACKET_SIZE; i++)
+    {
+        xQueueSend(queue, &data[cursorData].dataPoint[i], 0);
+    }
+}
+
+int LD06::Get_queue_length() { return uxQueueMessagesWaiting(queue); }
+
+LD06::PointLidar LD06::Get_queue_data()
+{
+    PointLidar element;
+    xQueueReceive(queue, &element, portTICK_PERIOD_MS * 1);
+    return element;
 }
 
 void LD06::Filter_lidar_data()

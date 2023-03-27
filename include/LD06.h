@@ -20,7 +20,11 @@ public:
     const int MAX_DISTANCE = 300;
     const int MIN_QUALITY = 100;
 
-public:
+   public:
+    QueueHandle_t queue;
+    int queueSize = 500;
+
+   public:
     struct PolarPoint
     {
         float angle;
@@ -74,6 +78,9 @@ public:
 public:
     void Read_lidar_data();
     void Calc_lidar_data();
+    void Send_queue_data();
+    int Get_queue_length();
+    LD06::PointLidar Get_queue_data();
     void Filter_lidar_data();
     Point findCircle(Point p1, Point p2, Point p3);
     Point findCircle(float x1, float y1, float x2, float y2, float x3, float y3);
