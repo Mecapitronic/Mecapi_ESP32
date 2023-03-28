@@ -87,7 +87,10 @@ void LD06::Calc_lidar_data()
         data.dataPoint[i].angle = (raw_deg <= 360 * 100 ? raw_deg : raw_deg - 360 * 100);
         data.dataPoint[i].confidence = (tmpChars[8 + i * 3]);
         data.dataPoint[i].distance = (int(tmpChars[8 + i * 3 - 1] << 8 | tmpChars[8 + i * 3 - 2]));
-        xQueueSend(queue, &data.dataPoint[i], 0);
+        // Filter point before sending to queue : increase speed for later calculus
+        if (data.dataPoint[i].distance > MIN_DISTANCE && data.dataPoint[i].distance < MAX_DISTANCE &&
+            data.dataPoint[i].confidence > MIN_QUALITY)
+            xQueueSend(queue, &data.dataPoint[i], 0);
     }
 }
 
@@ -105,7 +108,7 @@ void LD06::Filter_lidar_data(PointLidar p[], int size)
         int conf = node.confidence;  // 0-255
 
         // Ignore too close points
-        if (dist < MIN_DISTANCE || dist > MAX_DISTANCE || node.confidence < MIN_QUALITY) continue;
+        //if (dist < MIN_DISTANCE || dist > MAX_DISTANCE || node.confidence < MIN_QUALITY) continue;
 
         int robot_x = 0;
         int robot_y = 0;

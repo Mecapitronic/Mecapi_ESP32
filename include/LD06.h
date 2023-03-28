@@ -15,7 +15,7 @@ public:
 
 public:
     const int MIN_DISTANCE = 0;
-    const int MAX_DISTANCE = 300;
+    const int MAX_DISTANCE = 500;
     const int MIN_QUALITY = 100;
 
    public:
