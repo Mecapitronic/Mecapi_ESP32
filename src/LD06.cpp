@@ -21,6 +21,8 @@ void LD06::Init()
         }
         lidar_obstacle[i].dataT = 0;
     }
+    // we change the TX pin to 4 because the pin 10 is not available, and we do not use RX pin for now
+    SERIAL_ROBOT.begin(230400, SERIAL_8N1, 9, 4);
     SERIAL_LIDAR.begin(230400);
 }
 
@@ -34,7 +36,7 @@ void LD06::Read_lidar_data()
         if (SERIAL_LIDAR.available() > 0)
         {
             tmpInt = SERIAL_LIDAR.read();
-
+            SERIAL_ROBOT.write(tmpInt);
             if (tmpInt == 0x54 && cursorTmp == 0)
             {
                 tmpChars[cursorTmp++] = tmpInt;

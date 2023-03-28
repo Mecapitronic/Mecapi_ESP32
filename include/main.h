@@ -5,6 +5,7 @@
 
 #define SERIAL_PC Serial
 #define SERIAL_LIDAR Serial2
+#define SERIAL_ROBOT Serial1
 
 #include "LD06.h"
 
