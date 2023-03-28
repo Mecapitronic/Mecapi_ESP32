@@ -54,13 +54,30 @@ void Task1code(void *pvParameters)
 // Note the 1 Tick delay, this is need so the watchdog doesn't get confused
 void Task2code(void *pvParameters)
 {
+    int lastAngle = 0;
+    int index = 0;
+    LD06::PointLidar turn[ld06.queueSize];
+    LD06::PointLidar p;
     while (1)
     {
-        LD06::PointLidar p;
-        while (ld06.Get_queue_length() > 0)
+        if (uxQueueMessagesWaiting(ld06.queue) > 0)
         {
-            p = ld06.Get_queue_data();
-            // ld06.Print_lidar_data(p);
+            xQueueReceive(ld06.queue, &p, portTICK_PERIOD_MS * 0);
+
+            // a new turn is starting
+            if (p.angle < lastAngle)
+            {
+                // we process the previous data
+                if (index > 0)
+                {
+                    // SERIAL_PC.println(index);
+                    ld06.Filter_lidar_data(turn, index);
+                }
+                index = 0;
+            }
+            turn[index] = p;
+            if (index < ld06.queueSize) index++;
+            lastAngle = p.angle;
         }
         vTaskDelay(1);
     }

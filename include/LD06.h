@@ -13,8 +13,6 @@ public:
 
     static const int PACKET_SIZE = 12;
 
-    static const int PACKET_NUMBER = 50;
-
 public:
     const int MIN_DISTANCE = 0;
     const int MAX_DISTANCE = 300;
@@ -78,12 +76,12 @@ public:
 public:
     void Read_lidar_data();
     void Calc_lidar_data();
-    void Send_queue_data();
-    int Get_queue_length();
-    LD06::PointLidar Get_queue_data();
-    void Filter_lidar_data();
+
+    void Filter_lidar_data(PointLidar p[], int size);
+
     Point findCircle(Point p1, Point p2, Point p3);
     Point findCircle(float x1, float y1, float x2, float y2, float x3, float y3);
+
     void Print_lidar_data(PointLidar data);
     void Print_lidar_data2(PointLidar data, float x, float y);
 };
