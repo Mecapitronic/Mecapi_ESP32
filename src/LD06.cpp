@@ -102,6 +102,8 @@ void LD06::Filter_lidar_data(PointLidar p[], int size)
     {
         auto node = p[j];
 
+        SERIAL_PC.print(j);
+        SERIAL_PC.print(";");
         Print_lidar_data(node);
         int dist = node.distance;    // mm
         double angle = node.angle;   // degrees
@@ -137,7 +139,7 @@ void LD06::Filter_lidar_data(PointLidar p[], int size)
             {
                 // the limit of passing to new obstacle
                 if (fabsf(lidar_obstacle[obsN].data[dataN - 1].dist - dist) > 100 ||
-                    fabsf(lidar_obstacle[obsN].data[dataN - 1].angle) - fabsf(angle) > 5)
+                    fabsf(lidar_obstacle[obsN].data[dataN - 1].angle) - fabsf(angle) > 5 * 100)
                 {
                     // if we have sufficient data for this obstacle
                     if (dataN >= LD06::min_data_obs)
@@ -256,15 +258,6 @@ void LD06::Filter_lidar_data(PointLidar p[], int size)
                 // center found by circle is too far from the data
                 if (fabsf(center.x - mid.x) > 5 || fabsf(center.y - mid.y) > 5)
                 {
-                    // SERIAL_PC.print("Obstacle mid ");
-                    // SERIAL_PC.print(lidar_obstacle[o].dataT);
-                    // SERIAL_PC.print(";");
-                    SERIAL_PC.print(lidar_obstacle[o].data[(int)((lidar_obstacle[o].dataT - 1) / 2)].angle);
-                    SERIAL_PC.print(";");
-                    SERIAL_PC.print(lidar_obstacle[o].data[(int)((lidar_obstacle[o].dataT - 1) / 2)].dist);
-                    SERIAL_PC.print(";");
-                    SERIAL_PC.print(lidar_obstacle[o].data[(int)((lidar_obstacle[o].dataT - 1) / 2)].conf);
-                    SERIAL_PC.print(";");
                     SERIAL_PC.print(o);
                     SERIAL_PC.print(";");
                     SERIAL_PC.print(mid.x);
@@ -276,15 +269,6 @@ void LD06::Filter_lidar_data(PointLidar p[], int size)
                 }
                 else
                 {
-                    // SERIAL_PC.print("Obstacle center ");
-                    // SERIAL_PC.print(lidar_obstacle[o].dataT);
-                    // SERIAL_PC.print(";");
-                    SERIAL_PC.print(lidar_obstacle[o].data[(int)((lidar_obstacle[o].dataT - 1) / 2)].angle);
-                    SERIAL_PC.print(";");
-                    SERIAL_PC.print(lidar_obstacle[o].data[(int)((lidar_obstacle[o].dataT - 1) / 2)].dist);
-                    SERIAL_PC.print(";");
-                    SERIAL_PC.print(lidar_obstacle[o].data[(int)((lidar_obstacle[o].dataT - 1) / 2)].conf);
-                    SERIAL_PC.print(";");
                     SERIAL_PC.print(o);
                     SERIAL_PC.print(";");
                     SERIAL_PC.print(center.x);

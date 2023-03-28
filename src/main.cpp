@@ -8,7 +8,7 @@ void setup()
 {
     // put your setup code here, to run once:
     delay(500);
-    SERIAL_PC.begin(230400);
+    SERIAL_PC.begin(500000);
     SERIAL_PC.print("Start PC ! ");
     ld06.Init();
     SERIAL_PC.print("Start Lidar ! ");
@@ -46,7 +46,6 @@ void Task1code(void *pvParameters)
     {
         ld06.Read_lidar_data();
         ld06.Calc_lidar_data();
-        ld06.Send_queue_data();
         vTaskDelay(1);
     }
 }
