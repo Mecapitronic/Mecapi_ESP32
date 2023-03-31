@@ -22,7 +22,7 @@ void LD06::Init()
         lidar_obstacle[i].dataT = 0;
     }
     // we change the TX pin to 4 because the pin 10 is not available, and we do not use RX pin for now
-    SERIAL_ROBOT.begin(230400, SERIAL_8N1, 9, 4);
+    SERIAL_ROBOT.begin(250000, SERIAL_8N1, 9, 4);
     SERIAL_LIDAR.begin(230400);
 }
 
@@ -237,14 +237,17 @@ void LD06::Filter_lidar_data(PointLidar p[], int size)
             if (lidar_obstacle[o].dataT >= min_data_obs)
             {
                 Point center = {0, 0};
-                if (lidar_obstacle[o].dataT >= 3)
+
+                /*if (lidar_obstacle[o].dataT >= 3)
                 {
                     // get the center with the farthest 3 points of the batch
                     Point p1 = {(lidar_obstacle[o].data[0].x), (lidar_obstacle[o].data[0].y)};
-                    Point p2 = {(lidar_obstacle[o].data[lidar_obstacle[o].dataT - 1].x), (lidar_obstacle[o].data[lidar_obstacle[o].dataT - 1].y)};
-                    Point p3 = {(lidar_obstacle[o].data[(int)((lidar_obstacle[o].dataT - 1) / 2)].x), (lidar_obstacle[o].data[(int)((lidar_obstacle[o].dataT - 1) / 2)].y)};
+                    Point p2 = {(lidar_obstacle[o].data[lidar_obstacle[o].dataT - 1].x),
+                                (lidar_obstacle[o].data[lidar_obstacle[o].dataT - 1].y)};
+                    Point p3 = {(lidar_obstacle[o].data[(int)((lidar_obstacle[o].dataT - 1) / 2)].x),
+                                (lidar_obstacle[o].data[(int)((lidar_obstacle[o].dataT - 1) / 2)].y)};
                     center = findCircle(p1, p2, p3);
-                }
+                }*/
                 // get the middle point of all the data
                 Point mid = {0, 0};
                 for (int16_t d = 0; d < lidar_obstacle[o].dataT; d++)
@@ -256,28 +259,31 @@ void LD06::Filter_lidar_data(PointLidar p[], int size)
                 mid.y = mid.y / lidar_obstacle[o].dataT;
 
                 // center found by circle is too far from the data
-                if (fabsf(center.x - mid.x) > 5 || fabsf(center.y - mid.y) > 5)
+                // if (fabsf(center.x - mid.x) > 5 || fabsf(center.y - mid.y) > 5)
+                //{
+                SERIAL_ROBOT.print(o);
+                SERIAL_ROBOT.print(";");
+                SERIAL_ROBOT.print((int)mid.x);
+                SERIAL_ROBOT.print(";");
+                SERIAL_ROBOT.print((int)mid.y);
+                SERIAL_ROBOT.print('\n');
+                // if (obstacle_debug)
+                //     L::d << sl << "Obstacle mid " << o << " : x=" << mid.x * 1000 << "mm y=" << mid.y * 1000 <<
+                //     "mm" << el;
+                //}
+                /*else
                 {
                     SERIAL_PC.print(o);
                     SERIAL_PC.print(";");
-                    SERIAL_PC.print(mid.x);
+                    SERIAL_PC.print((int)center.x);
                     SERIAL_PC.print(";");
-                    SERIAL_PC.print(mid.y);
+                    SERIAL_PC.print((int)center.y);
                     SERIAL_PC.print('\n');
                     // if (obstacle_debug)
-                    //     L::d << sl << "Obstacle mid " << o << " : x=" << mid.x * 1000 << "mm y=" << mid.y * 1000 << "mm" << el;
-                }
-                else
-                {
-                    SERIAL_PC.print(o);
-                    SERIAL_PC.print(";");
-                    SERIAL_PC.print(center.x);
-                    SERIAL_PC.print(";");
-                    SERIAL_PC.print(center.y);
-                    SERIAL_PC.print('\n');
-                    // if (obstacle_debug)
-                    //     L::d << sl << "Obstacle center " << o << " : x=" << center.x * 1000 << "mm y=" << center.y * 1000 << "mm" << el;
-                }
+                    //     L::d << sl << "Obstacle center " << o << " : x=" << center.x * 1000 << "mm y=" <<
+                center.y *
+                    //     1000 << "mm" << el;
+                }*/
             }
             else
             {
