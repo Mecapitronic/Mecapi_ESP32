@@ -59,9 +59,9 @@ void LD06::Read_lidar_data()
     }
 }
 
-LD06::PacketLidar data;
-void LD06::Calc_lidar_data()
+LD06::PacketLidar LD06::Calc_lidar_data()
 {
+    PacketLidar data;
     data.header = tmpChars[0];
     data.dataLength = 0x1F & tmpChars[1];
     data.radarSpeed = tmpChars[3] << 8 | tmpChars[2];
@@ -87,11 +87,8 @@ void LD06::Calc_lidar_data()
         data.dataPoint[i].angle = (raw_deg <= 360 * 100 ? raw_deg : raw_deg - 360 * 100);
         data.dataPoint[i].confidence = (tmpChars[8 + i * 3]);
         data.dataPoint[i].distance = (int(tmpChars[8 + i * 3 - 1] << 8 | tmpChars[8 + i * 3 - 2]));
-        // Filter point before sending to queue : increase speed for later calculus
-        if (data.dataPoint[i].distance > MIN_DISTANCE && data.dataPoint[i].distance < MAX_DISTANCE &&
-            data.dataPoint[i].confidence > MIN_QUALITY)
-            xQueueSend(queue, &data.dataPoint[i], 0);
     }
+    return data;
 }
 
 void LD06::Filter_lidar_data(PointLidar p[], int size)

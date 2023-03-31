@@ -4,9 +4,19 @@ LD06 ld06;
 TaskHandle_t Task1;
 TaskHandle_t Task2;
 
+QueueHandle_t queue;
+int queueSize = 500;
+
+const int MIN_DISTANCE = 0;
+const int MAX_DISTANCE = 500;
+const int MIN_QUALITY = 100;
+
 void setup()
 {
     // put your setup code here, to run once:
+    queue = xQueueCreate(queueSize, sizeof(LD06::PointLidar));
+    if (queue == NULL) SERIAL_PC.println("Error creating the queue");
+
     delay(500);
     SERIAL_PC.begin(500000);
     SERIAL_PC.print("Start PC ! ");
@@ -45,7 +55,14 @@ void Task1code(void *pvParameters)
     while (1)
     {
         ld06.Read_lidar_data();
-        ld06.Calc_lidar_data();
+        LD06::PacketLidar data = ld06.Calc_lidar_data();
+        for (int i = 0; i < LD06::PACKET_SIZE; i++)
+        {
+            // Filter point before sending to queue : increase speed for later calculus
+            if (data.dataPoint[i].distance > MIN_DISTANCE && data.dataPoint[i].distance < MAX_DISTANCE &&
+                data.dataPoint[i].confidence > MIN_QUALITY)
+                xQueueSend(queue, &data.dataPoint[i], 0);
+        }
         vTaskDelay(1);
     }
 }
@@ -55,13 +72,13 @@ void Task2code(void *pvParameters)
 {
     int lastAngle = 0;
     int index = 0;
-    LD06::PointLidar turn[ld06.queueSize];
+    LD06::PointLidar turn[queueSize];
     LD06::PointLidar p;
     while (1)
     {
-        if (uxQueueMessagesWaiting(ld06.queue) > 0)
+        if (uxQueueMessagesWaiting(queue) > 0)
         {
-            xQueueReceive(ld06.queue, &p, portTICK_PERIOD_MS * 0);
+            xQueueReceive(queue, &p, portTICK_PERIOD_MS * 0);
 
             // a new turn is starting
             if (p.angle < lastAngle)

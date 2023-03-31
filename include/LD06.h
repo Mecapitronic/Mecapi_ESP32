@@ -74,8 +74,8 @@ public:
     void Init();
 
 public:
-    void Read_lidar_data();
-    void Calc_lidar_data();
+void Read_lidar_data();
+PacketLidar Calc_lidar_data();
 
     void Filter_lidar_data(PointLidar p[], int size);
 
