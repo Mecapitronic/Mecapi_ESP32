@@ -1,6 +1,5 @@
 #include "main.h"
 
-LD06 ld06;
 TaskHandle_t Task1;
 TaskHandle_t Task2;
 
@@ -14,13 +13,15 @@ const int MIN_QUALITY = 100;
 void setup()
 {
     // put your setup code here, to run once:
+    Debugger::init(VERBOSE);
+
     queue = xQueueCreate(queueSize, sizeof(LD06::PointLidar));
     if (queue == NULL) SERIAL_PC.println("Error creating the queue");
 
     delay(500);
     SERIAL_PC.begin(500000);
     SERIAL_PC.print("Start PC ! ");
-    ld06.Init();
+    LD06::Init();
     SERIAL_PC.print("Start Lidar ! ");
 
     // create a task that will be executed in the Task1code() function, with priority 1 and executed on core 0
@@ -54,9 +55,9 @@ void Task1code(void *pvParameters)
 {
     while (1)
     {
-        ld06.Read_lidar_data();
-        LD06::PacketLidar data = ld06.Calc_lidar_data();
-        for (int i = 0; i < LD06::PACKET_SIZE; i++)
+        LD06::Read_lidar_data();
+        LD06::PacketLidar data = LD06::Calc_lidar_data();
+        for (int i = 0; i < PACKET_SIZE; i++)
         {
             // Filter point before sending to queue : increase speed for later calculus
             if (data.dataPoint[i].distance > MIN_DISTANCE && data.dataPoint[i].distance < MAX_DISTANCE &&
@@ -87,12 +88,12 @@ void Task2code(void *pvParameters)
                 if (index > 0)
                 {
                     // SERIAL_PC.println(index);
-                    ld06.Filter_lidar_data(turn, index);
+                    LD06::Filter_lidar_data(turn, index);
                 }
                 index = 0;
             }
             turn[index] = p;
-            if (index < ld06.queueSize) index++;
+            if (index < queueSize) index++;
             lastAngle = p.angle;
         }
         vTaskDelay(1);

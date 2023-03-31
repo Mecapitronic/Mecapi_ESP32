@@ -7,6 +7,9 @@
 #define SERIAL_LIDAR Serial2
 #define SERIAL_ROBOT Serial1
 
+#include "Structure.h"
+
+#include "Debugger.h"
 #include "LD06.h"
 
 void Task1code(void* pvParameters);
