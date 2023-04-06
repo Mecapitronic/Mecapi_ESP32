@@ -19,10 +19,10 @@ void setup()
     if (queue == NULL) SERIAL_PC.println("Error creating the queue");
 
     delay(500);
-    SERIAL_PC.begin(500000);
-    SERIAL_PC.print("Start PC ! ");
+    // SERIAL_PC.begin(230400);
+    // SERIAL_PC.print("Start PC ! ");
     LD06::Init();
-    SERIAL_PC.print("Start Lidar ! ");
+    // SERIAL_PC.print("Start Lidar ! ");
 
     // create a task that will be executed in the Task1code() function, with priority 1 and executed on core 0
     xTaskCreatePinnedToCore(Task1code, /* Task function. */

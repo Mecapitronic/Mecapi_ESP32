@@ -23,7 +23,7 @@ void init(Level level)
 {
     if (enabled)
     {
-        SERIAL_DEBUG.begin(500000);
+        SERIAL_DEBUG.begin(230400);
         debugLevel = level;
 
         if (SERIAL_DEBUG.available() <= 0)

@@ -22,7 +22,7 @@ void Init()
         lidar_obstacle[i].dataT = 0;
     }
     // we change the TX pin to 4 because the pin 10 is not available, and we do not use RX pin for now
-    SERIAL_ROBOT.begin(250000, SERIAL_8N1, 9, 4);
+    SERIAL_ROBOT.begin(125000, SERIAL_8N1, 9, 4);
     SERIAL_LIDAR.begin(230400);
 }
 
@@ -103,8 +103,8 @@ void Filter_lidar_data(PointLidar p[], int size)
         double angle = node.angle;   // degrees
         int conf = node.confidence;  // 0-255
 
-        int robot_x = 0;
-        int robot_y = 0;
+        int robot_x = 500;
+        int robot_y = 500;
         double robot_theta = 0;
 
         // Compute detected position
