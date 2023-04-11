@@ -12,7 +12,7 @@ struct PolarPoint
     float y;
 
     PolarPoint();
-    PolarPoint(float _angle, u_int16_t _distance, uint16_t _confidence);
+    PolarPoint(float _angle, u_int16_t _distance, uint16_t _confidence, float _x, float _y);
     void Print(HardwareSerial s, PolarPoint p, bool debug = false);
 };
 

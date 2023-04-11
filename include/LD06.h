@@ -12,7 +12,7 @@ namespace LD06
 
 // Initialize obstacle
 int const obs_length = 50;
-int const obs_max_point = 20;
+// int const obs_max_point = 20;
 int const obs_min_point = 3;
 
 struct PointLidar
@@ -36,8 +36,9 @@ struct PacketLidar
 
 struct Obstacle
 {
-    PolarPoint data[obs_max_point];
-    int dataT;
+    static constexpr size_t kMaxPoints = 20;
+    PolarPoint data[kMaxPoints];
+    int size;
 };
 
 void Init();
