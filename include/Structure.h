@@ -25,4 +25,11 @@ struct Point
     void Print(HardwareSerial s, Point p, bool debug = false);
 };
 
+struct Robot_t
+{
+    int x;
+    int y;
+    double angle;
+};
+
 #endif

@@ -18,6 +18,7 @@ void setup()
     queue = xQueueCreate(queueSize, sizeof(LD06::PointLidar));
     if (queue == NULL) SERIAL_PC.println("Error creating the queue");
 
+    Robot::Init();
     delay(500);
     // SERIAL_PC.begin(230400);
     // SERIAL_PC.print("Start PC ! ");
@@ -56,6 +57,9 @@ void Task1code(void *pvParameters)
     while (1)
     {
         LD06::Read_lidar_data();
+        if (Robot::ReadSerial())
+        {
+        }
         LD06::PacketLidar data = LD06::Calc_lidar_data();
         for (int i = 0; i < PACKET_SIZE; i++)
         {

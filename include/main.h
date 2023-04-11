@@ -11,6 +11,7 @@
 
 #include "Debugger.h"
 #include "LD06.h"
+#include "Robot.h"
 
 void Task1code(void* pvParameters);
 void Task2code(void* pvParameters);
