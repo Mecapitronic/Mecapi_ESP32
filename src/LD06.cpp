@@ -104,7 +104,7 @@ void Filter_lidar_data(PointLidar p[], int size)
 
         const int dist = node.distance;    // mm
         const double angle = node.angle;   // degrees
-        const int conf = node.confidence;  // 0-255
+        const uint16_t conf = node.confidence;  // 0-255
 
         int robot_x = 500;
         int robot_y = 500;
@@ -351,7 +351,7 @@ PolarPoint::PolarPoint()
     y = 0;
 }
 
-PolarPoint::PolarPoint(float _angle, uint16_t _distance, uint16_t _confidence, float _x, float _y)
+PolarPoint::PolarPoint(double _angle, int _distance, uint16_t _confidence, float _x, float _y)
 {
     angle = _angle;
     distance = _distance;

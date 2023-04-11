@@ -5,14 +5,14 @@
 
 struct PolarPoint
 {
-    float angle;
-    uint16_t distance;
+    double angle;
+    int distance;
     uint16_t confidence;
     float x;
     float y;
 
     PolarPoint();
-    PolarPoint(float _angle, u_int16_t _distance, uint16_t _confidence, float _x, float _y);
+    PolarPoint(double _angle, int _distance, uint16_t _confidence, float _x, float _y);
     void Print(HardwareSerial s, PolarPoint p, bool debug = false);
 };
 

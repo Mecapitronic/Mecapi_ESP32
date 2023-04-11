@@ -19,7 +19,7 @@ struct PointLidar
 {
     int angle;
     int distance;
-    int confidence;
+    uint16_t confidence;
 };
 
 struct PacketLidar
