@@ -95,6 +95,7 @@ void Filter_lidar_data(PointLidar p[], int size)
     int16_t data_count = 0;
     int16_t obs_count = 0;
     const int kObsMaxPoints = Obstacle::kMaxPoints;
+    Robot_t robot = Robot::GetRobot();
 
     for (int j = 0; j < size; j++)
     {
@@ -104,9 +105,9 @@ void Filter_lidar_data(PointLidar p[], int size)
         const double angle = node.angle;   // degrees
         const uint16_t conf = node.confidence;  // 0-255
 
-        int robot_x = 500;
-        int robot_y = 500;
-        double robot_theta = 0;
+        int robot_x = robot.x;
+        int robot_y = robot.y;
+        double robot_theta = robot.angle;
 
         // Compute detected position
         const float lidar_x = robot_x + dist * cos((angle / 100 + robot_theta) * M_PI / 180);
@@ -117,7 +118,7 @@ void Filter_lidar_data(PointLidar p[], int size)
         if (filterTable)
         {
             // the margin represent the distance between the center of the obstacle and the edges of the table
-            const float table_margin = 0;
+            const float table_margin = 50;
             if (lidar_x < table_margin || lidar_x > 2000 - table_margin || lidar_y < table_margin || lidar_y > 3000 - table_margin) continue;
         }
 

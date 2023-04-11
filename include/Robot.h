@@ -9,6 +9,7 @@ namespace Robot
 void Init();
 boolean ReadSerial();
 void Analyze();
+Robot_t GetRobot();
 void Print();
 
 }  // namespace Robot

@@ -60,6 +60,8 @@ void Analyze()
     int8_t endl = tmpChars[7];
 }
 
+Robot_t GetRobot() { return robot; }
+
 void Print()
 {
     SERIAL_PC.print("X: ");

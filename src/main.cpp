@@ -60,7 +60,7 @@ void Task1code(void *pvParameters)
         if (Robot::ReadSerial())
         {
             Robot::Analyze();
-            Robot::Print();
+            // Robot::Print();
         }
         LD06::PacketLidar data = LD06::Calc_lidar_data();
         for (int i = 0; i < PACKET_SIZE; i++)
