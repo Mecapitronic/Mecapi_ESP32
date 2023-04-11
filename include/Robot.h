@@ -8,7 +8,8 @@ namespace Robot
 
 void Init();
 boolean ReadSerial();
-void AnalyseData();
+void Analyze();
+void Print();
 
 }  // namespace Robot
 
