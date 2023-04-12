@@ -45,6 +45,7 @@ void Init();
 void ReadSerial();
 void Analyze();
 PacketLidar GetData();
+void Print();
 void Filter_lidar_data(PointLidar p[], int size);
 
 Point findCircle(Point p1, Point p2, Point p3);
