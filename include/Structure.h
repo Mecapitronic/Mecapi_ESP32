@@ -25,4 +25,11 @@ struct Robot_t
     double angle;
 };
 
+struct Obstacle
+{
+    static constexpr size_t kMaxPoints = 20;
+    PolarPoint data[kMaxPoints];
+    int size;
+};
+
 #endif

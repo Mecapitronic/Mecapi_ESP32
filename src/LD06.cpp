@@ -116,207 +116,97 @@ void Print()
     }
 }
 
-void Filter_lidar_data(PointLidar p[], int size)
+int16_t data_count = 0;
+int16_t obs_count = 0;
+void AggregatePoint(PointLidar point)
 {
-    int16_t data_count = 0;
-    int16_t obs_count = 0;
     const int kObsMaxPoints = Obstacle::kMaxPoints;
     Robot_t robot = Robot::GetData();
 
-    for (int j = 0; j < size; j++)
+    // Compute detected position
+    const float lidar_x = robot.x + point.distance * cos((point.angle / 100 + robot.angle / 100) * M_PI / 180);
+    const float lidar_y = robot.y + point.distance * sin((point.angle / 100 + robot.angle / 100) * M_PI / 180);
+
+    // Ignore points outside of the table
+    boolean filterTable = false;
+    if (filterTable)
     {
-        const auto node = p[j];
+        // the margin represent the distance between the center of the obstacle and the edges of the table
+        const float table_margin = 50;
+        if (lidar_x < table_margin || lidar_x > 2000 - table_margin || lidar_y < table_margin || lidar_y > 3000 - table_margin) return;
+    }
 
-        const int dist = node.distance;    // mm
-        const double angle = node.angle;   // degrees
-        const uint16_t conf = node.confidence;  // 0-255
-
-        int robot_x = robot.x;
-        int robot_y = robot.y;
-        double robot_theta = robot.angle;
-
-        // Compute detected position
-        const float lidar_x = robot_x + dist * cos((angle / 100 + robot_theta) * M_PI / 180);
-        const float lidar_y = robot_y + dist * sin((angle / 100 + robot_theta) * M_PI / 180);
-
-        // Ignore points outside of the table
-        boolean filterTable = false;
-        if (filterTable)
+    if (obs_count < obs_length && data_count < kObsMaxPoints)
+    {
+        // Determine if it is a new obstacle
+        if (data_count > 0)
         {
-            // the margin represent the distance between the center of the obstacle and the edges of the table
-            const float table_margin = 50;
-            if (lidar_x < table_margin || lidar_x > 2000 - table_margin || lidar_y < table_margin || lidar_y > 3000 - table_margin) continue;
-        }
-
-        if (obs_count < obs_length && data_count < kObsMaxPoints)
-        {
-            // Start scan
-
-            // Determine if it is a new obstacle
-            if (data_count > 0)
+            // the limit of passing to new obstacle
+            if (fabsf(lidar_obstacle[obs_count].data[data_count - 1].distance - point.distance) > 100 ||
+                fabsf(lidar_obstacle[obs_count].data[data_count - 1].angle) - fabsf(point.angle) > 5 * 100)
             {
-                // the limit of passing to new obstacle
-                if (fabsf(lidar_obstacle[obs_count].data[data_count - 1].distance - dist) > 100 ||
-                    fabsf(lidar_obstacle[obs_count].data[data_count - 1].angle) - fabsf(angle) > 5 * 100)
+                // if we have sufficient data for this obstacle, we move to save another obstacle
+                if (data_count >= obs_min_point)
                 {
-                    // if we have sufficient data for this obstacle
-                    if (data_count >= obs_min_point)
-                    {
-                        // Reset the rest of the data for this obstacle
-                        /*for (int16_t d = data_count; d < kObsMaxPoints; d++)
-                        {
-                            lidar_obstacle[obs_count].data[d].angle = 0;
-                            lidar_obstacle[obs_count].data[d].distance = 0;
-                            lidar_obstacle[obs_count].data[d].confidence = 0;
-                            lidar_obstacle[obs_count].data[d].x = 0;
-                            lidar_obstacle[obs_count].data[d].y = 0;
-                        }*/
-                        lidar_obstacle[obs_count].size = data_count;
-                        obs_count++;
-                        data_count = 0;
-                    }
-                    else
-                        data_count = 0;
+                    lidar_obstacle[obs_count].size = data_count;
+                    ComputeCenter();
+                    obs_count++;
+                    data_count = 0;
                 }
-            }
-            if (obs_count < obs_length)
-            {
-                // calculate the coord of current lidar point
-                lidar_obstacle[obs_count].data[data_count] = {angle, dist, conf, lidar_x, lidar_y};
-                // lidar_obstacle[obs_count].data[data_count].angle = angle;
-                // lidar_obstacle[obs_count].data[data_count].distance = dist;
-                // lidar_obstacle[obs_count].data[data_count].confidence = conf;
-                // lidar_obstacle[obs_count].data[data_count].x = lidar_x;
-                // lidar_obstacle[obs_count].data[data_count].y = lidar_y;
-                data_count++;
+                else
+                    data_count = 0;
             }
         }
-
-        if (data_count >= kObsMaxPoints)
-        {
-            lidar_obstacle[obs_count].size = kObsMaxPoints;
-            obs_count++;
-            data_count = 0;
-        }
-    }
-
-    if (obs_count == 0 && data_count == 0)
-    {
-        // Nothing found !
-
-        // Reset all of the data
-        for (int16_t o = 0; o < obs_length; o++)
-        {
-            for (int16_t d = 0; d < kObsMaxPoints; d++)
-            {
-                lidar_obstacle[o].data[d] = {0, 0, 0, 0, 0};
-                // lidar_obstacle[o].data[d].angle = 0;
-                // lidar_obstacle[o].data[d].distance = 0;
-                // lidar_obstacle[o].data[d].confidence = 0;
-                // lidar_obstacle[o].data[d].x = 0;
-                // lidar_obstacle[o].data[d].y = 0;
-            }
-            lidar_obstacle[o].size = 0;
-        }
-    }
-    else
-    {
         if (obs_count < obs_length)
         {
-            // Reset the rest of the data for the current obstacle
-            for (int16_t d = data_count; d < kObsMaxPoints; d++)
-            {
-                lidar_obstacle[obs_count].data[d] = {0, 0, 0, 0, 0};
-                // lidar_obstacle[obs_count].data[d].angle = 0;
-                // lidar_obstacle[obs_count].data[d].distance = 0;
-                // lidar_obstacle[obs_count].data[d].confidence = 0;
-                // lidar_obstacle[obs_count].data[d].x = 0;
-                // lidar_obstacle[obs_count].data[d].y = 0;
-            }
-            lidar_obstacle[obs_count].size = data_count;
-            if (obs_count < obs_length) obs_count++;
-
-            // Reset the rest of the data for the remaining obstacle
-            for (int16_t o = obs_count; o < obs_length; o++)
-            {
-                for (int16_t d = 0; d < kObsMaxPoints; d++)
-                {
-                    lidar_obstacle[o].data[d] = {0, 0, 0, 0, 0};
-                    // lidar_obstacle[o].data[d].angle = 0;
-                    // lidar_obstacle[o].data[d].distance = 0;
-                    // lidar_obstacle[o].data[d].confidence = 0;
-                    // lidar_obstacle[o].data[d].x = 0;
-                    // lidar_obstacle[o].data[d].y = 0;
-                }
-                lidar_obstacle[o].size = 0;
-            }
-        }
-        for (int16_t o = 0; o < obs_length; o++)
-        {
-            // if we have enough point for the batch
-            if (lidar_obstacle[o].size >= obs_min_point)
-            {
-                Point center = {0, 0};
-
-                /*if (lidar_obstacle[o].size >= 3)
-                {
-                    // get the center with the farthest 3 points of the batch
-                    Point p1 = {(lidar_obstacle[o].data[0].x), (lidar_obstacle[o].data[0].y)};
-                    Point p2 = {(lidar_obstacle[o].data[lidar_obstacle[o].size - 1].x),
-                                (lidar_obstacle[o].data[lidar_obstacle[o].size - 1].y)};
-                    Point p3 = {(lidar_obstacle[o].data[(int)((lidar_obstacle[o].size - 1) / 2)].x),
-                                (lidar_obstacle[o].data[(int)((lidar_obstacle[o].size - 1) / 2)].y)};
-                    center = findCircle(p1, p2, p3);
-                }*/
-                // get the middle point of all the data
-                Point mid = {0, 0};
-                for (int16_t d = 0; d < lidar_obstacle[o].size; d++)
-                {
-                    mid.x += lidar_obstacle[o].data[d].x;
-                    mid.y += lidar_obstacle[o].data[d].y;
-                }
-                mid.x = mid.x / lidar_obstacle[o].size;
-                mid.y = mid.y / lidar_obstacle[o].size;
-
-                // center found by circle is too far from the data
-                // if (fabsf(center.x - mid.x) > 5 || fabsf(center.y - mid.y) > 5)
-                //{
-                SERIAL_ROBOT.print(o);
-                SERIAL_ROBOT.print(";");
-                SERIAL_ROBOT.print((int)mid.x);
-                SERIAL_ROBOT.print(";");
-                SERIAL_ROBOT.print((int)mid.y);
-                SERIAL_ROBOT.print('\n');
-                SERIAL_PC.print(o);
-                SERIAL_PC.print(";");
-                SERIAL_PC.print((int)mid.x);
-                SERIAL_PC.print(";");
-                SERIAL_PC.print((int)mid.y);
-                SERIAL_PC.print('\n');
-                // if (obstacle_debug)
-                //     L::d << sl << "Obstacle mid " << o << " : x=" << mid.x * 1000 << "mm y=" << mid.y * 1000 <<
-                //     "mm" << el;
-                //}
-                /*else
-                {
-                    SERIAL_PC.print(o);
-                    SERIAL_PC.print(";");
-                    SERIAL_PC.print((int)center.x);
-                    SERIAL_PC.print(";");
-                    SERIAL_PC.print((int)center.y);
-                    SERIAL_PC.print('\n');
-                    // if (obstacle_debug)
-                    //     L::d << sl << "Obstacle center " << o << " : x=" << center.x * 1000 << "mm y=" <<
-                center.y *
-                    //     1000 << "mm" << el;
-                }*/
-            }
-            else
-            {
-                lidar_obstacle[o].size = 0;
-            }
+            // save the coord of current lidar point
+            lidar_obstacle[obs_count].data[data_count].angle = point.angle;
+            lidar_obstacle[obs_count].data[data_count].distance = point.distance;
+            lidar_obstacle[obs_count].data[data_count].confidence = point.confidence;
+            lidar_obstacle[obs_count].data[data_count].x = lidar_x;
+            lidar_obstacle[obs_count].data[data_count].y = lidar_y;
+            data_count++;
         }
     }
+
+    // if we have too much data for this obstacle, we move to save another obstacle
+    if (data_count >= kObsMaxPoints)
+    {
+        lidar_obstacle[obs_count].size = kObsMaxPoints;
+        ComputeCenter();
+        obs_count++;
+        data_count = 0;
+    }
+    if (obs_count >= obs_length)
+    {
+        obs_count = 0;
+    }
+}
+
+void ComputeCenter()
+{
+    // get the middle point of all the data
+    Point mid = {0, 0};
+    for (int16_t d = 0; d < lidar_obstacle[obs_count].size; d++)
+    {
+        mid.x += lidar_obstacle[obs_count].data[d].x;
+        mid.y += lidar_obstacle[obs_count].data[d].y;
+    }
+    mid.x = mid.x / lidar_obstacle[obs_count].size;
+    mid.y = mid.y / lidar_obstacle[obs_count].size;
+
+    SERIAL_ROBOT.print(obs_count);
+    SERIAL_ROBOT.print(";");
+    SERIAL_ROBOT.print((int)mid.x);
+    SERIAL_ROBOT.print(";");
+    SERIAL_ROBOT.print((int)mid.y);
+    SERIAL_ROBOT.print('\n');
+    SERIAL_PC.print(obs_count);
+    SERIAL_PC.print(";");
+    SERIAL_PC.print((int)mid.x);
+    SERIAL_PC.print(";");
+    SERIAL_PC.print((int)mid.y);
+    SERIAL_PC.print('\n');
 }
 
 // Function to find the circle on
