@@ -2,7 +2,8 @@
 
 namespace LD06
 {
-uint32_t tmpChars[TOTAL_DATA_BYTE];
+PacketLidar lidar;
+uint32_t tmpChars[serial_packet_size];
 uint8_t cursorTmp = 0;
 
 Obstacle lidar_obstacle[obs_length];
@@ -13,19 +14,18 @@ void Init()
     {
         for (size_t j = 0; j < Obstacle::kMaxPoints; j++)
         {
-            lidar_obstacle[i].data[j] = {0, 0, 0, 0, 0};
-            // lidar_obstacle[i].data[j].angle = 0;
-            // lidar_obstacle[i].data[j].distance = 0;
-            // lidar_obstacle[i].data[j].confidence = 0;
-            // lidar_obstacle[i].data[j].x = 0;
-            // lidar_obstacle[i].data[j].y = 0;
+            lidar_obstacle[i].data[j].angle = 0;
+            lidar_obstacle[i].data[j].distance = 0;
+            lidar_obstacle[i].data[j].confidence = 0;
+            lidar_obstacle[i].data[j].x = 0;
+            lidar_obstacle[i].data[j].y = 0;
         }
         lidar_obstacle[i].size = 0;
     }
     SERIAL_LIDAR.begin(230400);
 }
 
-void Read_lidar_data()
+void ReadSerial()
 {
     boolean loopFlag = true;
     uint32_t tmpInt;
@@ -35,7 +35,6 @@ void Read_lidar_data()
         if (SERIAL_LIDAR.available() > 0)
         {
             tmpInt = SERIAL_LIDAR.read();
-            // SERIAL_ROBOT.write(tmpInt);
             if (tmpInt == 0x54 && cursorTmp == 0)
             {
                 tmpChars[cursorTmp++] = tmpInt;
@@ -49,8 +48,9 @@ void Read_lidar_data()
                 {
                     cursorTmp = 0;
                 }
-                if (cursorTmp == TOTAL_DATA_BYTE)
+                if (cursorTmp == serial_packet_size)
                 {
+                    Analyze();
                     loopFlag = false;
                 }
             }
@@ -58,44 +58,44 @@ void Read_lidar_data()
     }
 }
 
-PacketLidar Calc_lidar_data()
+void Analyze()
 {
-    PacketLidar data;
-    data.header = tmpChars[0];
-    data.dataLength = 0x1F & tmpChars[1];
-    data.radarSpeed = tmpChars[3] << 8 | tmpChars[2];
-    data.startAngle = tmpChars[5] << 8 | tmpChars[4];
+    lidar.header = tmpChars[0];
+    lidar.dataLength = 0x1F & tmpChars[1];
+    lidar.radarSpeed = tmpChars[3] << 8 | tmpChars[2];
+    lidar.startAngle = tmpChars[5] << 8 | tmpChars[4];
 
-    data.endAngle = tmpChars[43] << 8 | tmpChars[42];
-    data.timestamp = tmpChars[45] << 8 | tmpChars[44];
-    data.crcCheck = tmpChars[46];
+    lidar.endAngle = tmpChars[43] << 8 | tmpChars[42];
+    lidar.timestamp = tmpChars[45] << 8 | tmpChars[44];
+    lidar.crcCheck = tmpChars[46];
 
     int angleStep = 0;
 
-    if (data.endAngle > data.startAngle)
+    if (lidar.endAngle > lidar.startAngle)
     {
-        angleStep = (data.endAngle - data.startAngle) / (data.dataLength - 1);
+        angleStep = (lidar.endAngle - lidar.startAngle) / (lidar.dataLength - 1);
     }
     else
     {
-        angleStep = (data.endAngle + (360 * 100 - data.startAngle)) / (data.dataLength - 1);
+        angleStep = (lidar.endAngle + (360 * 100 - lidar.startAngle)) / (lidar.dataLength - 1);
     }
-    for (int i = 0; i < PACKET_SIZE; i++)
+    for (int i = 0; i < data_packet_size; i++)
     {
-        int raw_deg = data.startAngle + i * angleStep;
-        data.dataPoint[i].angle = (raw_deg <= 360 * 100 ? raw_deg : raw_deg - 360 * 100);
-        data.dataPoint[i].confidence = (tmpChars[8 + i * 3]);
-        data.dataPoint[i].distance = (int(tmpChars[8 + i * 3 - 1] << 8 | tmpChars[8 + i * 3 - 2]));
+        int raw_deg = lidar.startAngle + i * angleStep;
+        lidar.dataPoint[i].angle = (raw_deg <= 360 * 100 ? raw_deg : raw_deg - 360 * 100);
+        lidar.dataPoint[i].confidence = (tmpChars[8 + i * 3]);
+        lidar.dataPoint[i].distance = (int(tmpChars[8 + i * 3 - 1] << 8 | tmpChars[8 + i * 3 - 2]));
     }
-    return data;
 }
+
+PacketLidar GetData() { return lidar; }
 
 void Filter_lidar_data(PointLidar p[], int size)
 {
     int16_t data_count = 0;
     int16_t obs_count = 0;
     const int kObsMaxPoints = Obstacle::kMaxPoints;
-    Robot_t robot = Robot::GetRobot();
+    Robot_t robot = Robot::GetData();
 
     for (int j = 0; j < size; j++)
     {

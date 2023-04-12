@@ -4,16 +4,14 @@ namespace Robot
 {
 
 Robot_t robot;
-uint32_t tmpChars[32];
+uint32_t tmpChars[serial_packet_size];
 uint8_t cursorTmp = 0;
-uint8_t const data_size = 1 + 2 * 3 + 1;
-// '!' + "2000,2000,36000" + 'n'
 
 void Init()
 {
     robot = {0, 0, 0.0};
     cursorTmp = 0;
-    for (size_t i = 0; i < 32; i++)
+    for (size_t i = 0; i < serial_packet_size; i++)
     {
         tmpChars[i] = 0;
     }
@@ -25,7 +23,7 @@ void Init()
     SERIAL_ROBOT.begin(125000, SERIAL_8N1, RX1, TX1);
 }
 
-boolean ReadSerial()
+void ReadSerial()
 {
     if (SERIAL_ROBOT.available() > 0)
     {
@@ -38,17 +36,16 @@ boolean ReadSerial()
         {
             tmpChars[cursorTmp++] = tmpInt;
 
-            if (cursorTmp >= data_size)
+            if (cursorTmp >= data_packet_size)
             {
                 cursorTmp = 0;
-                if (tmpChars[data_size - 1] == 10)
+                if (tmpChars[data_packet_size - 1] == 10)
                 {
-                    return true;
+                    Analyze();
                 }
             }
         }
     }
-    return false;
 }
 
 void Analyze()
@@ -57,10 +54,10 @@ void Analyze()
     robot.x = tmpChars[2] << 8 | tmpChars[1];
     robot.y = tmpChars[4] << 8 | tmpChars[3];
     robot.angle = tmpChars[6] << 8 | tmpChars[5];
-    int8_t endl = tmpChars[7];
+    int8_t footer = tmpChars[7];
 }
 
-Robot_t GetRobot() { return robot; }
+Robot_t GetData() { return robot; }
 
 void Print()
 {

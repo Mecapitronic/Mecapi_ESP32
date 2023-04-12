@@ -3,12 +3,12 @@
 
 #include "main.h"
 
-// 47 = 1(Start) + 1(Datalen) + 2(Speed) + 2(StartAngle) + 36(12 * 3 DataByte) + 2(EndAngle) + 2(TimeStamp) + 1(CRC)
-#define TOTAL_DATA_BYTE 47
-#define PACKET_SIZE 12
-
 namespace LD06
 {
+
+// 47 = 1(Start) + 1(Datalen) + 2(Speed) + 2(StartAngle) + 36(12 * 3 DataByte) + 2(EndAngle) + 2(TimeStamp) + 1(CRC)
+uint8_t const serial_packet_size = 47;
+uint8_t const data_packet_size = 12;
 
 // Initialize obstacle
 int const obs_length = 50;
@@ -28,7 +28,7 @@ struct PacketLidar
     int dataLength;
     int radarSpeed;
     int startAngle;
-    PointLidar dataPoint[PACKET_SIZE];
+    PointLidar dataPoint[data_packet_size];
     int endAngle;
     int timestamp;
     byte crcCheck;
@@ -42,9 +42,9 @@ struct Obstacle
 };
 
 void Init();
-
-void Read_lidar_data();
-PacketLidar Calc_lidar_data();
+void ReadSerial();
+void Analyze();
+PacketLidar GetData();
 void Filter_lidar_data(PointLidar p[], int size);
 
 Point findCircle(Point p1, Point p2, Point p3);

@@ -54,21 +54,20 @@ void loop()
 // Note the 1 Tick delay, this is need so the watchdog doesn't get confused
 void Task1code(void *pvParameters)
 {
+    LD06::PacketLidar lidar;
+    Robot_t robot;
     while (1)
     {
-        LD06::Read_lidar_data();
-        if (Robot::ReadSerial())
-        {
-            Robot::Analyze();
-            // Robot::Print();
-        }
-        LD06::PacketLidar data = LD06::Calc_lidar_data();
-        for (int i = 0; i < PACKET_SIZE; i++)
+        LD06::ReadSerial();
+        Robot::ReadSerial();
+
+        lidar = LD06::GetData();
+        for (int i = 0; i < LD06::data_packet_size; i++)
         {
             // Filter point before sending to queue : increase speed for later calculus
-            if (data.dataPoint[i].distance > MIN_DISTANCE && data.dataPoint[i].distance < MAX_DISTANCE &&
-                data.dataPoint[i].confidence > MIN_QUALITY)
-                xQueueSend(queue, &data.dataPoint[i], 0);
+            if (lidar.dataPoint[i].distance > MIN_DISTANCE && lidar.dataPoint[i].distance < MAX_DISTANCE &&
+                lidar.dataPoint[i].confidence > MIN_QUALITY)
+                xQueueSend(queue, &lidar.dataPoint[i], 0);
         }
         vTaskDelay(1);
     }
