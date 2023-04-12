@@ -61,11 +61,11 @@ Robot_t GetData() { return robot; }
 
 void Print()
 {
-    SERIAL_PC.print("X: ");
-    SERIAL_PC.println(robot.x);
-    SERIAL_PC.print("Y: ");
-    SERIAL_PC.println(robot.y);
-    SERIAL_PC.print("A: ");
-    SERIAL_PC.println(robot.angle);
+    SERIAL_PC.print("X= ");
+    SERIAL_PC.print(robot.x);
+    SERIAL_PC.print("  Y= ");
+    SERIAL_PC.print(robot.y);
+    SERIAL_PC.print("  A= ");
+    SERIAL_PC.println(robot.angle / 100);
 }
 }  // namespace Robot

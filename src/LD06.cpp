@@ -92,28 +92,28 @@ PacketLidar GetData() { return lidar; }
 
 void Print()
 {
-    SERIAL_PC.print("dataLength: ");
-    SERIAL_PC.println(lidar.dataLength);
-    SERIAL_PC.print("radarSpeed: ");
-    SERIAL_PC.println(lidar.radarSpeed);
-    SERIAL_PC.print("startAngle: ");
-    SERIAL_PC.println(lidar.startAngle);
+    SERIAL_PC.print("dataLength:");
+    SERIAL_PC.print(lidar.dataLength);
+    SERIAL_PC.print(" radarSpeed:");
+    SERIAL_PC.print(lidar.radarSpeed);
+    SERIAL_PC.print(" startAngle:");
+    SERIAL_PC.print(lidar.startAngle);
+    SERIAL_PC.print(" endAngle: ");
+    SERIAL_PC.print(lidar.endAngle);
+    SERIAL_PC.print(" timestamp: ");
+    SERIAL_PC.println(lidar.timestamp);
     for (size_t i = 0; i < data_packet_size; i++)
     {
-        SERIAL_PC.print("dataPoint: ");
+        SERIAL_PC.print("   Point ");
         SERIAL_PC.print(i);
-        SERIAL_PC.println(")");
-        SERIAL_PC.print("   angle: ");
-        SERIAL_PC.println(lidar.dataPoint[i].angle);
-        SERIAL_PC.print("   distance: ");
-        SERIAL_PC.println(lidar.dataPoint[i].distance);
-        SERIAL_PC.print("   confidence: ");
+        SERIAL_PC.print(") ");
+        SERIAL_PC.print("A:");
+        SERIAL_PC.print(lidar.dataPoint[i].angle);
+        SERIAL_PC.print(" D:");
+        SERIAL_PC.print(lidar.dataPoint[i].distance);
+        SERIAL_PC.print(" C:");
         SERIAL_PC.println(lidar.dataPoint[i].confidence);
     }
-    SERIAL_PC.print("endAngle: ");
-    SERIAL_PC.println(lidar.endAngle);
-    SERIAL_PC.print("timestamp: ");
-    SERIAL_PC.println(lidar.timestamp);
 }
 
 void Filter_lidar_data(PointLidar p[], int size)
