@@ -341,6 +341,23 @@ Point findCircle(float x1, float y1, float x2, float y2, float x3, float y3)
 }
 }  // namespace LD06
 
+LD06::PacketLidar::PacketLidar()
+{
+    header = 0;
+    dataLength = 0;
+    radarSpeed = 0;
+    startAngle = 0;
+    for (size_t i = 0; i < data_packet_size; i++)
+    {
+        dataPoint[i].angle = 0;
+        dataPoint[i].distance = 0;
+        dataPoint[i].confidence = 0;
+    }
+    endAngle = 0;
+    timestamp = 0;
+    crcCheck = 0;
+}
+
 PolarPoint::PolarPoint()
 {
     angle = 0;

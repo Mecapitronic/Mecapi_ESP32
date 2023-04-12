@@ -32,6 +32,8 @@ struct PacketLidar
     int endAngle;
     int timestamp;
     byte crcCheck;
+
+    PacketLidar();
 };
 
 struct Obstacle
