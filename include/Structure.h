@@ -3,6 +3,12 @@
 
 #include "main.h"
 
+// 3 is the minimum number of points to detect a 7cm wide target @ 3m distance
+#define OBS_MIN_POINT 3
+
+// at 200mm distance, to detect an object of 70mm, it represent 20°, with 0.8° each point, we need 25 points
+#define OBS_MAX_POINT 25
+
 struct PolarPoint
 {
     double angle;
@@ -27,8 +33,7 @@ struct Robot_t
 
 struct Obstacle
 {
-    static constexpr size_t kMaxPoints = 20;
-    PolarPoint data[kMaxPoints];
+    PolarPoint data[OBS_MAX_POINT];
     int size;
 };
 
