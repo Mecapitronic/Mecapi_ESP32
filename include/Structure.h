@@ -22,7 +22,7 @@ struct Robot_t
 {
     int x;
     int y;
-    double angle;
+    float angle;
 };
 
 struct Obstacle

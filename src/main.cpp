@@ -6,24 +6,18 @@ TaskHandle_t Task2;
 QueueHandle_t queue;
 int queueSize = 500;
 
-const int MIN_DISTANCE = 0;
-const int MAX_DISTANCE = 500;
-const int MIN_QUALITY = 100;
-
 void setup()
 {
     // put your setup code here, to run once:
     Debugger::init(VERBOSE);
 
     queue = xQueueCreate(queueSize, sizeof(LD06::PointLidar));
-    if (queue == NULL) SERIAL_PC.println("Error creating the queue");
+    if (queue == NULL)
+        SERIAL_PC.println("Error creating the queue");
 
     Robot::Init();
     delay(500);
-    // SERIAL_PC.begin(230400);
-    // SERIAL_PC.print("Start PC ! ");
     LD06::Init();
-    // SERIAL_PC.print("Start Lidar ! ");
 
     // create a task that will be executed in the Task1code() function, with priority 1 and executed on core 0
     xTaskCreatePinnedToCore(Task1code, /* Task function. */
@@ -73,9 +67,10 @@ void Task1code(void *pvParameters)
         for (int i = 0; i < LD06::data_packet_size; i++)
         {
             // Filter point before sending to queue : increase speed for later calculus
-            if (lidar.dataPoint[i].distance > MIN_DISTANCE && lidar.dataPoint[i].distance < MAX_DISTANCE &&
-                lidar.dataPoint[i].confidence > MIN_QUALITY)
+            if (lidar.dataPoint[i].confidence != 0)
+            {
                 xQueueSend(queue, &lidar.dataPoint[i], 0);
+            }
         }
         vTaskDelay(1);
     }
@@ -99,7 +94,8 @@ void Task2code(void *pvParameters)
 
 void Print(HardwareSerial s, PolarPoint p, bool debug)
 {
-    if (debug) s.print("Angle:");
+    if (debug)
+        s.print("Angle:");
     s.print((int)p.angle);
     if (debug)
         s.print(" Distance:");
@@ -115,7 +111,8 @@ void Print(HardwareSerial s, PolarPoint p, bool debug)
 
 void Print(HardwareSerial s, Point p, bool debug)
 {
-    if (debug) s.print("X:");
+    if (debug)
+        s.print("X:");
     s.print((int)p.x);
     if (debug)
         s.print(" Y:");
