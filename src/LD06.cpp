@@ -28,19 +28,19 @@ namespace LD06
 
     void Config(int min, int max, int quality, int distance, int angle)
     {
-        if (config.min_distance != -1)
+        if (min != -1)
             config.min_distance = min;
 
-        if (config.max_distance != -1)
+        if (max != -1)
             config.max_distance = max;
 
-        if (config.min_quality != -1)
+        if (quality != -1)
             config.min_quality = quality;
 
-        if (config.obs_distance != -1)
+        if (distance != -1)
             config.obs_distance = distance;
 
-        if (config.obs_angle != -1)
+        if (angle != -1)
             config.obs_angle = angle;
     }
 
