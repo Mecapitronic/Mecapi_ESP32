@@ -38,7 +38,7 @@
                 "gruntfuggly.todo-tree",
                 "jeff-hykin.better-cpp-syntax",
                 "ms-azuretools.vscode-docker",
-                "ms-vscode.cpptools",
+                "ms-vscode.cpptools-extension-pack",
                 "platformio.platformio-ide"
             ]
         }

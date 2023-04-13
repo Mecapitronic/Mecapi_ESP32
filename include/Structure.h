@@ -1,7 +1,11 @@
+/**
+ * All data structures used across program
+ */
+
 #ifndef STRUCTURE_H
 #define STRUCTURE_H
 
-#include "main.h"
+#include <Arduino.h>
 
 struct PolarPoint
 {

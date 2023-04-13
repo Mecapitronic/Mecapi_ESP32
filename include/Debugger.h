@@ -1,53 +1,61 @@
+/**
+ * Helper functions to print and debug via serial
+ */
+
 #ifndef DEBUGGER_H
 #define DEBUGGER_H
 
-#include "main.h"
+#define VERBOSE Level::LEVEL_VERBOSE
+#define INFO Level::LEVEL_INFO
+#define WARN Level::LEVEL_WARN
+#define ERROR Level::LEVEL_ERROR
 
-#define VERBOSE Debugger::Level::LEVEL_VERBOSE
-#define INFO Debugger::Level::LEVEL_INFO
-#define WARN Debugger::Level::LEVEL_WARN
-#define ERROR Debugger::Level::LEVEL_ERROR
+#include <Arduino.h>
 
+#define SERIAL_PC Serial
 #define SERIAL_DEBUG SERIAL_PC
 
-namespace Debugger
+enum class Level
+{
+    LEVEL_VERBOSE = 0,
+    LEVEL_INFO = 1,
+    LEVEL_WARN = 2,
+    LEVEL_ERROR = 3
+};
+
+class Debugger
 {
 
-    enum class Level
-    {
-        LEVEL_VERBOSE = 0,
-        LEVEL_INFO = 1,
-        LEVEL_WARN = 2,
-        LEVEL_ERROR = 3
-    };
+public:
+    static void header();
+    static void init();
+    static void checkSerial();
 
-    void header();
-    void init(Level = INFO);
-    void checkSerial();
+    static Level level();
 
-    Level level();
+    static void println(char);
+    static void println(String = "");
+    static void println(bool);
+    static void println(int);
+    static void println(float);
 
-    void println(char);
-    void println(String = "");
-    void println(bool);
-    void println(int);
-    void println(float);
+    static void print(char);
+    static void print(String);
+    static void print(bool);
+    static void print(int);
+    static void print(float);
 
-    void print(char);
-    void print(String);
-    void print(bool);
-    void print(int);
-    void print(float);
+    static void log(String prefix, int data, String suffix = "", Level level = VERBOSE, boolean lineFeed = true);
+    static void log(String prefix, char data, String suffix = "", Level level = VERBOSE, boolean lineFeed = true);
+    static void log(String prefix, float data, String suffix = "", Level level = VERBOSE, boolean lineFeed = true);
+    static void log(String prefix, bool data, String suffix = "", Level level = VERBOSE, boolean lineFeed = true);
 
-    void log(String prefix, int data, String suffix = "", Level level = VERBOSE, boolean lineFeed = true);
-    void log(String prefix, char data, String suffix = "", Level level = VERBOSE, boolean lineFeed = true);
-    void log(String prefix, float data, String suffix = "", Level level = VERBOSE, boolean lineFeed = true);
-    void log(String prefix, bool data, String suffix = "", Level level = VERBOSE, boolean lineFeed = true);
+    static void logArray(String prefix, int array[], size_t size, char separator = ',', String suffix = ")", Level level = VERBOSE);
+    static void logArrayN(String prefix, int element, String interFix, int array[], size_t size, char separator = ',', String suffix = ")",
+                          Level level = VERBOSE);
 
-    void logArray(String prefix, int array[], size_t size, char separator = ',', String suffix = ")", Level level = VERBOSE);
-    void logArrayN(String prefix, int element, String interFix, int array[], size_t size, char separator = ',', String suffix = ")",
-                   Level level = VERBOSE);
-
-}; // namespace Debugger
-
+private:
+    static const boolean enabled = true;
+    static const Level debugLevel = VERBOSE;
+};
 #endif
