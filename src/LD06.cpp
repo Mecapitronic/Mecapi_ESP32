@@ -217,12 +217,8 @@ namespace LD06
 
         Robot::WriteSerial(obs_count, mid.x, mid.y);
 
-        SERIAL_PC.print(obs_count);
-        SERIAL_PC.print(";");
-        SERIAL_PC.print((int)mid.x);
-        SERIAL_PC.print(";");
-        SERIAL_PC.print((int)mid.y);
-        SERIAL_PC.print('\n');
+        Debugger::log(">obs:", (int)mid.x, "", VERBOSE, false);
+        Debugger::log(":", (int)mid.y, "|xy", VERBOSE, true);
     }
 
     // Function to find the circle on
