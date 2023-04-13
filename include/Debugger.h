@@ -13,51 +13,41 @@
 namespace Debugger
 {
 
-enum class Level
-{
-    LEVEL_VERBOSE = 0,
-    LEVEL_INFO = 1,
-    LEVEL_WARN = 2,
-    LEVEL_ERROR = 3
-};
+    enum class Level
+    {
+        LEVEL_VERBOSE = 0,
+        LEVEL_INFO = 1,
+        LEVEL_WARN = 2,
+        LEVEL_ERROR = 3
+    };
 
-void header();
-void init(Level = INFO);
-void checkSerial();
+    void header();
+    void init(Level = INFO);
+    void checkSerial();
 
-Level level();
+    Level level();
 
-void println(char);
-void println(String = "");
-void println(bool);
-void println(int);
-void println(float);
+    void println(char);
+    void println(String = "");
+    void println(bool);
+    void println(int);
+    void println(float);
 
-void print(char);
-void print(String);
-void print(bool);
-void print(int);
-void print(float);
+    void print(char);
+    void print(String);
+    void print(bool);
+    void print(int);
+    void print(float);
 
-void log(char, Level level = VERBOSE);
-void log(int, Level level = VERBOSE);
-void log(float, Level level = VERBOSE);
-void log(String, Level level = VERBOSE);
+    void log(String prefix, int data, String suffix = "", Level level = VERBOSE, boolean lineFeed = true);
+    void log(String prefix, char data, String suffix = "", Level level = VERBOSE, boolean lineFeed = true);
+    void log(String prefix, float data, String suffix = "", Level level = VERBOSE, boolean lineFeed = true);
+    void log(String prefix, bool data, String suffix = "", Level level = VERBOSE, boolean lineFeed = true);
 
-void log(String prefix, int data, Level level = VERBOSE);
-void log(String prefix, char data, Level level = VERBOSE);
-void log(String prefix, float data, Level level = VERBOSE);
-void log(String prefix, bool data, Level level = VERBOSE);
+    void logArray(String prefix, int array[], size_t size, char separator = ',', String suffix = ")", Level level = VERBOSE);
+    void logArrayN(String prefix, int element, String interFix, int array[], size_t size, char separator = ',', String suffix = ")",
+                   Level level = VERBOSE);
 
-void log(String prefix, int data, String suffix, Level level = VERBOSE);
-void log(String prefix, char data, String suffix, Level level = VERBOSE);
-void log(String prefix, float data, String suffix, Level level = VERBOSE);
-void log(String prefix, bool data, String suffix, Level level = VERBOSE);
-
-void logArray(String prefix, int array[], size_t size, char separator = ',', String suffix = ")", Level level = VERBOSE);
-void logArrayN(String prefix, int element, String interFix, int array[], size_t size, char separator = ',', String suffix = ")",
-               Level level = VERBOSE);
-
-};  // namespace Debugger
+}; // namespace Debugger
 
 #endif

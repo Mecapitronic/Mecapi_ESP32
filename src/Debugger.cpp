@@ -73,83 +73,48 @@ namespace Debugger
 
     void print(int data) { SERIAL_DEBUG.print(data); }
 
-    void log(int data, Level level)
-    {
-        if (level < debugLevel)
-            return;
-        println(data);
-    }
-
-    void log(char data, Level level)
-    {
-        if (level < debugLevel)
-            return;
-        println(data);
-    }
-
-    void log(float data, Level level)
-    {
-        if (level < debugLevel)
-            return;
-        println(data);
-    }
-
-    void log(String data, Level level)
-    {
-        if (level < debugLevel)
-            return;
-        println(data);
-    }
-
-    void log(String prefix, int data, String suffix, Level level)
+    void log(String prefix, int data, String suffix, Level level, boolean lineFeed)
     {
         if (level < debugLevel)
             return;
         SERIAL_DEBUG.print(prefix);
         SERIAL_DEBUG.print(data);
-        SERIAL_DEBUG.println(suffix);
+        SERIAL_DEBUG.print(suffix);
+        if (lineFeed)
+            SERIAL_DEBUG.println();
     }
 
-    void log(String prefix, float data, String suffix, Level level)
+    void log(String prefix, char data, String suffix, Level level, boolean lineFeed)
     {
         if (level < debugLevel)
             return;
         SERIAL_DEBUG.print(prefix);
         SERIAL_DEBUG.print(data);
-        SERIAL_DEBUG.println(suffix);
+        SERIAL_DEBUG.print(suffix);
+        if (lineFeed)
+            SERIAL_DEBUG.println();
     }
 
-    void log(String prefix, bool data, String suffix, Level level)
+    void log(String prefix, float data, String suffix, Level level, boolean lineFeed)
     {
         if (level < debugLevel)
             return;
         SERIAL_DEBUG.print(prefix);
         SERIAL_DEBUG.print(data);
-        SERIAL_DEBUG.println(suffix);
+        SERIAL_DEBUG.print(suffix);
+        if (lineFeed)
+            SERIAL_DEBUG.println();
     }
 
-    void log(String prefix, int data, Level level)
+    void log(String prefix, bool data, String suffix, Level level, boolean lineFeed)
     {
         if (level < debugLevel)
             return;
         SERIAL_DEBUG.print(prefix);
-        SERIAL_DEBUG.println(data);
-    }
-
-    void log(String prefix, float data, Level level)
-    {
-        if (level < debugLevel)
-            return;
-        SERIAL_DEBUG.print(prefix);
-        SERIAL_DEBUG.println(data);
-    }
-
-    void log(String prefix, bool data, Level level)
-    {
-        if (level < debugLevel)
-            return;
-        SERIAL_DEBUG.print(prefix);
-        SERIAL_DEBUG.println(data);
+        SERIAL_DEBUG.print(data);
+        SERIAL_DEBUG.print(suffix);
+        if (lineFeed)
+            SERIAL_DEBUG.println();
     }
 
     void logArray(String prefix, int array[], size_t size, char separator, String suffix, Level level)
