@@ -46,10 +46,10 @@ void checkSerial()
     {
         if (SERIAL_DEBUG.available() > 0)
         {
-            String command = SERIAL_DEBUG.readStringUntil('(');
+            String command = SERIAL_DEBUG.readStringUntil('\n');
             SERIAL_DEBUG.println("Received :" + command);
 
-            // if(command.startsWith("toggleFilter")) Parser::toggleFilter();
+            // if(command.startsWith("cmd")) {}
         }
     }
 }

@@ -58,6 +58,8 @@ void Task1code(void *pvParameters)
     Robot_t robot;
     while (1)
     {
+        Debugger::checkSerial();
+
         if (LD06::ReadSerial())
         {
             LD06::Analyze();
