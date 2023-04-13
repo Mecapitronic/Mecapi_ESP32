@@ -39,10 +39,12 @@ namespace LD06
         int min_distance;
         int max_distance;
         int min_quality;
+        int obs_distance;
+        int obs_angle;
     };
 
     void Init();
-    void Config(int min, int max, int quality);
+    void Config(int min, int max, int quality, int distance, int angle);
     boolean ReadSerial();
     void Analyze();
     PacketLidar GetData();

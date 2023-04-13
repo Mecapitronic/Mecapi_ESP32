@@ -51,7 +51,7 @@ namespace Debugger
 
                 // if (command.startsWith("Config:"))
                 //{
-                LD06::Config(0, atoi(command.c_str()), 100);
+                LD06::Config(-1, atoi(command.c_str()), -1, -1, -1);
                 //}
             }
         }

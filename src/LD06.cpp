@@ -22,17 +22,26 @@ namespace LD06
             }
             lidar_obstacle[i].size = 0;
         }
-        config.min_distance = 0;
-        config.max_distance = 100;
-        config.min_quality = 500;
+        Config(0, 500, 200, 200, 5);
         SERIAL_LIDAR.begin(230400);
     }
 
-    void Config(int min, int max, int quality)
+    void Config(int min, int max, int quality, int distance, int angle)
     {
-        config.min_distance = min;
-        config.max_distance = max;
-        config.min_quality = quality;
+        if (config.min_distance != -1)
+            config.min_distance = min;
+
+        if (config.max_distance != -1)
+            config.max_distance = max;
+
+        if (config.min_quality != -1)
+            config.min_quality = quality;
+
+        if (config.obs_distance != -1)
+            config.obs_distance = distance;
+
+        if (config.obs_angle != -1)
+            config.obs_angle = angle;
     }
 
     boolean ReadSerial()
@@ -153,8 +162,8 @@ namespace LD06
             if (data_count > 0)
             {
                 // the limit of passing to new obstacle
-                if (fabsf(lidar_obstacle[obs_count].data[data_count - 1].distance - point.distance) > 100 ||
-                    fabsf(lidar_obstacle[obs_count].data[data_count - 1].angle) - fabsf(point.angle) > 5 * 100)
+                if (fabsf(lidar_obstacle[obs_count].data[data_count - 1].distance - point.distance) > config.obs_distance ||
+                    fabsf(lidar_obstacle[obs_count].data[data_count - 1].angle) - fabsf(point.angle) > config.obs_angle * 100)
                 {
                     // if we have sufficient data for this obstacle, we move to save another obstacle
                     if (data_count >= obs_min_point)
