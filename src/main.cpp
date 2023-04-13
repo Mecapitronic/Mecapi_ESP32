@@ -58,8 +58,14 @@ void Task1code(void *pvParameters)
     Robot_t robot;
     while (1)
     {
-        LD06::ReadSerial();
-        Robot::ReadSerial();
+        if (LD06::ReadSerial())
+        {
+            LD06::Analyze();
+        }
+        if (Robot::ReadSerial())
+        {
+            Robot::Analyze();
+        }
 
         lidar = LD06::GetData();
         for (int i = 0; i < LD06::data_packet_size; i++)

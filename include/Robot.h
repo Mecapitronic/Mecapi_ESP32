@@ -11,10 +11,11 @@ uint8_t const serial_packet_size = 32;
 uint8_t const data_packet_size = 1 + 2 * 3 + 1;
 
 void Init();
-void ReadSerial();
+boolean ReadSerial();
 void Analyze();
 Robot_t GetData();
 void Print();
+void WriteSerial(int n, int x, int y);
 
 }  // namespace Robot
 

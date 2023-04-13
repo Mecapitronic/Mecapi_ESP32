@@ -25,37 +25,31 @@ void Init()
     SERIAL_LIDAR.begin(230400);
 }
 
-void ReadSerial()
+boolean ReadSerial()
 {
-    boolean loopFlag = true;
-    uint32_t tmpInt;
-    cursorTmp = 0;
-    while (loopFlag)
+    if (SERIAL_LIDAR.available() > 0)
     {
-        if (SERIAL_LIDAR.available() > 0)
+        uint32_t tmpInt = SERIAL_LIDAR.read();
+        if (tmpInt == 0x54 && cursorTmp == 0)
         {
-            tmpInt = SERIAL_LIDAR.read();
-            if (tmpInt == 0x54 && cursorTmp == 0)
-            {
-                tmpChars[cursorTmp++] = tmpInt;
-                // continue;
-            }
-            else if (cursorTmp > 0)
-            {
-                tmpChars[cursorTmp++] = tmpInt;
+            tmpChars[cursorTmp++] = tmpInt;
+        }
+        else if (cursorTmp > 0)
+        {
+            tmpChars[cursorTmp++] = tmpInt;
 
-                if (tmpChars[1] != 0x2C)
-                {
-                    cursorTmp = 0;
-                }
-                if (cursorTmp == serial_packet_size)
-                {
-                    Analyze();
-                    loopFlag = false;
-                }
+            if (tmpChars[1] != 0x2C)
+            {
+                cursorTmp = 0;
+            }
+            if (cursorTmp == serial_packet_size)
+            {
+                cursorTmp = 0;
+                return true;
             }
         }
     }
+    return false;
 }
 
 void Analyze()
@@ -195,12 +189,8 @@ void ComputeCenter()
     mid.x = mid.x / lidar_obstacle[obs_count].size;
     mid.y = mid.y / lidar_obstacle[obs_count].size;
 
-    SERIAL_ROBOT.print(obs_count);
-    SERIAL_ROBOT.print(";");
-    SERIAL_ROBOT.print((int)mid.x);
-    SERIAL_ROBOT.print(";");
-    SERIAL_ROBOT.print((int)mid.y);
-    SERIAL_ROBOT.print('\n');
+    Robot::WriteSerial(obs_count, mid.x, mid.y);
+
     SERIAL_PC.print(obs_count);
     SERIAL_PC.print(";");
     SERIAL_PC.print((int)mid.x);

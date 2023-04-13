@@ -23,7 +23,7 @@ void Init()
     SERIAL_ROBOT.begin(125000, SERIAL_8N1, RX1, TX1);
 }
 
-void ReadSerial()
+boolean ReadSerial()
 {
     if (SERIAL_ROBOT.available() > 0)
     {
@@ -41,11 +41,12 @@ void ReadSerial()
                 cursorTmp = 0;
                 if (tmpChars[data_packet_size - 1] == 10)
                 {
-                    Analyze();
+                    return true;
                 }
             }
         }
     }
+    return false;
 }
 
 void Analyze()
@@ -67,5 +68,15 @@ void Print()
     SERIAL_PC.print(robot.y);
     SERIAL_PC.print("  A= ");
     SERIAL_PC.println(robot.angle / 100);
+}
+
+void WriteSerial(int n, int x, int y)
+{
+    SERIAL_ROBOT.print(n);
+    SERIAL_ROBOT.print(";");
+    SERIAL_ROBOT.print(x);
+    SERIAL_ROBOT.print(";");
+    SERIAL_ROBOT.print(y);
+    SERIAL_ROBOT.print('\n');
 }
 }  // namespace Robot

@@ -35,7 +35,7 @@ struct PacketLidar
 };
 
 void Init();
-void ReadSerial();
+boolean ReadSerial();
 void Analyze();
 PacketLidar GetData();
 void Print();
