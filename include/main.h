@@ -7,7 +7,16 @@
 #include "Robot.h"
 #include "Structure.h"
 
+/**
+ * Get lidar data from serial
+ * Get robot position from serial
+ * Send lidar data in a queue for another thread to compute
+ */
 void Task1code(void *pvParameters);
+
+/**
+ * Get lidar data from queue and compute them in order to send obstacles positions to PIC
+ */
 void Task2code(void *pvParameters);
 
 TaskHandle_t Task1;

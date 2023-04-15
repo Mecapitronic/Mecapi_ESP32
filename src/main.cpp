@@ -75,7 +75,7 @@ void Task2code(void *pvParameters)
 {
     PointLidar turn[queueSize];
     PointLidar point;
-    Robot_t data;
+    RobotPosition_t data;
     while (1)
     {
         if (uxQueueMessagesWaiting(queue) > 0)

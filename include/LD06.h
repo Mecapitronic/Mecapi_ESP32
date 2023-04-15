@@ -48,16 +48,53 @@ class Lidar
 {
 
 public:
+    /**
+     * Lidar Constructor
+     */
     Lidar(void);
+
+    /**
+     * Configure lidar_config local variable with the given values in parameters
+     */
     void Config(int min, int max, int quality, int distance, int angle);
+
+    /**
+     * Read data from serial and put in a buffer if it comes form the Lidar LD06
+     */
     boolean ReadSerial();
+
+    /**
+     * Put data from lidar in lidar_packet local variable.
+     * Analyze and fix data according to angle step and out of bound distance
+     */
     void Analyze();
+
+    /**
+     * Return lidar_packet data
+     */
     PacketLidar GetData();
+
+    /**
+     * Debugging print: pretty print all data stored in lidar_packet
+     */
     void Print();
+
     void AggregatePoint(Robot robot, PointLidar p);
+
+    /**
+     * Compute the center of local var lidar_obstacle
+     * based on the fact that it is a cylinder of 70mm diameter
+     */
     Point ComputeCenter();
 
+    /**
+     * Find the circle on which the given three points lie
+     */
     Point findCircle(Point p1, Point p2, Point p3);
+
+    /**
+     * Find the circle on which the given three points coordonates lie
+     */
     Point findCircle(float x1, float y1, float x2, float y2, float x3, float y3);
 
 private:
@@ -69,7 +106,8 @@ private:
     // int const obs_max_point = 20;
     static const uint8_t obs_min_point = 3;
 
-    uint32_t tmpChars[LIDAR_SERIAL_PACKET_SIZE];
+    // why are you using uint32 instead of chars?
+    uint32_t serial_buffer[LIDAR_SERIAL_PACKET_SIZE] = {0};
     uint8_t cursorTmp = 0;
 
     Obstacle lidar_obstacle[obs_length];

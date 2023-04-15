@@ -55,13 +55,13 @@ boolean Lidar::ReadSerial()
         uint32_t tmpInt = SERIAL_LIDAR.read();
         if (tmpInt == 0x54 && cursorTmp == 0)
         {
-            tmpChars[cursorTmp++] = tmpInt;
+            serial_buffer[cursorTmp++] = tmpInt;
         }
         else if (cursorTmp > 0)
         {
-            tmpChars[cursorTmp++] = tmpInt;
+            serial_buffer[cursorTmp++] = tmpInt;
 
-            if (tmpChars[1] != 0x2C)
+            if (serial_buffer[1] != 0x2C)
             {
                 cursorTmp = 0;
             }
@@ -77,17 +77,19 @@ boolean Lidar::ReadSerial()
 
 void Lidar::Analyze()
 {
-    lidar_packet.header = tmpChars[0];
-    lidar_packet.dataLength = 0x1F & tmpChars[1];
-    lidar_packet.radarSpeed = tmpChars[3] << 8 | tmpChars[2];
-    lidar_packet.startAngle = tmpChars[5] << 8 | tmpChars[4];
+    lidar_packet.header = serial_buffer[0];
+    lidar_packet.dataLength = 0x1F & serial_buffer[1];
+    lidar_packet.radarSpeed = serial_buffer[3] << 8 | serial_buffer[2];
+    lidar_packet.startAngle = serial_buffer[5] << 8 | serial_buffer[4];
 
-    lidar_packet.endAngle = tmpChars[43] << 8 | tmpChars[42];
-    lidar_packet.timestamp = tmpChars[45] << 8 | tmpChars[44];
-    lidar_packet.crcCheck = tmpChars[46];
+    lidar_packet.endAngle = serial_buffer[43] << 8 | serial_buffer[42];
+    lidar_packet.timestamp = serial_buffer[45] << 8 | serial_buffer[44];
+    lidar_packet.crcCheck = serial_buffer[46];
 
     int angleStep = 0;
-
+    // fix angle step to negative if we cross 0° during scan
+    // which means first angle is bigger than the last one
+    // else positive
     if (lidar_packet.endAngle > lidar_packet.startAngle)
     {
         angleStep = (lidar_packet.endAngle - lidar_packet.startAngle) / (lidar_packet.dataLength - 1);
@@ -96,12 +98,14 @@ void Lidar::Analyze()
     {
         angleStep = (lidar_packet.endAngle + (360 * 100 - lidar_packet.startAngle)) / (lidar_packet.dataLength - 1);
     }
+
+    // compute lidar result with previously defined angle step
     for (int i = 0; i < LIDAR_DATA_PACKET_SIZE; i++)
     {
         int raw_deg = lidar_packet.startAngle + i * angleStep;
         lidar_packet.dataPoint[i].angle = (raw_deg <= 360 * 100 ? raw_deg : raw_deg - 360 * 100);
-        lidar_packet.dataPoint[i].confidence = (tmpChars[8 + i * 3]);
-        lidar_packet.dataPoint[i].distance = (int(tmpChars[8 + i * 3 - 1] << 8 | tmpChars[8 + i * 3 - 2]));
+        lidar_packet.dataPoint[i].confidence = (serial_buffer[8 + i * 3]);
+        lidar_packet.dataPoint[i].distance = (int(serial_buffer[8 + i * 3 - 1] << 8 | serial_buffer[8 + i * 3 - 2]));
 
         // if the point is out of bound, we will not use it
         if (lidar_packet.dataPoint[i].distance < lidar_config.min_distance ||
@@ -143,23 +147,20 @@ void Lidar::Print()
 
 void Lidar::AggregatePoint(Robot robot, PointLidar point)
 {
-    const int kObsMaxPoints = Obstacle::kMaxPoints;
-    Robot_t robot_tbd = robot.GetData();
+    RobotPosition_t robot_position = robot.GetData();
     // Compute detected position
-    const float lidar_x = robot_tbd.x + point.distance * cos((point.angle / 100 + robot_tbd.angle / 100) * M_PI / 180);
-    const float lidar_y = robot_tbd.y + point.distance * sin((point.angle / 100 + robot_tbd.angle / 100) * M_PI / 180);
+    const float lidar_x = robot_position.x + point.distance * cos((point.angle / 100 + robot_position.angle / 100) * M_PI / 180);
+    const float lidar_y = robot_position.y + point.distance * sin((point.angle / 100 + robot_position.angle / 100) * M_PI / 180);
 
     // Ignore points outside of the table
-    boolean filterTable = false;
-    if (filterTable)
+    // the margin represent the distance between the center of the obstacle and the edges of the table
+    const float table_margin = 50;
+    if (lidar_x < table_margin || lidar_x > 2000 - table_margin || lidar_y < table_margin || lidar_y > 3000 - table_margin)
     {
-        // the margin represent the distance between the center of the obstacle and the edges of the table
-        const float table_margin = 50;
-        if (lidar_x < table_margin || lidar_x > 2000 - table_margin || lidar_y < table_margin || lidar_y > 3000 - table_margin)
-            return;
+        return;
     }
 
-    if (obs_count < obs_length && data_count < kObsMaxPoints)
+    if (obs_count < obs_length && data_count < Obstacle::kMaxPoints)
     {
         // Determine if it is a new obstacle
         if (data_count > 0)
@@ -194,9 +195,9 @@ void Lidar::AggregatePoint(Robot robot, PointLidar point)
     }
 
     // if we have too much data for this obstacle, we move to save another obstacle
-    if (data_count >= kObsMaxPoints)
+    if (data_count >= Obstacle::kMaxPoints)
     {
-        lidar_obstacle[obs_count].size = kObsMaxPoints;
+        lidar_obstacle[obs_count].size = Obstacle::kMaxPoints;
         Point mid = ComputeCenter();
         robot.WriteSerial(obs_count, mid.x, mid.y);
 
@@ -227,9 +228,8 @@ Point Lidar::ComputeCenter()
     return mid;
 }
 
-// Function to find the circle on
-// which the given three points lie
 Point Lidar::findCircle(Point p1, Point p2, Point p3) { return findCircle(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y); }
+
 Point Lidar::findCircle(float x1, float y1, float x2, float y2, float x3, float y3)
 {
     float x12 = x1 - x2;

@@ -12,7 +12,6 @@ void Debugger::init()
 
         header();
         SERIAL_DEBUG.print("Preparing system...");
-
         delay(200);
         SERIAL_DEBUG.println("done.");
     }

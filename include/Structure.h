@@ -22,7 +22,7 @@ struct Point
     float y;
 };
 
-struct Robot_t
+struct RobotPosition_t
 {
     int x;
     int y;
@@ -32,8 +32,8 @@ struct Robot_t
 struct Obstacle
 {
     static constexpr size_t kMaxPoints = 20;
-    PolarPoint data[kMaxPoints];
-    int size;
+    PolarPoint data[kMaxPoints] = {0, 0, 0, 0, 0};
+    int size = 0;
 };
 
 #endif
