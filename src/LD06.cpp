@@ -1,24 +1,10 @@
 #include "LD06.h"
 
-Lidar::Lidar(void)
+Lidar::Lidar()
 {
-    for (size_t i = 0; i < obs_length; i++)
-    {
-        for (size_t i = 0; i < obs_length; i++)
-        {
-            for (size_t j = 0; j < Obstacle::kMaxPoints; j++)
-            {
-                lidar_obstacle[i].data[j].angle = 0;
-                lidar_obstacle[i].data[j].distance = 0;
-                lidar_obstacle[i].data[j].confidence = 0;
-                lidar_obstacle[i].data[j].x = 0;
-                lidar_obstacle[i].data[j].y = 0;
-            }
-            lidar_obstacle[i].size = 0;
-        }
-        Config(0, 500, 200, 200, 5);
-        SERIAL_LIDAR.begin(230400);
-    }
+    // min_distance, max_distance, min_quality, distance_threshold, angle_threshold;
+    Config(0, 500, 200, 200, 5);
+    SERIAL_LIDAR.begin(230400);
 }
 
 void Lidar::Config(int min, int max, int quality, int distance, int angle)
@@ -38,11 +24,11 @@ void Lidar::Config(int min, int max, int quality, int distance, int angle)
     }
     if (distance != -1)
     {
-        lidar_config.obs_distance = distance;
+        lidar_config.distance_threshold = distance;
     }
     if (angle != -1)
     {
-        lidar_config.obs_angle = angle;
+        lidar_config.angle_threshold = angle;
     }
 }
 
@@ -148,65 +134,67 @@ void Lidar::Print()
 void Lidar::AggregatePoint(Robot robot, PointLidar point)
 {
     RobotPosition_t robot_position = robot.GetData();
-    // Compute detected position
+    // convert detected position from polar coordinates to cartesian coordinates
     const float lidar_x = robot_position.x + point.distance * cos((point.angle / 100 + robot_position.angle / 100) * M_PI / 180);
     const float lidar_y = robot_position.y + point.distance * sin((point.angle / 100 + robot_position.angle / 100) * M_PI / 180);
 
     // Ignore points outside of the table
-    // the margin represent the distance between the center of the obstacle and the edges of the table
+    // the margin represents the distance between the center of the obstacle
+    // and the edges of the table (which is 3000mm long and 2000mm large)
     const float table_margin = 50;
     if (lidar_x < table_margin || lidar_x > 2000 - table_margin || lidar_y < table_margin || lidar_y > 3000 - table_margin)
     {
         return;
     }
 
-    if (obs_count < obs_length && data_count < Obstacle::kMaxPoints)
+    if (obstacles_counter < obs_length && points_counter < Obstacle::kMaxPoints)
     {
         // Determine if it is a new obstacle
-        if (data_count > 0)
+        if (points_counter > 0)
         {
-            // the limit of passing to new obstacle
-            if (fabsf(lidar_obstacle[obs_count].data[data_count - 1].distance - point.distance) > lidar_config.obs_distance ||
-                fabsf(lidar_obstacle[obs_count].data[data_count - 1].angle) - fabsf(point.angle) > lidar_config.obs_angle * 100)
+            // the limit of passing to new obstacle:
+            // compare the difference with the previous point to the defined threshold
+            if (fabsf(lidar_obstacle[obstacles_counter].data[points_counter - 1].distance - point.distance) > lidar_config.distance_threshold ||
+                fabsf(lidar_obstacle[obstacles_counter].data[points_counter - 1].angle) - fabsf(point.angle) > lidar_config.angle_threshold * 100)
             {
-                // if we have sufficient data for this obstacle, we move to save another obstacle
-                if (data_count >= obs_min_point)
+                Debugger::println("new obstacle detected");
+                // if we have sufficient data for this obstacle
+                // we move to save another obstacle
+                if (points_counter >= obs_min_point)
                 {
-                    lidar_obstacle[obs_count].size = data_count;
+                    lidar_obstacle[obstacles_counter].size = points_counter;
                     Point mid = ComputeCenter();
-                    robot.WriteSerial(obs_count, mid.x, mid.y);
-                    obs_count++;
-                    data_count = 0;
+                    robot.WriteSerial(obstacles_counter, mid);
+                    obstacles_counter++;
                 }
-                else
-                    data_count = 0;
+                points_counter = 0;
             }
         }
-        if (obs_count < obs_length)
+        if (obstacles_counter < obs_length)
         {
             // save the coord of current lidar point
-            lidar_obstacle[obs_count].data[data_count].angle = point.angle;
-            lidar_obstacle[obs_count].data[data_count].distance = point.distance;
-            lidar_obstacle[obs_count].data[data_count].confidence = point.confidence;
-            lidar_obstacle[obs_count].data[data_count].x = lidar_x;
-            lidar_obstacle[obs_count].data[data_count].y = lidar_y;
-            data_count++;
+            lidar_obstacle[obstacles_counter].data[points_counter].angle = point.angle;
+            lidar_obstacle[obstacles_counter].data[points_counter].distance = point.distance;
+            lidar_obstacle[obstacles_counter].data[points_counter].confidence = point.confidence;
+            lidar_obstacle[obstacles_counter].data[points_counter].x = lidar_x;
+            lidar_obstacle[obstacles_counter].data[points_counter].y = lidar_y;
+            points_counter++;
         }
     }
 
     // if we have too much data for this obstacle, we move to save another obstacle
-    if (data_count >= Obstacle::kMaxPoints)
+    if (points_counter >= Obstacle::kMaxPoints)
     {
-        lidar_obstacle[obs_count].size = Obstacle::kMaxPoints;
+        lidar_obstacle[obstacles_counter].size = Obstacle::kMaxPoints;
         Point mid = ComputeCenter();
-        robot.WriteSerial(obs_count, mid.x, mid.y);
+        robot.WriteSerial(obstacles_counter, mid);
 
-        obs_count++;
-        data_count = 0;
+        obstacles_counter++;
+        points_counter = 0;
     }
-    if (obs_count >= obs_length)
+    if (obstacles_counter >= obs_length)
     {
-        obs_count = 0;
+        obstacles_counter = 0;
     }
 }
 
@@ -214,13 +202,13 @@ Point Lidar::ComputeCenter()
 {
     // get the middle point of all the data
     Point mid = {0, 0};
-    for (int16_t d = 0; d < lidar_obstacle[obs_count].size; d++)
+    for (int16_t d = 0; d < lidar_obstacle[obstacles_counter].size; d++)
     {
-        mid.x += lidar_obstacle[obs_count].data[d].x;
-        mid.y += lidar_obstacle[obs_count].data[d].y;
+        mid.x += lidar_obstacle[obstacles_counter].data[d].x;
+        mid.y += lidar_obstacle[obstacles_counter].data[d].y;
     }
-    mid.x = mid.x / lidar_obstacle[obs_count].size;
-    mid.y = mid.y / lidar_obstacle[obs_count].size;
+    mid.x = mid.x / lidar_obstacle[obstacles_counter].size;
+    mid.y = mid.y / lidar_obstacle[obstacles_counter].size;
 
     Debugger::log(">obstacle center: x:", mid.x, " |", VERBOSE, false);
     Debugger::log("y:", mid.y, "", VERBOSE, true);

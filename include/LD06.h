@@ -22,8 +22,8 @@ struct ConfigLidar
     int min_distance;
     int max_distance;
     int min_quality;
-    int obs_distance;
-    int obs_angle;
+    int distance_threshold; // represents the distance threshold to differentiate two obstacles
+    int angle_threshold;    // represents the angle threshold to differentiate two obstacles
 };
 struct PointLidar
 {
@@ -98,12 +98,15 @@ public:
     Point findCircle(float x1, float y1, float x2, float y2, float x3, float y3);
 
 private:
-    int16_t data_count = 0;
-    int16_t obs_count = 0;
+    // counter of points while detecting an obstacle from data
+    int16_t points_counter = 0;
+    // counter of obstacles tracked right now
+    int16_t obstacles_counter = 0;
 
     // Initialize obstacle
+    // maximum number of obstacles we can track at the same time
     static const uint8_t obs_length = 10;
-    // int const obs_max_point = 20;
+    // minimum number of pointsq needed to qualify as an obstacle
     static const uint8_t obs_min_point = 3;
 
     // why are you using uint32 instead of chars?

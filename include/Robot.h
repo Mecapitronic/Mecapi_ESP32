@@ -48,7 +48,7 @@ public:
     /**
      * Send data to robot PIC: send obstacle position given in args
      */
-    void WriteSerial(int n, int x, int y);
+    void WriteSerial(int n, Point p);
 
 private:
     RobotPosition_t robot_position;

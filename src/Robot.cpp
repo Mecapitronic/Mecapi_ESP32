@@ -60,12 +60,12 @@ void Robot::Print()
     Debugger::log("A= ", robot_position.angle / 100, "  ", VERBOSE);
 }
 
-void Robot::WriteSerial(int n, int x, int y)
+void Robot::WriteSerial(int n, Point p)
 {
     SERIAL_ROBOT.print(n);
     SERIAL_ROBOT.print(";");
-    SERIAL_ROBOT.print(x);
+    SERIAL_ROBOT.print(p.x);
     SERIAL_ROBOT.print(";");
-    SERIAL_ROBOT.print(y);
+    SERIAL_ROBOT.print(p.y);
     SERIAL_ROBOT.print('\n');
 }
