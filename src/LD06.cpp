@@ -48,6 +48,8 @@ namespace LD06
     {
         while (SERIAL_LIDAR.available() > 0)
         {
+            // we are building a lidar packet
+            // it always start with 0x54 0x2C and is 47 bytes long
             uint32_t tmpInt = SERIAL_LIDAR.read();
             if (tmpInt == 0x54 && cursorTmp == 0)
             {
