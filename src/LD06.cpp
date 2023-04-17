@@ -46,7 +46,7 @@ namespace LD06
 
     boolean ReadSerial()
     {
-        if (SERIAL_LIDAR.available() > 0)
+        while (SERIAL_LIDAR.available() > 0)
         {
             uint32_t tmpInt = SERIAL_LIDAR.read();
             if (tmpInt == 0x54 && cursorTmp == 0)
