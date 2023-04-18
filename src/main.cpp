@@ -115,7 +115,7 @@ void Task2code(void *pvParameters)
             xQueueReceive(queue, &point, portTICK_PERIOD_MS * 0);
             lidar06.SearchForObstacles(point, &tracker, robot);
         }
-        tracker.sendObstacleToRobot(robot);
+        tracker.sendObstaclesToRobot(robot);
         vTaskDelay(1);
     }
 }
