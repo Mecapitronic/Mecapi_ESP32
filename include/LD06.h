@@ -14,6 +14,7 @@
 #include <Arduino.h>
 #include "Debugger.h"
 #include "Robot.h"
+#include "Tracker.h"
 
 // LIDAR
 
@@ -79,13 +80,51 @@ public:
      */
     void Print();
 
-    void AggregatePoint(Robot robot, PointLidar p);
+    /**
+     * convert detected position from polar coordinates to cartesian coordinates
+     * according to robot position on the field
+     */
+    Point polarToCartesian(PointLidar polar_point, Robot robot);
+
+    /**
+     * returns whether or not the given point is outside the table
+     * the margin represents the distance between the center of the obstacle
+     * and the edges of the table
+     */
+    bool isOutsideTable(Point point);
+
+    /**
+     * returns whether or not the given point is outside the table
+     * the margin represents the distance between the center of the obstacle
+     * and the edges of the table
+     */
+    bool isOutsideTable(PointLidar polar_point, Robot robot);
+
+    /**
+     * detects if the points is on the table and agregate it if it is part of a obstacle
+     * currently detected
+     */
+    void searchForObstacles(PointLidar polar_point, Tracker *tracker, Robot robot);
+
+    void ObstacleDetected(Tracker *tracker, uint8_t size);
+
+    /**
+     * the limit of passing to new obstacle
+     * compare the difference with the previous point to the defined threshold
+     */
+    bool newObstacleThreshold(PointLidar polar_point);
+
+    /**
+     * Custom segmentation algorithm to detect cylinders in 2D plan
+     * Send data to object tracker that send it to the PIC
+     */
+    void AggregatePoint(PointLidar polar_point, Point point, Tracker *tracker);
 
     /**
      * Compute the center of local var lidar_obstacle
      * based on the fact that it is a cylinder of 70mm diameter
      */
-    Point ComputeCenter();
+    Point ComputeCenter(Obstacle lidar_obstacle);
 
     /**
      * Find the circle on which the given three points lie
@@ -98,22 +137,16 @@ public:
     Point findCircle(float x1, float y1, float x2, float y2, float x3, float y3);
 
 private:
-    // counter of points while detecting an obstacle from data
-    int16_t points_counter = 0;
-    // counter of obstacles tracked right now
-    int16_t obstacles_counter = 0;
-
-    // Initialize obstacle
-    // maximum number of obstacles we can track at the same time
-    static const uint8_t obs_length = 10;
-    // minimum number of pointsq needed to qualify as an obstacle
+    // minimum number of points needed to qualify as an obstacle
     static const uint8_t obs_min_point = 3;
+
+    // counter of points while detecting an obstacle from data
+    uint16_t points_counter = 0;
+    Obstacle tmp_obstacle;
 
     // why are you using uint32 instead of chars?
     uint32_t serial_buffer[LIDAR_SERIAL_PACKET_SIZE] = {0};
     uint8_t cursorTmp = 0;
-
-    Obstacle lidar_obstacle[obs_length];
 
     PacketLidar lidar_packet;
     ConfigLidar lidar_config;
