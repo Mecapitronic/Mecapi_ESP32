@@ -207,7 +207,7 @@ void Lidar::ObstacleDetected(Tracker *tracker, uint8_t size)
 {
     obstacleTmp.size = size;
     Point mid = ComputeCenter(obstacleTmp);
-    tracker->trackNewObstacle(mid);
+    tracker->track(mid);
     pointsCounter = 0;
 }
 

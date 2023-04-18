@@ -1,30 +1,68 @@
 #include "Tracker.h"
 
-Tracker::Tracker()
+Tracker::Tracker(float cutoff) : lpf_cutoff(cutoff)
 {
     Debugger::println("Init Tracker");
 }
 
-void Tracker::trackNewObstacle(Point obstacle)
+std::vector<Point> Tracker::getPoints()
 {
-    // Debugger::println("Obstacle: ");
-    // Debugger::log(" x: ", obstacle.x, "", VERBOSE);
-    // Debugger::log(" y: ", obstacle.y, "", VERBOSE);
-
-    obstacleTracked = obstacle;
-
-    newObstacle = true;
+    return tracked_points;
 }
 
-void Tracker::sendObstacleToRobot(Robot robot)
+int Tracker::findMatchingPoint(Point newPoint)
 {
-    if (newObstacle)
-    {
-        // Debugger::print("Sent to robot: ");
-        // Debugger::log("x= ", (int)obstacleTracked.x, " ", VERBOSE, false);
-        // Debugger::log("y= ", (int)obstacleTracked.y, "", VERBOSE);
+    // to hold the closest point to the new one
+    // A point can not be further than 5000.0 as it is the field size
+    float best_match = 5000.0;
+    int matching_point_index = -1;
 
-        robot.WriteSerial(1, obstacleTracked);
-        newObstacle = false;
+    Debugger::log("search point: x: ", newPoint.x, "  ", VERBOSE, false);
+    Debugger::log("y: ", newPoint.y, "", VERBOSE);
+    Debugger::log("tracked size: ", (int)tracked_points.size(), "", VERBOSE);
+
+    for (int i = 0; i < tracked_points.size(); i++)
+    {
+        Debugger::log("Compare to: x: ", tracked_points.at(i).x, "  ", VERBOSE, false);
+        Debugger::log("y: ", tracked_points.at(i).y, "  ", VERBOSE);
+
+        float dist = sqrt(pow(newPoint.x - tracked_points.at(i).x, 2) + pow(newPoint.y - tracked_points.at(i).y, 2));
+
+        // If distance is smaller than lpf_cutoff, assume it's the same point
+        if ((dist < lpf_cutoff) && (dist < best_match))
+        {
+            Debugger::println("it's the same point");
+            best_match = dist;
+            matching_point_index = i;
+        }
+    }
+
+    return matching_point_index;
+}
+
+void Tracker::track(Point new_point)
+{
+    int point_index = findMatchingPoint(new_point);
+
+    if (point_index == -1)
+    {
+        Debugger::println("New point detected, add to tracked");
+        // Add point to list of tracked points
+        tracked_points.push_back(new_point);
+    }
+    else
+    {
+        // update with new value
+        Debugger::println("Point already tracked, updating");
+        tracked_points[point_index] = new_point;
+    }
+}
+
+void Tracker::sendObstaclesToRobot(Robot robot)
+{
+    // TODO detect big changes not to send too much data
+    for (int i = 0; i < tracked_points.size(); i++)
+    {
+        robot.WriteSerial(i, tracked_points[i]);
     }
 }
