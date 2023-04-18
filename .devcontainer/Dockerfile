@@ -13,8 +13,10 @@ RUN apt-get update \
     curl \
     dialog \
     git \
+    screen \
     udev \
     unzip \
+    vim \
     wget \
     # for platformio
     bc \
@@ -47,3 +49,6 @@ USER $USERNAME
 
 # install PlatformIO
 RUN python3 -c "$(curl -fsSL https://raw.githubusercontent.com/platformio/platformio/develop/scripts/get-platformio.py)"
+
+# simulator dependencies
+RUN python3 -m pip install pyserial
