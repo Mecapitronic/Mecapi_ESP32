@@ -1,60 +1,118 @@
+/**
+ * Lidar manipulation and data computation
+ * fetch data from LIDAR scans and compute filters to extract other robots positions
+ * Computations are done on ESP32 for performances purposes
+ */
 #ifndef LD06_H
 #define LD06_H
 
-#include "main.h"
+#define SERIAL_LIDAR Serial2
+// 47 = 1(Start) + 1(Datalen) + 2(Speed) + 2(StartAngle) + 36(12 * 3 DataByte) + 2(EndAngle) + 2(TimeStamp) + 1(CRC)
+#define LIDAR_SERIAL_PACKET_SIZE 47
+#define LIDAR_DATA_PACKET_SIZE 12
 
-namespace LD06
+#include <Arduino.h>
+#include "Debugger.h"
+#include "Robot.h"
+
+// LIDAR
+
+struct ConfigLidar
+{
+    int min_distance;
+    int max_distance;
+    int min_quality;
+    int obs_distance;
+    int obs_angle;
+};
+struct PointLidar
+{
+    int angle;
+    int distance;
+    uint16_t confidence;
+};
+
+struct PacketLidar
+{
+    byte header;
+    int dataLength;
+    int radarSpeed;
+    int startAngle;
+    PointLidar dataPoint[LIDAR_DATA_PACKET_SIZE];
+    int endAngle;
+    int timestamp;
+    byte crcCheck;
+};
+
+class Lidar
 {
 
-    // 47 = 1(Start) + 1(Datalen) + 2(Speed) + 2(StartAngle) + 36(12 * 3 DataByte) + 2(EndAngle) + 2(TimeStamp) + 1(CRC)
-    uint8_t const serial_packet_size = 47;
-    uint8_t const data_packet_size = 12;
+public:
+    /**
+     * Lidar Constructor
+     */
+    Lidar(void);
 
-    // Initialize obstacle
-    int const obs_length = 10;
-    // int const obs_max_point = 20;
-    int const obs_min_point = 3;
-
-    struct PointLidar
-    {
-        int angle;
-        int distance;
-        uint16_t confidence;
-    };
-
-    struct PacketLidar
-    {
-        byte header;
-        int dataLength;
-        int radarSpeed;
-        int startAngle;
-        PointLidar dataPoint[data_packet_size];
-        int endAngle;
-        int timestamp;
-        byte crcCheck;
-    };
-
-    struct ConfigLidar
-    {
-        int min_distance;
-        int max_distance;
-        int min_quality;
-        int obs_distance;
-        int obs_angle;
-    };
-
-    void Init();
+    /**
+     * Configure lidar_config local variable with the given values in parameters
+     */
     void Config(int min, int max, int quality, int distance, int angle);
-    boolean ReadSerial();
-    void Analyze();
-    PacketLidar GetData();
-    void Print();
-    void AggregatePoint(PointLidar p);
-    void ComputeCenter();
 
+    /**
+     * Read data from serial and put in a buffer if it comes form the Lidar LD06
+     */
+    boolean ReadSerial();
+
+    /**
+     * Put data from lidar in lidar_packet local variable.
+     * Analyze and fix data according to angle step and out of bound distance
+     */
+    void Analyze();
+
+    /**
+     * Return lidar_packet data
+     */
+    PacketLidar GetData();
+
+    /**
+     * Debugging print: pretty print all data stored in lidar_packet
+     */
+    void Print();
+
+    void AggregatePoint(Robot robot, PointLidar p);
+
+    /**
+     * Compute the center of local var lidar_obstacle
+     * based on the fact that it is a cylinder of 70mm diameter
+     */
+    Point ComputeCenter();
+
+    /**
+     * Find the circle on which the given three points lie
+     */
     Point findCircle(Point p1, Point p2, Point p3);
+
+    /**
+     * Find the circle on which the given three points coordinates lie
+     */
     Point findCircle(float x1, float y1, float x2, float y2, float x3, float y3);
 
-} // namespace LD06
+private:
+    int16_t data_count = 0;
+    int16_t obs_count = 0;
 
+    // Initialize obstacle
+    static const uint8_t obs_length = 10;
+    // int const obs_max_point = 20;
+    static const uint8_t obs_min_point = 3;
+
+    // why are you using uint32 instead of chars?
+    uint32_t serial_buffer[LIDAR_SERIAL_PACKET_SIZE] = {0};
+    uint8_t cursorTmp = 0;
+
+    Obstacle lidar_obstacle[obs_length];
+
+    PacketLidar lidar_packet;
+    ConfigLidar lidar_config;
+};
 #endif
