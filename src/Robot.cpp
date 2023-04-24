@@ -66,8 +66,8 @@ void Robot::WriteSerial(int n, Point p)
 {
     SERIAL_ROBOT.print(n);
     SERIAL_ROBOT.print(";");
-    SERIAL_ROBOT.print(p.x);
+    SERIAL_ROBOT.print((int)p.x);
     SERIAL_ROBOT.print(";");
-    SERIAL_ROBOT.print(p.y);
+    SERIAL_ROBOT.print((int)p.y);
     SERIAL_ROBOT.print('\n');
 }

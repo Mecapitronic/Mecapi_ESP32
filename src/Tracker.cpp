@@ -24,7 +24,7 @@ void Tracker::sendObstacleToRobot(Robot robot)
         Debugger::log("x= ", (int)tracked_obstacle.x, " ", VERBOSE, false);
         Debugger::log("y= ", (int)tracked_obstacle.y, "", VERBOSE);
 
-        // robot.WriteSerial(1, tracked_obstacle);
+        robot.WriteSerial(1, tracked_obstacle);
         new_obstacle = false;
     }
 }
