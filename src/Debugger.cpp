@@ -43,7 +43,7 @@ void Debugger::checkSerial()
 
             // if (command.startsWith("Config:"))
             //{
-            // TODO I don't think Lidar functin should be here
+            // TODO I don't think Lidar function should be here
             // Lidar::config = Lidar::Config(-1, atoi(command.c_str()), -1, -1, -1);
             //}
         }

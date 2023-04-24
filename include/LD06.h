@@ -93,7 +93,7 @@ public:
     Point findCircle(Point p1, Point p2, Point p3);
 
     /**
-     * Find the circle on which the given three points coordonates lie
+     * Find the circle on which the given three points coordinates lie
      */
     Point findCircle(float x1, float y1, float x2, float y2, float x3, float y3);
 

@@ -24,7 +24,7 @@ public:
     Robot();
 
     /**
-     * Read data comming from Robot PIC giving the actual position of the robot
+     * Read data coming from Robot PIC giving the actual position of the robot
      * put data in local buffer
      */
     boolean ReadSerial();
