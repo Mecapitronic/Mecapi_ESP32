@@ -6,6 +6,7 @@
 #ifndef LD06_H
 #define LD06_H
 
+// Serial 2 : U2TX = GPIO17 ; U2RX = GPIO16
 #define SERIAL_LIDAR Serial2
 // 47 = 1(Start) + 1(Datalen) + 2(Speed) + 2(StartAngle) + 36(12 * 3 DataByte) + 2(EndAngle) + 2(TimeStamp) + 1(CRC)
 #define LIDAR_SERIAL_PACKET_SIZE 47
@@ -132,7 +133,7 @@ public:
     Point findCircle(Point p1, Point p2, Point p3);
 
     /**
-     * Find the circle on which the given three points coordonates lie
+     * Find the circle on which the given three points coordinates lie
      */
     Point findCircle(float x1, float y1, float x2, float y2, float x3, float y3);
 
