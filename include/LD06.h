@@ -155,6 +155,7 @@ private:
     uint8_t cursorTmp = 0;
 
     PacketLidar lidar_packet;
+    PointLidar lidar_last_data;
     ConfigLidar lidar_config;
 };
 #endif

@@ -95,6 +95,13 @@ void Lidar::Analyze()
         lidar_packet.dataPoint[i].confidence = (serial_buffer[8 + i * 3]);
         lidar_packet.dataPoint[i].distance = (int(serial_buffer[8 + i * 3 - 1] << 8 | serial_buffer[8 + i * 3 - 2]));
 
+        // We save the last point and it will be compared with the first point to the packet
+        if (i == LIDAR_DATA_PACKET_SIZE - 1)
+        {
+            lidar_last_data = lidar_packet.dataPoint[i];
+            Print_Point(lidar_last_data);
+        }
+
         // if the point is out of bound, we will not use it
         if (lidar_packet.dataPoint[i].distance < lidar_config.min_distance ||
             lidar_packet.dataPoint[i].distance > lidar_config.max_distance ||
