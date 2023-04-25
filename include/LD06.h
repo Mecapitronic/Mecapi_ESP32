@@ -79,7 +79,12 @@ public:
     /**
      * Debugging print: pretty print all data stored in lidar_packet
      */
-    void Print();
+    void Print_Packet();
+
+    /**
+     * Debugging print: pretty print data stored in one PointLidar
+     */
+    void Print_Point(PointLidar p);
 
     /**
      * convert detected position from polar coordinates to cartesian coordinates

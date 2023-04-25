@@ -107,7 +107,7 @@ void Lidar::Analyze()
 
 PacketLidar Lidar::GetData() { return lidar_packet; }
 
-void Lidar::Print()
+void Lidar::Print_Packet()
 {
     Debugger::print("dataLength:");
     Debugger::print(lidar_packet.dataLength);
@@ -131,6 +131,17 @@ void Lidar::Print()
         Debugger::print(" C:");
         Debugger::println(lidar_packet.dataPoint[i].confidence);
     }
+}
+
+void Lidar::Print_Point(PointLidar p)
+{
+    Debugger::print("Point ");
+    Debugger::print("A:");
+    Debugger::print(p.angle);
+    Debugger::print(" D:");
+    Debugger::print(p.distance);
+    Debugger::print(" C:");
+    Debugger::println(p.confidence);
 }
 
 Point Lidar::polarToCartesian(PointLidar polar_point, Robot robot)
