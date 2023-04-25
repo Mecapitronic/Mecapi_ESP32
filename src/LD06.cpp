@@ -95,6 +95,30 @@ void Lidar::Analyze()
         lidar_packet.dataPoint[i].confidence = (serial_buffer[8 + i * 3]);
         lidar_packet.dataPoint[i].distance = (int(serial_buffer[8 + i * 3 - 1] << 8 | serial_buffer[8 + i * 3 - 2]));
 
+        // We compare the first point of this packet with the last point of the previous packet
+        // we do not care about distance and confidence as we only seek continuity in angle
+        if (i == 0)
+        {
+            int delta = 36000;
+            if (lidar_packet.dataPoint[i].angle > lidar_last_data.angle)
+            {
+                delta = lidar_packet.dataPoint[i].angle - lidar_last_data.angle;
+                Print_Point(lidar_packet.dataPoint[i]);
+            }
+            else
+            {
+                delta = lidar_packet.dataPoint[i].angle + (36000 - lidar_last_data.angle);
+            }
+            if (delta > 100)  // TODO put in parameter
+            {
+                Debugger::log("Discontinuity detected : ", delta, " 1/100 deg", WARN);
+            }
+            else
+            {
+                Debugger::log("Continuity OK : ", delta, " 1/100 deg", VERBOSE);
+            }
+        }
+
         // We save the last point and it will be compared with the first point to the packet
         if (i == LIDAR_DATA_PACKET_SIZE - 1)
         {
