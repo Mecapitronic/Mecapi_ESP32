@@ -6,6 +6,7 @@
 #ifndef LD06_H
 #define LD06_H
 
+// Serial 2 : U2TX = GPIO17 ; U2RX = GPIO16
 #define SERIAL_LIDAR Serial2
 // 47 = 1(Start) + 1(Datalen) + 2(Speed) + 2(StartAngle) + 36(12 * 3 DataByte) + 2(EndAngle) + 2(TimeStamp) + 1(CRC)
 #define LIDAR_SERIAL_PACKET_SIZE 47
