@@ -2,6 +2,8 @@
 
 Robot::Robot()
 {
+    Debugger::println("Init Robot");
+
     robot_position = {0, 0, 0.0};
     cursorTmp = 0;
     for (size_t i = 0; i < ROBOT_SERIAL_PACKET_SIZE; i++)
@@ -60,12 +62,12 @@ void Robot::Print()
     Debugger::log("A= ", robot_position.angle / 100, "  ", VERBOSE);
 }
 
-void Robot::WriteSerial(int n, int x, int y)
+void Robot::WriteSerial(int n, Point p)
 {
     SERIAL_ROBOT.print(n);
     SERIAL_ROBOT.print(";");
-    SERIAL_ROBOT.print(x);
+    SERIAL_ROBOT.print((int)p.x);
     SERIAL_ROBOT.print(";");
-    SERIAL_ROBOT.print(y);
+    SERIAL_ROBOT.print((int)p.y);
     SERIAL_ROBOT.print('\n');
 }

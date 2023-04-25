@@ -29,11 +29,15 @@ struct RobotPosition_t
     float angle;
 };
 
+/**
+ * Represent an obstacle, the topping cylinder on adversary robots
+ * The maximum points needed to represent a 70mm wide cylinder is 20 (kMaxPoints)
+ */
 struct Obstacle
 {
     static constexpr size_t kMaxPoints = 20;
     PolarPoint data[kMaxPoints] = {0, 0, 0, 0, 0};
-    int size = 0;
+    uint8_t size = 0;
 };
 
 #endif

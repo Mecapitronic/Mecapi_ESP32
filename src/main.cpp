@@ -13,6 +13,8 @@ void setup()
     robot = Robot();
     delay(500);
     lidar06 = Lidar();
+    delay(500);
+    tracker = Tracker();
 
     // create a task that will be executed in the Task1code() function, with priority 1 and executed on core 0
     xTaskCreatePinnedToCore(Task1code, /* Task function. */
@@ -81,12 +83,14 @@ void Task2code(void *pvParameters)
         if (uxQueueMessagesWaiting(queue) > 0)
         {
             xQueueReceive(queue, &point, portTICK_PERIOD_MS * 0);
-            lidar06.AggregatePoint(robot, point);
+            lidar06.searchForObstacles(point, &tracker, robot);
         }
+        tracker.sendObstacleToRobot(robot);
         vTaskDelay(1);
     }
 }
 
+// should be in debugger or utils
 void Print(HardwareSerial s, PolarPoint p, bool debug)
 {
     if (debug)

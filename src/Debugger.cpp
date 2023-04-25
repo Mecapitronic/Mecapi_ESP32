@@ -58,8 +58,6 @@ void Debugger::println(float data) { SERIAL_DEBUG.println(data); }
 
 void Debugger::println(int data) { SERIAL_DEBUG.println(data); }
 
-void Debugger::println(bool data) { SERIAL_DEBUG.println(data); }
-
 void Debugger::print(String message) { SERIAL_DEBUG.print(message); }
 
 void Debugger::print(char c) { SERIAL_DEBUG.print(c); }
@@ -67,8 +65,6 @@ void Debugger::print(char c) { SERIAL_DEBUG.print(c); }
 void Debugger::print(float data) { SERIAL_DEBUG.print(data); }
 
 void Debugger::print(int data) { SERIAL_DEBUG.print(data); }
-
-void Debugger::print(bool data) { SERIAL_DEBUG.print(data); }
 
 void Debugger::log(String prefix, int data, String suffix, Level level, boolean lineFeed)
 {

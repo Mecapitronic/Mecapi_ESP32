@@ -47,15 +47,14 @@ public:
      */
     static Level level();
 
+    // can't define print(bool) because it overload every other prints
     static void println(char);
     static void println(String = "");
-    static void println(bool);
     static void println(int);
     static void println(float);
 
     static void print(char);
     static void print(String);
-    static void print(bool);
     static void print(int);
     static void print(float);
 

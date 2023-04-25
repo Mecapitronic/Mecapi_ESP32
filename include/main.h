@@ -31,5 +31,8 @@ const int MIN_QUALITY = 100;
 
 Lidar lidar06;
 Robot robot;
+Tracker tracker;
+
+Point obstacle;
 
 #endif

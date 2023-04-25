@@ -24,6 +24,8 @@ RUN apt-get update \
     clang \
     curl \
     gcc \
+    libpython2.7 \
+    libusb-1.0-0 \
     python3 \
     python3-dev \
     python3-distutils \
