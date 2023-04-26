@@ -72,6 +72,11 @@ public:
     void Analyze();
 
     /**
+     * Check between 2 lidar packet received if there is no packet loss
+     */
+    boolean CheckContinuity();
+
+    /**
      * Return lidar_packet data
      */
     PacketLidar GetData();

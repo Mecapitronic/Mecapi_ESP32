@@ -53,6 +53,7 @@ void Task1code(void *pvParameters)
         if (lidar06.ReadSerial())
         {
             lidar06.Analyze();
+            lidar06.CheckContinuity();
         }
         if (robot.ReadSerial())
         {
