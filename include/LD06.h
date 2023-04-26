@@ -84,12 +84,12 @@ public:
     /**
      * Debugging print: pretty print all data stored in lidarPacket
      */
-    void PrintPacket();
+    void PrintPacket(PacketLidar packet);
 
     /**
      * Debugging print: pretty print data stored in one PointLidar
      */
-    void PrintPoint(PointLidar p);
+    void PrintPoint(PointLidar point);
 
     /**
      * convert detected position from polar coordinates to cartesian coordinates
@@ -151,6 +151,9 @@ private:
     // minimum number of points needed to qualify as an obstacle
     static const uint8_t obstacleMinPoints = 3;
 
+    // Maximum angle between Lidar packet admissible
+    static const uint8_t angleMaxDiscontinuity = 160; // TODO move into config ?
+
     // counter of points while detecting an obstacle from data
     uint16_t pointsCounter = 0;
     Obstacle obstacleTmp;
@@ -160,7 +163,7 @@ private:
     uint8_t cursorTmp = 0;
 
     PacketLidar lidarPacket;
-    PointLidar lidarLastPoint;
+    PacketLidar lidarLastPacket;
     ConfigLidar lidarConfig;
 };
 #endif

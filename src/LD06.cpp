@@ -108,62 +108,64 @@ boolean Lidar::CheckContinuity()
 {
     // We compare the first point of this packet with the last point of the previous packet
     // we do not care about distance and confidence as we only seek continuity in angle
-    int delta = lidarPacket.dataPoint[0].angle - lidarLastPoint.angle;
+    int delta = lidarPacket.dataPoint[0].angle - lidarLastPacket.dataPoint[LIDAR_DATA_PACKET_SIZE - 1].angle;
     // previous packet was before 0° and current after
-    if (lidarLastPoint.angle >= lidarPacket.dataPoint[0].angle)
+    if (lidarLastPacket.dataPoint[LIDAR_DATA_PACKET_SIZE - 1].angle >= lidarPacket.dataPoint[0].angle)
     {
         delta += 36000;
     }
 
     // save the last point to compare to the next packet's first point
-    lidarLastPoint = lidarPacket.dataPoint[LIDAR_DATA_PACKET_SIZE - 1];
+    lidarLastPacket = lidarPacket;
 
-    if (delta > 160) // TODO put in parameter
+    if (delta > angleMaxDiscontinuity)
     {
-        Debugger::log("Discontinuity detected : ", delta, " 1/100 deg", WARN);
+        Debugger::log("Discontinuity : ", (float)delta / 100, " deg", WARN);
         return false;
     }
     else
+    {
         return true;
+    }
 }
 
 PacketLidar Lidar::GetData() { return lidarPacket; }
 
-void Lidar::PrintPacket()
+void Lidar::PrintPacket(PacketLidar packet)
 {
     Debugger::print("dataLength:");
-    Debugger::print(lidarPacket.dataLength);
+    Debugger::print(packet.dataLength);
     Debugger::print(" radarSpeed:");
-    Debugger::print(lidarPacket.radarSpeed);
+    Debugger::print(packet.radarSpeed);
     Debugger::print(" startAngle:");
-    Debugger::print(lidarPacket.startAngle);
+    Debugger::print(packet.startAngle);
     Debugger::print(" endAngle: ");
-    Debugger::print(lidarPacket.endAngle);
+    Debugger::print(packet.endAngle);
     Debugger::print(" timestamp: ");
-    Debugger::println(lidarPacket.timestamp);
+    Debugger::println(packet.timestamp);
     for (uint8_t i = 0; i < LIDAR_DATA_PACKET_SIZE; i++)
     {
         Debugger::print("   Point ");
         Debugger::print(i);
         Debugger::print(") ");
         Debugger::print("A:");
-        Debugger::print(lidarPacket.dataPoint[i].angle);
+        Debugger::print(packet.dataPoint[i].angle);
         Debugger::print(" D:");
-        Debugger::print(lidarPacket.dataPoint[i].distance);
+        Debugger::print(packet.dataPoint[i].distance);
         Debugger::print(" C:");
-        Debugger::println(lidarPacket.dataPoint[i].confidence);
+        Debugger::println(packet.dataPoint[i].confidence);
     }
 }
 
-void Lidar::PrintPoint(PointLidar p)
+void Lidar::PrintPoint(PointLidar point)
 {
     Debugger::print("Point ");
     Debugger::print("A:");
-    Debugger::print(p.angle);
+    Debugger::print(point.angle);
     Debugger::print(" D:");
-    Debugger::print(p.distance);
+    Debugger::print(point.distance);
     Debugger::print(" C:");
-    Debugger::println(p.confidence);
+    Debugger::println(point.confidence);
 }
 
 Point Lidar::PolarToCartesian(PointLidar polar_point, Robot robot)
