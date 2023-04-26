@@ -103,19 +103,19 @@ void Lidar::Analyze()
             if (lidar_packet.dataPoint[i].angle > lidar_last_data.angle)
             {
                 delta = lidar_packet.dataPoint[i].angle - lidar_last_data.angle;
-                Print_Point(lidar_packet.dataPoint[i]);
+                // Print_Point(lidar_packet.dataPoint[i]);
             }
             else
             {
                 delta = lidar_packet.dataPoint[i].angle + (36000 - lidar_last_data.angle);
             }
-            if (delta > 100)  // TODO put in parameter
+            if (delta > 160) // TODO put in parameter
             {
                 Debugger::log("Discontinuity detected : ", delta, " 1/100 deg", WARN);
             }
             else
             {
-                Debugger::log("Continuity OK : ", delta, " 1/100 deg", VERBOSE);
+                // Debugger::log("Continuity OK : ", delta, " 1/100 deg", VERBOSE);
             }
         }
 
@@ -123,7 +123,7 @@ void Lidar::Analyze()
         if (i == LIDAR_DATA_PACKET_SIZE - 1)
         {
             lidar_last_data = lidar_packet.dataPoint[i];
-            Print_Point(lidar_last_data);
+            // Print_Point(lidar_last_data);
         }
 
         // if the point is out of bound, we will not use it
