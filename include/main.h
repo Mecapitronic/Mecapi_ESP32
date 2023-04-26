@@ -25,10 +25,6 @@ TaskHandle_t Task2;
 QueueHandle_t queue;
 int queueSize = 500;
 
-const int MIN_DISTANCE = 0;
-const int MAX_DISTANCE = 500;
-const int MIN_QUALITY = 100;
-
 Lidar lidar06;
 Robot robot;
 Tracker tracker;
