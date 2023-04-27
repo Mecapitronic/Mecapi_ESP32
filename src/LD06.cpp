@@ -11,7 +11,6 @@ Lidar::Lidar()
 
 void Lidar::Config(int min, int max, int quality, int distance, int angle)
 {
-
     if (min != -1)
     {
         lidarConfig.minDistance = min;
