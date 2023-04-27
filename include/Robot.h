@@ -9,7 +9,8 @@
 
 #define SERIAL_ROBOT Serial1
 #define ROBOT_SERIAL_PACKET_SIZE 32
-// '!' + "2000,2000,36000" + 'n' :  1 + 2 * 3 + 1;
+// '!' + "1000,1500,9000" + '\n' :  1 + 2 * 3 + 1;
+// 21 e8 03 dc 05 28 23 0A
 #define ROBOT_DATA_PACKET_SIZE 8
 
 #include "Debugger.h"
