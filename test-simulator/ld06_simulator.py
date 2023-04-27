@@ -29,7 +29,7 @@ def packets_from_file(data_file: Path) -> List:
     return data
 
 def convert_packet(packet_str: str) -> bytes:
-    packet_str = packet_str.replace('0x', '')
+    #packet_str = packet_str.replace('0x', '')
     return bytes.fromhex(packet_str)
 
 def os_is_unix() -> bool:
