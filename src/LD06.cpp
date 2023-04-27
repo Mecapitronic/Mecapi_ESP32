@@ -11,7 +11,6 @@ Lidar::Lidar()
 
 void Lidar::Config(int min, int max, int quality, int distance, int angle)
 {
-
     if (min != -1)
     {
         lidar_config.min_distance = min;
@@ -96,8 +95,7 @@ void Lidar::Analyze()
         lidar_packet.dataPoint[i].distance = (int(serial_buffer[8 + i * 3 - 1] << 8 | serial_buffer[8 + i * 3 - 2]));
 
         // if the point is out of bound, we will not use it
-        if (lidar_packet.dataPoint[i].distance < lidar_config.min_distance ||
-            lidar_packet.dataPoint[i].distance > lidar_config.max_distance ||
+        if (lidar_packet.dataPoint[i].distance < lidar_config.min_distance || lidar_packet.dataPoint[i].distance > lidar_config.max_distance ||
             lidar_packet.dataPoint[i].confidence < lidar_config.min_quality)
         {
             lidar_packet.dataPoint[i].confidence = 0;

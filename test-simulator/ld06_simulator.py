@@ -15,12 +15,12 @@ def init_serial(serial_if: str) -> None:
     ser = serial.Serial(serial_if, 230400)
     ser.reset_input_buffer()
     ser.reset_output_buffer()
-    ser.close() 
+    ser.close()
 
 def send_packet(packet: bytes, serial_if: str) -> None:
     ser = serial.Serial(serial_if, 230400)
     ser.write(packet)
-    ser.close() 
+    ser.close()
 
 
 def packets_from_file(data_file: Path) -> List:
@@ -29,15 +29,15 @@ def packets_from_file(data_file: Path) -> List:
     return data
 
 def convert_packet(packet_str: str) -> bytes:
-    packet_str = packet_str.replace('0x', '')
-    return bytes.fromhex(packet_str) 
+    #packet_str = packet_str.replace('0x', '')
+    return bytes.fromhex(packet_str)
 
 def os_is_unix() -> bool:
     if platform == "linux" or platform == "linux2" or platform == "darwin":
         return True
     elif platform == "win32":
         return False
-        
+
 
 def main(serial_if: str):
     print(f"Starting Lidar, sending packets to {serial_if}:")
@@ -56,10 +56,10 @@ def main(serial_if: str):
 def which_serial_if(serial_if: str = None) -> str:
     if serial_if:
         return serial_if
-    
+
     if os_is_unix():
         return SERIAL_LNX
-    
+
     return SERIAL_WIN
 
 if __name__ == "__main__":
