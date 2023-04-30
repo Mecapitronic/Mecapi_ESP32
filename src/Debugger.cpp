@@ -34,19 +34,16 @@ Level Debugger::level() { return debugLevel; }
 
 void Debugger::checkSerial()
 {
-    if (enabled)
+    if (enabled && SERIAL_DEBUG.available() > 0)
     {
-        if (SERIAL_DEBUG.available() > 0)
-        {
-            String command = SERIAL_DEBUG.readStringUntil('\n');
-            SERIAL_DEBUG.println("Received :" + command);
+        String command = SERIAL_DEBUG.readStringUntil('\n');
+        SERIAL_DEBUG.println("Received :" + command);
 
-            // if (command.startsWith("Config:"))
-            //{
-            // TODO I don't think Lidar function should be here
-            // Lidar::config = Lidar::Config(-1, atoi(command.c_str()), -1, -1, -1);
-            //}
-        }
+        // if (command.startsWith("Config:"))
+        //{
+        // TODO I don't think Lidar function should be here
+        // Lidar::config = Lidar::Config(-1, atoi(command.c_str()), -1, -1, -1);
+        //}
     }
 }
 
@@ -146,4 +143,42 @@ void Debugger::logArrayN(String prefix, int element, String interFix, int array[
     }
     else
         println("Invalid array printed !");
+}
+
+void Debugger::printPolarPoint(PolarPoint p, Level level)
+{
+    if (level < debugLevel)
+    {
+        SERIAL_DEBUG.print((int)p.angle);
+        SERIAL_DEBUG.print(";");
+        SERIAL_DEBUG.print(p.distance);
+        SERIAL_DEBUG.print(";");
+        SERIAL_DEBUG.println(p.confidence);
+    }
+    else
+    {
+        SERIAL_DEBUG.print("Angle:");
+        SERIAL_DEBUG.print((int)p.angle);
+        SERIAL_DEBUG.print(" Distance:");
+        SERIAL_DEBUG.print(p.distance);
+        SERIAL_DEBUG.print(" Confidence:");
+        SERIAL_DEBUG.println(p.confidence);
+    }
+}
+
+void Debugger::printPoint(Point p, Level level)
+{
+    if (level < debugLevel)
+    {
+        SERIAL_DEBUG.print((int)p.x);
+        SERIAL_DEBUG.print(";");
+        SERIAL_DEBUG.print((int)p.y);
+    }
+    else
+    {
+        SERIAL_DEBUG.print("X:");
+        SERIAL_DEBUG.print((int)p.x);
+        SERIAL_DEBUG.print(" Y:");
+        SERIAL_DEBUG.print((int)p.y);
+    }
 }
