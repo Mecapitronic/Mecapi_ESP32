@@ -5,11 +5,11 @@ Lidar::Lidar()
     Debugger::println("Init Lidar");
 
     // min_distance, max_distance, min_quality, distance_threshold, angle_threshold;
-    Config(0, 500, 200, 200, 5);
+    Config(0, 2000, 200, 200, 5);
     SERIAL_LIDAR.begin(230400);
 }
 
-void Lidar::Config(int min, int max, int quality, int distance, int angle)
+void Lidar::Config(int min = -1, int max = -1, int quality = -1, int distance = -1, int angle = -1)
 {
     if (min != -1)
     {
