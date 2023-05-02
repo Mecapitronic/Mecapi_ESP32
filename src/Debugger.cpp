@@ -32,19 +32,15 @@ void Debugger::header()
 
 Level Debugger::level() { return debugLevel; }
 
-void Debugger::checkSerial()
+String Debugger::checkSerial()
 {
     if (enabled && SERIAL_DEBUG.available() > 0)
     {
         String command = SERIAL_DEBUG.readStringUntil('\n');
-        SERIAL_DEBUG.println("Received :" + command);
-
-        // if (command.startsWith("Config:"))
-        //{
-        // TODO I don't think Lidar function should be here
-        // Lidar::config = Lidar::Config(-1, atoi(command.c_str()), -1, -1, -1);
-        //}
+        SERIAL_DEBUG.println("Received : " + command);
+        return command;
     }
+    return "";
 }
 
 void Debugger::println(String message) { SERIAL_DEBUG.println(message); }

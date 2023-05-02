@@ -48,7 +48,26 @@ void Task1code(void *pvParameters)
     PacketLidar lidar_packet;
     while (1)
     {
-        Debugger::checkSerial();
+
+        String cmd = Debugger::checkSerial();
+
+        if (cmd.startsWith("Lidar:"))
+        {
+            try
+            {
+                cmd.remove(0, 6);
+                int i = atoi(cmd.c_str());
+                Debugger::print("Lidar: ");
+                Debugger::println(i);
+                lidar06.Config(-1, i, -1, -1, -1);
+                // TODO : make a function for reading commands
+            }
+            catch (std::exception const &e)
+            {
+                Debugger::print("error : ");
+                Debugger::println(e.what());
+            }
+        }
 
         if (lidar06.ReadSerial())
         {

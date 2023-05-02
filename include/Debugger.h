@@ -41,7 +41,7 @@ public:
      * Check for commands send on debugging serial plugged to a computer
      * List of commands is still empty now
      */
-    static void checkSerial();
+    static String checkSerial();
 
     /**
      * Return the debugging level used: VERBOSE, INFO,WARN or ERROR
