@@ -9,7 +9,7 @@ Lidar::Lidar()
     SERIAL_LIDAR.begin(230400);
 }
 
-void Lidar::Config(int min, int max, int quality, int distance, int angle)
+void Lidar::Config(int min = -1, int max = -1, int quality = -1, int distance = -1, int angle = -1)
 {
     if (min != -1)
     {

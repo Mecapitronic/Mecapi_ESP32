@@ -11,6 +11,7 @@
 #define ERROR Level::LEVEL_ERROR
 
 #include <Arduino.h>
+#include "Structure.h"
 
 #define SERIAL_PC Serial
 #define SERIAL_DEBUG SERIAL_PC
@@ -40,7 +41,7 @@ public:
      * Check for commands send on debugging serial plugged to a computer
      * List of commands is still empty now
      */
-    static void checkSerial();
+    static String checkSerial();
 
     /**
      * Return the debugging level used: VERBOSE, INFO,WARN or ERROR
@@ -54,7 +55,7 @@ public:
     static void println(float);
 
     static void print(char);
-    static void print(String);
+    static void print(String = "");
     static void print(int);
     static void print(float);
 
@@ -66,6 +67,9 @@ public:
     static void logArray(String prefix, int array[], size_t size, char separator = ',', String suffix = ")", Level level = VERBOSE);
     static void logArrayN(String prefix, int element, String interFix, int array[], size_t size, char separator = ',', String suffix = ")",
                           Level level = VERBOSE);
+
+    static void printPolarPoint(PolarPoint p, Level level);
+    static void printPoint(Point p, Level level);
 
 private:
     static const boolean enabled = true;

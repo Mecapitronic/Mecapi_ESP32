@@ -7,18 +7,19 @@ from pathlib import Path
 from typing import List
 from sys import platform
 
-FILE="data_ld06.txt"
-SERIAL_LNX='/dev/ttyUSB0'
-SERIAL_WIN='COM0'
+FILE = "data_ld06_2.txt"
+SERIAL_LNX = '/dev/ttyUSB0'
+SERIAL_WIN = 'COM0'
+BAUDRATE = 230400
 
 def init_serial(serial_if: str) -> None:
-    ser = serial.Serial(serial_if, 230400)
+    ser = serial.Serial(serial_if, BAUDRATE)
     ser.reset_input_buffer()
     ser.reset_output_buffer()
     ser.close()
 
 def send_packet(packet: bytes, serial_if: str) -> None:
-    ser = serial.Serial(serial_if, 230400)
+    ser = serial.Serial(serial_if, BAUDRATE)
     ser.write(packet)
     ser.close()
 

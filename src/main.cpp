@@ -48,7 +48,26 @@ void Task1code(void *pvParameters)
     PacketLidar lidarPacket;
     while (1)
     {
-        Debugger::checkSerial();
+
+        String cmd = Debugger::checkSerial();
+
+        if (cmd.startsWith("Lidar:"))
+        {
+            try
+            {
+                cmd.remove(0, 6);
+                int i = atoi(cmd.c_str());
+                Debugger::print("Lidar: ");
+                Debugger::println(i);
+                lidar06.Config(-1, i, -1, -1, -1);
+                // TODO : make a function for reading commands
+            }
+            catch (std::exception const &e)
+            {
+                Debugger::print("error : ");
+                Debugger::println(e.what());
+            }
+        }
 
         if (lidar06.ReadSerial())
         {
@@ -89,50 +108,4 @@ void Task2code(void *pvParameters)
         tracker.sendObstacleToRobot(robot);
         vTaskDelay(1);
     }
-}
-
-// should be in debugger or utils
-void Print(HardwareSerial s, PolarPoint p, bool debug)
-{
-    if (debug)
-    {
-        s.print("Angle:");
-    }
-    s.print((int)p.angle);
-    if (debug)
-    {
-        s.print(" Distance:");
-    }
-    else
-    {
-        s.print(";");
-    }
-    s.print(p.distance);
-    if (debug)
-    {
-        s.print(" Confidence:");
-    }
-    else
-    {
-        s.print(";");
-    }
-    s.println(p.confidence);
-}
-
-void Print(HardwareSerial s, Point p, bool debug)
-{
-    if (debug)
-    {
-        s.print("X:");
-    }
-    s.print((int)p.x);
-    if (debug)
-    {
-        s.print(" Y:");
-    }
-    else
-    {
-        s.print(";");
-    }
-    s.print((int)p.y);
 }
