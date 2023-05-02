@@ -19,8 +19,8 @@
     "postAttachCommand": "sudo service udev restart",
     "mounts": [
         "source=/dev/,target=/dev/,type=bind,consistency=consistent",
-        "source=/home/${localEnv:USER}/.gitconfig,target=/root/.gitconfig,type=bind",
-        "source=/home/${localEnv:USER}/.ssh,target=/root/.ssh-localhost,type=bind"
+        "source=/${localEnv:HOME}/.gitconfig,target=/root/.gitconfig,type=bind",
+        "source=/${localEnv:HOME}/.ssh,target=/root/.ssh,type=bind"
     ],
     // "source=/run/user/1000,target=/run/user/1000,type=bind,consistency=cached",
     "customizations": {
