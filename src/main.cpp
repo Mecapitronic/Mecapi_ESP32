@@ -45,7 +45,7 @@ void loop()
 // Note the 1 Tick delay, this is need so the watchdog doesn't get confused
 void Task1code(void *pvParameters)
 {
-    PacketLidar lidar_packet;
+    PacketLidar lidarPacket;
     while (1)
     {
 
@@ -72,19 +72,20 @@ void Task1code(void *pvParameters)
         if (lidar06.ReadSerial())
         {
             lidar06.Analyze();
+            lidar06.CheckContinuity();
         }
         if (robot.ReadSerial())
         {
             robot.Analyze();
         }
 
-        lidar_packet = lidar06.GetData();
+        lidarPacket = lidar06.GetData();
         for (int i = 0; i < LIDAR_DATA_PACKET_SIZE; i++)
         {
             // Filter point before sending to queue : increase speed for later calculus
-            if (lidar_packet.dataPoint[i].confidence != 0)
+            if (lidarPacket.dataPoint[i].confidence != 0)
             {
-                xQueueSend(queue, &lidar_packet.dataPoint[i], 0);
+                xQueueSend(queue, &lidarPacket.dataPoint[i], 0);
             }
         }
         vTaskDelay(1);
@@ -102,7 +103,7 @@ void Task2code(void *pvParameters)
         if (uxQueueMessagesWaiting(queue) > 0)
         {
             xQueueReceive(queue, &point, portTICK_PERIOD_MS * 0);
-            lidar06.searchForObstacles(point, &tracker, robot);
+            lidar06.SearchForObstacles(point, &tracker, robot);
         }
         tracker.sendObstacleToRobot(robot);
         vTaskDelay(1);

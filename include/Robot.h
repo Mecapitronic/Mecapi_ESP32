@@ -9,7 +9,8 @@
 
 #define SERIAL_ROBOT Serial1
 #define ROBOT_SERIAL_PACKET_SIZE 32
-// '!' + "2000,2000,36000" + 'n' :  1 + 2 * 3 + 1;
+// '!' + "1000,1500,9000" + '\n' :  1 + 2 * 3 + 1;
+// 21 e8 03 dc 05 28 23 0A
 #define ROBOT_DATA_PACKET_SIZE 8
 
 #include "Debugger.h"
@@ -31,19 +32,19 @@ public:
 
     /**
      * Register robot position received from PIC on serial
-     * in a local variable robot_position
+     * in a local variable robotPosition
      */
     void Analyze();
 
     /**
-     * Return robot_position: last known robot position
+     * Return robotPosition: last known robot position
      */
-    RobotPosition_t GetData();
+    RobotPosition_t GetPosition();
 
     /**
      * Debug print: pretty print robot position and orientation
      */
-    void Print();
+    void PrintPosition();
 
     /**
      * Send data to robot PIC: send obstacle position given in args
@@ -51,8 +52,8 @@ public:
     void WriteSerial(int n, Point p);
 
 private:
-    RobotPosition_t robot_position;
-    uint32_t serial_buffer[ROBOT_SERIAL_PACKET_SIZE] = {0};
+    RobotPosition_t robotPosition;
+    uint32_t serialBuffer[ROBOT_SERIAL_PACKET_SIZE] = {0};
     uint8_t cursorTmp = 0;
 };
 

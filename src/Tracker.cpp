@@ -7,24 +7,24 @@ Tracker::Tracker()
 
 void Tracker::trackNewObstacle(Point obstacle)
 {
-    Debugger::println("Obstacle: ");
-    Debugger::log(" x: ", obstacle.x, "", VERBOSE);
-    Debugger::log(" y: ", obstacle.y, "", VERBOSE);
+    // Debugger::println("Obstacle: ");
+    // Debugger::log(" x: ", obstacle.x, "", VERBOSE);
+    // Debugger::log(" y: ", obstacle.y, "", VERBOSE);
 
-    tracked_obstacle = obstacle;
+    obstacleTracked = obstacle;
 
-    new_obstacle = true;
+    newObstacle = true;
 }
 
 void Tracker::sendObstacleToRobot(Robot robot)
 {
-    if (new_obstacle)
+    if (newObstacle)
     {
-        Debugger::print("Sent to robot: ");
-        Debugger::log("x= ", (int)tracked_obstacle.x, " ", VERBOSE, false);
-        Debugger::log("y= ", (int)tracked_obstacle.y, "", VERBOSE);
+        // Debugger::print("Sent to robot: ");
+        // Debugger::log("x= ", (int)obstacleTracked.x, " ", VERBOSE, false);
+        // Debugger::log("y= ", (int)obstacleTracked.y, "", VERBOSE);
 
-        robot.WriteSerial(1, tracked_obstacle);
-        new_obstacle = false;
+        robot.WriteSerial(1, obstacleTracked);
+        newObstacle = false;
     }
 }

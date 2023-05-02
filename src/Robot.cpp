@@ -4,11 +4,11 @@ Robot::Robot()
 {
     Debugger::println("Init Robot");
 
-    robot_position = {0, 0, 0.0};
+    robotPosition = {0, 0, 0.0};
     cursorTmp = 0;
     for (size_t i = 0; i < ROBOT_SERIAL_PACKET_SIZE; i++)
     {
-        serial_buffer[i] = 0;
+        serialBuffer[i] = 0;
     }
 
     // we change the UART 1 RX pin from 9 to 2
@@ -18,7 +18,7 @@ Robot::Robot()
     SERIAL_ROBOT.begin(250000, SERIAL_8N1, RX1, TX1);
 }
 
-RobotPosition_t Robot::GetData() { return robot_position; }
+RobotPosition_t Robot::GetPosition() { return robotPosition; }
 
 boolean Robot::ReadSerial()
 {
@@ -27,16 +27,16 @@ boolean Robot::ReadSerial()
         uint32_t tmpInt = SERIAL_ROBOT.read();
         if (tmpInt == 0x21 && cursorTmp == 0) // 0x21 = '!'
         {
-            serial_buffer[cursorTmp++] = tmpInt;
+            serialBuffer[cursorTmp++] = tmpInt;
         }
         else if (cursorTmp > 0)
         {
-            serial_buffer[cursorTmp++] = tmpInt;
+            serialBuffer[cursorTmp++] = tmpInt;
 
             if (cursorTmp >= ROBOT_DATA_PACKET_SIZE)
             {
                 cursorTmp = 0;
-                if (serial_buffer[ROBOT_DATA_PACKET_SIZE - 1] == 10)
+                if (serialBuffer[ROBOT_DATA_PACKET_SIZE - 1] == 10)
                 {
                     return true;
                 }
@@ -48,18 +48,18 @@ boolean Robot::ReadSerial()
 
 void Robot::Analyze()
 {
-    int8_t header = serial_buffer[0];
-    robot_position.x = serial_buffer[2] << 8 | serial_buffer[1];
-    robot_position.y = serial_buffer[4] << 8 | serial_buffer[3];
-    robot_position.angle = serial_buffer[6] << 8 | serial_buffer[5];
-    int8_t footer = serial_buffer[7];
+    int8_t header = serialBuffer[0];
+    robotPosition.x = serialBuffer[2] << 8 | serialBuffer[1];
+    robotPosition.y = serialBuffer[4] << 8 | serialBuffer[3];
+    robotPosition.angle = serialBuffer[6] << 8 | serialBuffer[5];
+    int8_t footer = serialBuffer[7];
 }
 
-void Robot::Print()
+void Robot::PrintPosition()
 {
-    Debugger::log("X= ", robot_position.x, "  ", VERBOSE);
-    Debugger::log("Y= ", robot_position.y, "  ", VERBOSE);
-    Debugger::log("A= ", robot_position.angle / 100, "  ", VERBOSE);
+    Debugger::log("X= ", robotPosition.x, "  ", VERBOSE);
+    Debugger::log("Y= ", robotPosition.y, "  ", VERBOSE);
+    Debugger::log("A= ", robotPosition.angle / 100, "  ", VERBOSE);
 }
 
 void Robot::WriteSerial(int n, Point p)

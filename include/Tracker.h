@@ -20,10 +20,10 @@ public:
 
 private:
     // all obstacles tracked right now
-    // std::vector<Point> tracked_obstacles;
+    // std::vector<Point> obstacleTracked;
     // counter of obstacles tracked right now: tracked_object_list.size
 
-    bool new_obstacle = false;
-    Point tracked_obstacle;
+    bool newObstacle = false;
+    Point obstacleTracked;
 };
 #endif /* TRACKER_H */
