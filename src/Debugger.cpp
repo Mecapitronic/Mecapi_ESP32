@@ -178,3 +178,9 @@ void Debugger::printPoint(Point p, Level level)
         SERIAL_DEBUG.print((int)p.y);
     }
 }
+
+void Debugger::plotPoint(Point p, String varName)
+{
+    String data = ">" + varName + ":" + (int)p.x + ":" + (int)p.y + "|xy";
+    SERIAL_DEBUG.println(data);
+}

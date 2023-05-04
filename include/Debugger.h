@@ -71,6 +71,8 @@ public:
     static void printPolarPoint(PolarPoint p, Level level);
     static void printPoint(Point p, Level level);
 
+    static void plotPoint(Point p, String varName);
+
 private:
     static const boolean enabled = true;
     static const Level debugLevel = VERBOSE;
