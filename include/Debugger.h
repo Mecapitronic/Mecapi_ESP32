@@ -71,7 +71,15 @@ public:
     static void printPolarPoint(PolarPoint p, Level level);
     static void printPoint(Point p, Level level);
 
+    /**
+     * send point data on serial for teleplot to trace x and y in a graph
+     */
     static void plotPoint(Point p, String varName);
+
+    /**
+     * send point data on serial for teleplot to trace x and y as two separate graphs
+     */
+    static void plotPoint(Point p);
 
 private:
     static const boolean enabled = true;

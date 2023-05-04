@@ -20,7 +20,8 @@ void Tracker::sendObstacleToRobot(Robot robot)
 {
     if (newObstacle)
     {
-        Debugger::plotPoint(obstacleTracked, "obstacle");
+        Debugger::plotPoint(obstacleTracked);
+
         robot.WriteSerial(1, obstacleTracked);
         newObstacle = false;
     }

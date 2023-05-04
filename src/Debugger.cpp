@@ -184,3 +184,11 @@ void Debugger::plotPoint(Point p, String varName)
     String data = ">" + varName + ":" + (int)p.x + ":" + (int)p.y + "|xy";
     SERIAL_DEBUG.println(data);
 }
+
+void Debugger::plotPoint(Point p)
+{
+    SERIAL_DEBUG.print(">x:");
+    SERIAL_DEBUG.println((int)p.x);
+    SERIAL_DEBUG.print(">y:");
+    SERIAL_DEBUG.println((int)p.y);
+}
