@@ -1,6 +1,6 @@
 This folder contains code to simulate LD06 on serial
 
-prerequisites: `python3 -m pip install pyserial`
+prerequisites: `python3 -m pip install -r requirements.txt`
 usage: Run the software and plug serial to your PC, then `./ld06_simuator.py`
 
 Data must be formatted as a packet par line like this

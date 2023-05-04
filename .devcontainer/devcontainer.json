@@ -10,6 +10,10 @@
     "runArgs": [
         "--privileged"
     ],
+    "containerEnv": {
+        "DISPLAY": "${localEnv:DISPLAY}",
+        "XDG_RUNTIME_DIR": "/run/user/1000"
+    },
     // Use 'forwardPorts' to make a list of ports inside the container available locally.
     "forwardPorts": [
         8008
@@ -19,6 +23,8 @@
     "postAttachCommand": "sudo service udev restart",
     "mounts": [
         "source=/dev/,target=/dev/,type=bind,consistency=consistent",
+        "source=/run/user/1000,target=/run/user/1000,type=bind",
+        "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind",
         "source=/${localEnv:HOME}/.gitconfig,target=/root/.gitconfig,type=bind",
         "source=/${localEnv:HOME}/.ssh,target=/root/.ssh,type=bind"
     ],
@@ -26,7 +32,11 @@
     "customizations": {
         // Configure properties specific to VS Code.
         "vscode": {
+            "cmake.configureOnOpen": false,
             "editor.formatOnSave": true,
+            "[cpp]": {
+                "editor.defaultFormatter": "ms-vscode.cpptools"
+            },
             "editor.rulers": [
                 90,
                 120
@@ -38,6 +48,8 @@
                 "gruntfuggly.todo-tree",
                 "jeff-hykin.better-cpp-syntax",
                 "ms-azuretools.vscode-docker",
+                "ms-python.isort",
+                "ms-python.vscode-pylance",
                 "ms-vscode.cpptools-extension-pack",
                 "platformio.platformio-ide"
             ]

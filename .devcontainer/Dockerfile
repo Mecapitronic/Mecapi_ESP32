@@ -13,6 +13,8 @@ RUN apt-get update \
     curl \
     dialog \
     git \
+    python3-tk \
+    libx11-6 \
     screen \
     udev \
     unzip \
