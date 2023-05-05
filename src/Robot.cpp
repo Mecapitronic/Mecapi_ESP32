@@ -57,8 +57,8 @@ void Robot::Analyze()
 
 void Robot::PrintPosition()
 {
-    Debugger::log("X= ", robotPosition.x, "  ", VERBOSE);
-    Debugger::log("Y= ", robotPosition.y, "  ", VERBOSE);
+    Debugger::log("Robot Position : X= ", robotPosition.x, "  ", VERBOSE, false);
+    Debugger::log("Y= ", robotPosition.y, "  ", VERBOSE, false);
     Debugger::log("A= ", robotPosition.angle / 100, "  ", VERBOSE);
 }
 
