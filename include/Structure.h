@@ -21,6 +21,11 @@ struct Point
     float x;
     float y;
 };
+struct TrackPoint
+{
+    Point point;
+    bool isNew;
+};
 
 struct RobotPosition_t
 {

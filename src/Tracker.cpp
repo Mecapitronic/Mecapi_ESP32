@@ -5,7 +5,7 @@ Tracker::Tracker(float cutoff) : lpf_cutoff(cutoff)
     Debugger::println("Init Tracker");
 }
 
-std::vector<Point> Tracker::getPoints()
+std::vector<TrackPoint> Tracker::getPoints()
 {
     return tracked_points;
 }
@@ -17,15 +17,16 @@ int Tracker::findMatchingPoint(Point newPoint)
     float best_match = 5000.0;
     int matching_point_index = -1;
 
-    Debugger::plotPoint(newPoint);
+    Debugger::log("search point: x: ", newPoint.x, "  ", VERBOSE, false);
+    Debugger::log("y: ", newPoint.y, "", VERBOSE);
     Debugger::log("tracked size: ", (int)tracked_points.size(), "", VERBOSE);
 
     for (int i = 0; i < tracked_points.size(); i++)
     {
-        Debugger::log("Compare to: x: ", tracked_points.at(i).x, "  ", VERBOSE, false);
-        Debugger::log("y: ", tracked_points.at(i).y, "  ", VERBOSE);
+        Debugger::log("Compare to: x: ", tracked_points.at(i).point.x, "  ", VERBOSE, false);
+        Debugger::log("y: ", tracked_points.at(i).point.y, "  ", VERBOSE);
 
-        float dist = sqrt(pow(newPoint.x - tracked_points.at(i).x, 2) + pow(newPoint.y - tracked_points.at(i).y, 2));
+        float dist = sqrt(pow(newPoint.x - tracked_points.at(i).point.x, 2) + pow(newPoint.y - tracked_points.at(i).point.y, 2));
 
         // If distance is smaller than lpf_cutoff, assume it's the same point
         if ((dist < lpf_cutoff) && (dist < best_match))
@@ -37,23 +38,28 @@ int Tracker::findMatchingPoint(Point newPoint)
     }
 
     return matching_point_index;
+    return matching_point_index;
 }
 
-void Tracker::track(Point new_point)
+void Tracker::track(Point newPoint)
 {
-    int point_index = findMatchingPoint(new_point);
+    int point_index = findMatchingPoint(newPoint);
+    TrackPoint newTrackPoint;
+    newTrackPoint.point = newPoint;
+    newTrackPoint.isNew = true;
 
     if (point_index == -1)
     {
         Debugger::println("New point detected, add to tracked");
         // Add point to list of tracked points
-        tracked_points.push_back(new_point);
+
+        tracked_points.push_back(newTrackPoint);
     }
     else
     {
         // update with new value
         Debugger::println("Point already tracked, updating");
-        tracked_points[point_index] = new_point;
+        tracked_points[point_index] = newTrackPoint;
     }
 }
 
@@ -62,6 +68,13 @@ void Tracker::sendObstaclesToRobot(Robot robot)
     // TODO detect big changes not to send too much data
     for (int i = 0; i < tracked_points.size(); i++)
     {
-        robot.WriteSerial(i, tracked_points[i]);
+        if (tracked_points[i].isNew)
+        {
+            tracked_points[i].isNew = false;
+            robot.WriteSerial(i, tracked_points[i].point);
+            Debugger::log("Obstacle : ", i, ") ", VERBOSE, false);
+            Debugger::log("x= ", (int)tracked_points[i].point.x, " ", VERBOSE, false);
+            Debugger::log("y= ", (int)tracked_points[i].point.y, "", VERBOSE);
+        }
     }
 }
