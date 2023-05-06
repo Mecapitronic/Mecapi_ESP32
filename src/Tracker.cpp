@@ -51,13 +51,10 @@ void Tracker::track(Point newPoint)
     if (point_index == -1)
     {
         Debugger::println("New point detected, add to tracked");
-        // Add point to list of tracked points
-
         tracked_points.push_back(newPointTracker);
     }
     else
     {
-        // update with new value
         Debugger::println("Point already tracked, updating");
         tracked_points[point_index] = newPointTracker;
     }

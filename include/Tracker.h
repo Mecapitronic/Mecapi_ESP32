@@ -31,12 +31,15 @@ public:
 
     /**
      * send new point to tracker, it will automatically detects if it is new one or not
+     * if the point is new, add it to list of tracked points
      */
     void track(Point newPoint);
 
     /**
      * filter the given point to search if it is already tracked with a low pass filter
-     * search for the closest point
+     * search for the closest point:
+     * if the distance between a tracked point and newPoint is smaller than lpf_cutoff,
+     * we assume it's the same point
      * if the point is already tracked returns the index of the matching point
      * else return -1
      */
