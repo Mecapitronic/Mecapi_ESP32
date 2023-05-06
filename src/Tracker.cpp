@@ -1,6 +1,7 @@
 #include "Tracker.h"
 
 Tracker::Tracker(float cutoff) : lpf_cutoff(cutoff)
+                                     Tracker::Tracker(float cutoff) : lpf_cutoff(cutoff)
 {
     Debugger::println("Init Tracker");
 }
@@ -37,6 +38,7 @@ int Tracker::findMatchingPoint(Point newPoint)
         }
     }
 
+    return matching_point_index;
     return matching_point_index;
 }
 

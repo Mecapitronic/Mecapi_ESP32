@@ -3,11 +3,13 @@
 
 #include <Arduino.h>
 #include <vector>
+#include <vector>
 
 #include "Structure.h"
 #include "Debugger.h"
 #include "Robot.h"
 
+#define DEFAULT_LPF_CUTOFF 5000.0
 #define DEFAULT_LPF_CUTOFF 5000.0
 /**
  * In charge of tracking objects on the field based on Lidar detections and Kalman filter
@@ -51,6 +53,11 @@ private:
     // filtered status of obstacles/points
     std::vector<TrackPoint> tracked_points;
 
+    /**
+     * cut off of the low pass filter
+     * limits to define the closest robot to track matching points
+     */
+    float lpf_cutoff;
     /**
      * cut off of the low pass filter
      * limits to define the closest robot to track matching points
