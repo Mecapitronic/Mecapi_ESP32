@@ -65,6 +65,7 @@ void Tracker::track(Point newPoint)
 
 void Tracker::sendObstaclesToRobot(Robot robot)
 {
+    String varName = "graph";
     // TODO detect big changes not to send too much data
     for (int i = 0; i < tracked_points.size(); i++)
     {
@@ -72,9 +73,7 @@ void Tracker::sendObstaclesToRobot(Robot robot)
         {
             tracked_points[i].isNew = false;
             robot.WriteSerial(i, tracked_points[i].point);
-            Debugger::log("Obstacle : ", i, ") ", VERBOSE, false);
-            Debugger::log("x= ", (int)tracked_points[i].point.x, " ", VERBOSE, false);
-            Debugger::log("y= ", (int)tracked_points[i].point.y, "", VERBOSE);
+            Debugger::plotPoint(tracked_points[i].point, varName);
         }
     }
 }
