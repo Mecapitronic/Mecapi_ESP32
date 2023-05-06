@@ -10,14 +10,25 @@
 
 #define DEFAULT_LPF_CUTOFF 5000.0
 
-#define MILISECOND 100000
+#define HUNDRED_MILISECONDS 100000
 #define SECOND 1000000
 
-#define HAS_CHANGE_RECENTLY 3 * MILISECOND
-#define IS_TOO_OLD 5 * SECOND
+/**
+ * lidar make 10 turns in 1 second, data are updated every 100 miliseconds
+ * data are send every 25 miliseconds to robot
+ * because robot updates its data every 50 miliseconds
+ * a recently updated data is younger than at least 200 second
+ */
+#define HAS_CHANGE_RECENTLY 2 * HUNDRED_MILISECONDS
 
 /**
- * In charge of tracking objects on the field based on Lidar detections and Kalman filter
+ * amount of time needed to delete a point from tracker
+ * if it is not detected in this term
+ */
+#define IS_TOO_OLD 3 * SECOND
+
+/**
+ * @brief In charge of tracking objects on the field based on Lidar detections and Kalman filter
  */
 class Tracker
 {
@@ -58,17 +69,25 @@ public:
     /**
      * @brief send all tracked obstacles to robot
      * TODO reduce amount of data sent by filtering not big enough changes
+     * TODO detect big changes not to send too much data
      *
      * @param robot the robot object to send data to
      */
     void sendObstaclesToRobot(Robot robot);
 
     /**
+     * @brief Get the current time with milisecond precision
+     *
+     * @return int64_t current time in milisecond
+     */
+    int64_t getTimeNowMs();
+
+    /**
      * @brief Get the current time with microsecond precision
      *
      * @return int64_t current time in microseconds
      */
-    int64_t getTimeNow();
+    int64_t getTimeNowUs();
 
 private:
     /**

@@ -28,8 +28,6 @@ struct PointTracker
 {
     // point coordinates beeing tracked
     Point point;
-    // if the point has been updated recently, the coordinates have changed
-    bool hasChanged;
     // timestamp of the last time the tracker has been updated
     int64_t lastUpdateTime;
 };
