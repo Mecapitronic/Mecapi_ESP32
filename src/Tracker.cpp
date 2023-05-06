@@ -17,14 +17,12 @@ int Tracker::findMatchingPoint(Point newPoint)
     float best_match = 5000.0;
     int matching_point_index = -1;
 
-    Debugger::log("search point: x: ", newPoint.x, "  ", VERBOSE, false);
-    Debugger::log("y: ", newPoint.y, "", VERBOSE);
-    Debugger::log("tracked size: ", (int)tracked_points.size(), "", VERBOSE);
+    Debugger::logPoint("Search point:", newPoint, "", VERBOSE, false);
+    Debugger::log("tracked size: ", (int)tracked_points.size(), "", VERBOSE, true);
 
     for (int i = 0; i < tracked_points.size(); i++)
     {
-        Debugger::log("Compare to: x: ", tracked_points.at(i).point.x, "  ", VERBOSE, false);
-        Debugger::log("y: ", tracked_points.at(i).point.y, "  ", VERBOSE);
+        Debugger::logPoint("Compare to:", tracked_points.at(i).point, "", VERBOSE, true);
 
         float dist = sqrt(pow(newPoint.x - tracked_points.at(i).point.x, 2) + pow(newPoint.y - tracked_points.at(i).point.y, 2));
 
@@ -38,15 +36,19 @@ int Tracker::findMatchingPoint(Point newPoint)
     }
 
     return matching_point_index;
-    return matching_point_index;
 }
 
 void Tracker::track(Point newPoint)
 {
     int point_index = findMatchingPoint(newPoint);
-    PointTracker newPointTracker;
-    newPointTracker.point = newPoint;
-    newPointTracker.hasChanged = true;
+    PointTracker newPointTracker = {
+        newPoint,     // point
+        true,         // hasChanged
+        getTimeNow(), // lastUpdateTime
+    };
+
+    Debugger::print("NEW POINT: ");
+    Debugger::println((int)getTimeNow());
 
     if (point_index == -1)
     {
@@ -66,11 +68,22 @@ void Tracker::sendObstaclesToRobot(Robot robot)
     // TODO detect big changes not to send too much data
     for (int i = 0; i < tracked_points.size(); i++)
     {
-        if (tracked_points[i].hasChanged)
+        if (tracked_points[i].lastUpdateTime - getTimeNow() < HAS_CHANGE_RECENTLY)
         {
+            Debugger::print("TIME: ");
+            Debugger::println((int)getTimeNow());
             tracked_points[i].hasChanged = false;
             robot.WriteSerial(i, tracked_points[i].point);
             Debugger::plotPoint(tracked_points[i].point, varName);
         }
     }
+}
+
+int64_t Tracker::getTimeNow()
+{
+    struct timeval tv_now;
+    gettimeofday(&tv_now, NULL);
+    int64_t time_us = (int64_t)tv_now.tv_sec * 1000000L + (int64_t)tv_now.tv_usec;
+
+    return time_us;
 }

@@ -3,14 +3,19 @@
 
 #include <Arduino.h>
 #include <vector>
-#include <vector>
 
 #include "Structure.h"
 #include "Debugger.h"
 #include "Robot.h"
 
 #define DEFAULT_LPF_CUTOFF 5000.0
-#define DEFAULT_LPF_CUTOFF 5000.0
+
+#define MILISECOND 100000
+#define SECOND 1000000
+
+#define HAS_CHANGE_RECENTLY 3 * MILISECOND
+#define IS_TOO_OLD 5 * SECOND
+
 /**
  * In charge of tracking objects on the field based on Lidar detections and Kalman filter
  */
@@ -19,48 +24,62 @@ class Tracker
 
 public:
     /**
-     * Construct the tracker, if no cutoff distance is provided use DEFAULT_LPF_CUTOFF
-     * as maxmimal distance between to points to match them as the same point
+     * @brief Construct a new Tracker object
+     * if no cutoff distance is provided use DEFAULT_LPF_CUTOFF
+     *
+     * @param cutoff maxmimal distance between to points to match them as the same point
      */
     Tracker(float cutoff = DEFAULT_LPF_CUTOFF);
 
     /**
-     * returns the list of tracked points
+     * @brief Get the list of tracked points
+     *
+     * @return std::vector<PointTracker> list of tracked points
      */
     std::vector<PointTracker> getPoints();
 
     /**
-     * send new point to tracker, it will automatically detects if it is new one or not
-     * if the point is new, add it to list of tracked points
+     * @brief send new point to tracker
+     * automatically detects if the point is new,
+     * in that case add it to list of tracked points
      */
     void track(Point newPoint);
 
     /**
-     * filter the given point to search if it is already tracked with a low pass filter
-     * search for the closest point:
+     * @brief filter (low pass) the given point to search if it is already tracked
+     * search for the closest point: we assume it's the same point
      * if the distance between a tracked point and newPoint is smaller than lpf_cutoff,
-     * we assume it's the same point
-     * if the point is already tracked returns the index of the matching point
-     * else return -1
+     *
+     * @param newPoint
+     * @return int index of the matching point if the point is already tracked else return -1
      */
     int findMatchingPoint(Point newPoint);
 
     /**
-     * send all tracked obstacles to robot
+     * @brief send all tracked obstacles to robot
      * TODO reduce amount of data sent by filtering not big enough changes
+     *
+     * @param robot the robot object to send data to
      */
     void sendObstaclesToRobot(Robot robot);
 
+    /**
+     * @brief Get the current time with microsecond precision
+     *
+     * @return int64_t current time in microseconds
+     */
+    int64_t getTimeNow();
+
 private:
     /**
-     * list of obstacles/points being tracked
+     * @brief list of obstacles/points being tracked
      * the list is updarted with new data
      * and cleaned up if some points are not updated for a long time
      */
     std::vector<PointTracker> tracked_points;
 
     /**
-     * cut off of the low pass filter
+     * @brief cut off of the low pass filter
      * limits to define the closest robot to track matching points
      */
     float lpf_cutoff;

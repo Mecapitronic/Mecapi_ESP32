@@ -1,5 +1,8 @@
 /**
- * All data structures used across program
+ * @file Structure.h
+ * @author Mecapitronic (mecapitronic@gmail.com)
+ * @brief All data structures used across program
+ *
  */
 
 #ifndef STRUCTURE_H
@@ -27,6 +30,8 @@ struct PointTracker
     Point point;
     // if the point has been updated recently, the coordinates have changed
     bool hasChanged;
+    // timestamp of the last time the tracker has been updated
+    int64_t lastUpdateTime;
 };
 
 struct RobotPosition_t
