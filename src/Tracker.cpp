@@ -46,9 +46,6 @@ void Tracker::track(Point newPoint)
         getTimeNowMs(), // lastUpdateTime
     };
 
-    Debugger::print("NEW POINT: ");
-    Debugger::println((int)getTimeNowMs());
-
     if (point_index == -1)
     {
         Debugger::println("New point detected, add to tracked");
@@ -77,8 +74,7 @@ void Tracker::sendObstaclesToRobot(Robot robot)
     for (int i = 0; i < tracked_points.size(); i++)
     {
         int64_t delta = getTimeNowMs() - tracked_points[i].lastUpdateTime;
-        Debugger::println((int)delta);
-        if (delta < HAS_CHANGE_RECENTLY)
+        if (delta < HAS_CHANGE_RECENTLY_HMS)
         {
             robot.WriteSerial(i, tracked_points[i].point);
             Debugger::plotPoint(tracked_points[i].point, varName);

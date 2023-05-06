@@ -10,22 +10,20 @@
 
 #define DEFAULT_LPF_CUTOFF 5000.0
 
-#define HUNDRED_MILISECONDS 100000
-#define SECOND 1000000
-
 /**
  * lidar make 10 turns in 1 second, data are updated every 100 miliseconds
  * data are send every 25 miliseconds to robot
  * because robot updates its data every 50 miliseconds
  * a recently updated data is younger than at least 200 second
  */
-#define HAS_CHANGE_RECENTLY 2 * HUNDRED_MILISECONDS
+#define HAS_CHANGE_RECENTLY_HMS 2
 
 /**
  * amount of time needed to delete a point from tracker
  * if it is not detected in this term
  */
-#define IS_TOO_OLD 3 * SECOND
+#define SECOND_FROM_MS 10
+#define IS_TOO_OLD 3 * SECOND_FROM_MS
 
 /**
  * @brief In charge of tracking objects on the field based on Lidar detections and Kalman filter
