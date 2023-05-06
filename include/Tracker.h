@@ -58,10 +58,5 @@ private:
      * limits to define the closest robot to track matching points
      */
     float lpf_cutoff;
-    /**
-     * cut off of the low pass filter
-     * limits to define the closest robot to track matching points
-     */
-    float lpf_cutoff;
 };
 #endif /* TRACKER_H */

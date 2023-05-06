@@ -1,7 +1,6 @@
 #include "Tracker.h"
 
 Tracker::Tracker(float cutoff) : lpf_cutoff(cutoff)
-                                     Tracker::Tracker(float cutoff) : lpf_cutoff(cutoff)
 {
     Debugger::println("Init Tracker");
 }
