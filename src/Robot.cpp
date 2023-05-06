@@ -57,17 +57,29 @@ void Robot::Analyze()
 
 void Robot::PrintPosition()
 {
-    Debugger::log("X= ", robotPosition.x, "  ", VERBOSE);
-    Debugger::log("Y= ", robotPosition.y, "  ", VERBOSE);
+    Debugger::log("Robot Position : X= ", robotPosition.x, "  ", VERBOSE, false);
+    Debugger::log("Y= ", robotPosition.y, "  ", VERBOSE, false);
     Debugger::log("A= ", robotPosition.angle / 100, "  ", VERBOSE);
 }
 
 void Robot::WriteSerial(int n, Point p)
 {
-    SERIAL_ROBOT.print(n);
-    SERIAL_ROBOT.print(";");
-    SERIAL_ROBOT.print((int)p.x);
-    SERIAL_ROBOT.print(";");
-    SERIAL_ROBOT.print((int)p.y);
-    SERIAL_ROBOT.print('\n');
+    // Starting char : '!'
+    SERIAL_ROBOT.write(0x21);
+
+    // Number
+    SERIAL_ROBOT.write(n);
+
+    // X
+    int x = (int)p.x;
+    SERIAL_ROBOT.write(x % 256);
+    SERIAL_ROBOT.write(x >> 8);
+
+    // Y
+    int y = (int)p.y;
+    SERIAL_ROBOT.write(y % 256);
+    SERIAL_ROBOT.write(y >> 8);
+
+    // Ending char : 'LF'
+    SERIAL_ROBOT.write(10);
 }

@@ -46,6 +46,11 @@ void loop()
 void Task1code(void *pvParameters)
 {
     PacketLidar lidarPacket;
+    RobotPosition_t robotPosition;
+    robotPosition.x = 0;
+    robotPosition.y = 0;
+    robotPosition.angle = 0;
+
     while (1)
     {
 
@@ -77,6 +82,11 @@ void Task1code(void *pvParameters)
         if (robot.ReadSerial())
         {
             robot.Analyze();
+            if (robotPosition.x != robot.GetPosition().x || robotPosition.y != robot.GetPosition().y || robotPosition.angle != robot.GetPosition().angle)
+            {
+                robotPosition = robot.GetPosition();
+                robot.PrintPosition();
+            }
         }
 
         lidarPacket = lidar06.GetData();
