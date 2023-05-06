@@ -133,6 +133,7 @@ public:
 
     /**
      * Compute the center of local var lidar_obstacle
+     * computes the mean of all points position to approximate circle center (without offset)
      * based on the fact that it is a cylinder of 70mm diameter
      */
     Point ComputeCenter(Obstacle lidar_obstacle);

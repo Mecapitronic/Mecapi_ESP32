@@ -21,10 +21,12 @@ struct Point
     float x;
     float y;
 };
-struct TrackPoint
+struct PointTracker
 {
+    // point coordinates beeing tracked
     Point point;
-    bool isNew;
+    // if the point has been updated recently, the coordinates have changed
+    bool hasChanged;
 };
 
 struct RobotPosition_t

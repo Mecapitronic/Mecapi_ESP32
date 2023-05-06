@@ -27,7 +27,7 @@ public:
     /**
      * returns the list of tracked points
      */
-    std::vector<TrackPoint> getPoints();
+    std::vector<PointTracker> getPoints();
 
     /**
      * send new point to tracker, it will automatically detects if it is new one or not
@@ -39,7 +39,6 @@ public:
      * search for the closest point
      * if the point is already tracked returns the index of the matching point
      * else return -1
-     * TODO add cleanup to delete the point if no more tracked/existing
      */
     int findMatchingPoint(Point newPoint);
 
@@ -50,8 +49,12 @@ public:
     void sendObstaclesToRobot(Robot robot);
 
 private:
-    // filtered status of obstacles/points
-    std::vector<TrackPoint> tracked_points;
+    /**
+     * list of obstacles/points being tracked
+     * the list is updarted with new data
+     * and cleaned up if some points are not updated for a long time
+     */
+    std::vector<PointTracker> tracked_points;
 
     /**
      * cut off of the low pass filter
