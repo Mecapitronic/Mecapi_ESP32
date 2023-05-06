@@ -25,12 +25,12 @@ public:
     /**
      * returns the list of tracked points
      */
-    std::vector<Point> getPoints();
+    std::vector<TrackPoint> getPoints();
 
     /**
      * send new point to tracker, it will automatically detects if it is new one or not
      */
-    void track(Point obstacle);
+    void track(Point newPoint);
 
     /**
      * filter the given point to search if it is already tracked with a low pass filter
@@ -49,7 +49,7 @@ public:
 
 private:
     // filtered status of obstacles/points
-    std::vector<Point> tracked_points;
+    std::vector<TrackPoint> tracked_points;
 
     /**
      * cut off of the low pass filter
