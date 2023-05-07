@@ -74,6 +74,11 @@ public:
     /**
      * send point data on serial for teleplot to trace x and y in a graph
      */
+    static void plotTrackerPoints(TrackPoint p, String varName);
+
+    /**
+     * send point data on serial for teleplot to trace x and y in a graph
+     */
     static void plotPoint(Point p, String varName);
 
     /**

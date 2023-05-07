@@ -32,7 +32,7 @@ public:
     /**
      * send new point to tracker, it will automatically detects if it is new one or not
      */
-    void track(Point newPoint);
+    void track(Point newPoint, PolarPoint data[], uint8_t size);
 
     /**
      * filter the given point to search if it is already tracked with a low pass filter

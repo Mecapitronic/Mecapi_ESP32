@@ -24,6 +24,9 @@ struct Point
 struct TrackPoint
 {
     Point point;
+    static constexpr size_t kMaxPoints = 20;
+    PolarPoint data[20] = {0, 0, 0, 0, 0};
+    uint8_t size;
     bool isNew;
 };
 

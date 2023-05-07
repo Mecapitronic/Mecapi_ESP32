@@ -179,6 +179,19 @@ void Debugger::printPoint(Point p, Level level)
     }
 }
 
+void Debugger::plotTrackerPoints(TrackPoint p, String varName)
+{
+    String data = ">" + varName + ":" + (int)(p.data[0].angle) + ":" + (int)p.data[0].distance;
+    String a = ";";
+
+    for (size_t i = 1; i < p.size; i++)
+    {
+        data += a + (int)p.data[i].angle + ":" + (int)p.data[i].distance;
+    }
+    data += "|xy";
+    SERIAL_DEBUG.println(data);
+}
+
 void Debugger::plotPoint(Point p, String varName)
 {
     String data = ">" + varName + ":" + (int)p.x + ":" + (int)p.y + "|xy";

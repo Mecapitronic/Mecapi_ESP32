@@ -38,15 +38,19 @@ int Tracker::findMatchingPoint(Point newPoint)
     }
 
     return matching_point_index;
-    return matching_point_index;
 }
 
-void Tracker::track(Point newPoint)
+void Tracker::track(Point newPoint, PolarPoint data[], uint8_t size)
 {
     int point_index = findMatchingPoint(newPoint);
     TrackPoint newTrackPoint;
     newTrackPoint.point = newPoint;
     newTrackPoint.isNew = true;
+    newTrackPoint.size = size;
+    for (size_t i = 0; i < size; i++)
+    {
+        newTrackPoint.data[i] = data[i];
+    }
 
     if (point_index == -1)
     {
@@ -72,9 +76,11 @@ void Tracker::sendObstaclesToRobot(Robot robot)
         {
             tracked_points[i].isNew = false;
             robot.WriteSerial(i, tracked_points[i].point);
-            Debugger::log("Obstacle : ", i, ") ", VERBOSE, false);
-            Debugger::log("x= ", (int)tracked_points[i].point.x, " ", VERBOSE, false);
-            Debugger::log("y= ", (int)tracked_points[i].point.y, "", VERBOSE);
+            // Debugger::log("Obstacle : ", i, ") ", VERBOSE, false);
+            // Debugger::log("x= ", (int)tracked_points[i].point.x, " ", VERBOSE, false);
+            // Debugger::log("y= ", (int)tracked_points[i].point.y, "", VERBOSE);
+            Debugger::plotPoint(tracked_points[i].point, "obs");
+            Debugger::plotTrackerPoints(tracked_points[i], "points");
         }
     }
 }
