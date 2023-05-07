@@ -53,27 +53,6 @@ void Task1code(void *pvParameters)
 
     while (1)
     {
-
-        String cmd = Debugger::checkSerial();
-
-        if (cmd.startsWith("Lidar:"))
-        {
-            try
-            {
-                cmd.remove(0, 6);
-                int i = atoi(cmd.c_str());
-                Debugger::print("Lidar: ");
-                Debugger::println(i);
-                lidar06.Config(-1, i, -1, -1, -1);
-                // TODO : make a function for reading commands
-            }
-            catch (std::exception const &e)
-            {
-                Debugger::print("error : ");
-                Debugger::println(e.what());
-            }
-        }
-
         if (lidar06.ReadSerial())
         {
             lidar06.Analyze();
@@ -82,7 +61,9 @@ void Task1code(void *pvParameters)
         if (robot.ReadSerial())
         {
             robot.Analyze();
-            if (robotPosition.x != robot.GetPosition().x || robotPosition.y != robot.GetPosition().y || robotPosition.angle != robot.GetPosition().angle)
+            if (robotPosition.x != robot.GetPosition().x ||
+                robotPosition.y != robot.GetPosition().y ||
+                robotPosition.angle != robot.GetPosition().angle)
             {
                 robotPosition = robot.GetPosition();
                 robot.PrintPosition();
@@ -93,6 +74,7 @@ void Task1code(void *pvParameters)
         for (int i = 0; i < LIDAR_DATA_PACKET_SIZE; i++)
         {
             // Filter point before sending to queue : increase speed for later calculus
+            // TODO increase the confidence limit to avoid abberations
             if (lidarPacket.dataPoint[i].confidence != 0)
             {
                 xQueueSend(queue, &lidarPacket.dataPoint[i], 0);
@@ -116,6 +98,28 @@ void Task2code(void *pvParameters)
             lidar06.SearchForObstacles(point, &tracker, robot);
         }
         tracker.sendObstaclesToRobot(robot);
+
+        // Check if we get commands from operator via debug serial
+        String cmd = Debugger::checkSerial();
+
+        if (cmd.startsWith("Lidar:"))
+        {
+            try
+            {
+                cmd.remove(0, 6);
+                int i = atoi(cmd.c_str());
+                Debugger::print("Lidar: ");
+                Debugger::println(i);
+                lidar06.Config(-1, i, -1, -1, -1);
+                // TODO : make a function for reading commands
+            }
+            catch (std::exception const &e)
+            {
+                Debugger::print("error : ");
+                Debugger::println(e.what());
+            }
+        }
+
         vTaskDelay(1);
     }
 }
