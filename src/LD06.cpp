@@ -5,7 +5,7 @@ Lidar::Lidar()
     Debugger::println("Init Lidar");
 
     // minDistance, maxDistance, minQuality, distanceThreshold, angleThreshold;
-    Config(0, 2000, 200, 200, 5);
+    Config(0, 200, 200, 200, 5);
     SERIAL_LIDAR.begin(230400);
 }
 
@@ -90,7 +90,8 @@ void Lidar::Analyze()
     for (int i = 0; i < LIDAR_DATA_PACKET_SIZE; i++)
     {
         int rawDeg = lidarPacket.startAngle + i * angleStep;
-        lidarPacket.dataPoint[i].angle = (rawDeg <= 360 * 100 ? rawDeg : rawDeg - 360 * 100);
+        // Raw angle are inverted
+        lidarPacket.dataPoint[i].angle = 360 * 100 - (rawDeg <= 360 * 100 ? rawDeg : rawDeg - 360 * 100);
         lidarPacket.dataPoint[i].confidence = (serialBuffer[8 + i * 3]);
         lidarPacket.dataPoint[i].distance = (int(serialBuffer[8 + i * 3 - 1] << 8 | serialBuffer[8 + i * 3 - 2]));
 
@@ -107,9 +108,9 @@ boolean Lidar::CheckContinuity()
 {
     // We compare the first point of this packet with the last point of the previous packet
     // we do not care about distance and confidence as we only seek continuity in angle
-    int delta = lidarPacket.dataPoint[0].angle - lidarLastPacket.dataPoint[LIDAR_DATA_PACKET_SIZE - 1].angle;
+    int delta = lidarLastPacket.dataPoint[LIDAR_DATA_PACKET_SIZE - 1].angle - lidarPacket.dataPoint[0].angle;
     // previous packet was before 0° and current after
-    if (lidarLastPacket.dataPoint[LIDAR_DATA_PACKET_SIZE - 1].angle >= lidarPacket.dataPoint[0].angle)
+    if (lidarLastPacket.dataPoint[LIDAR_DATA_PACKET_SIZE - 1].angle <= lidarPacket.dataPoint[0].angle)
     {
         delta += 36000;
     }
@@ -171,8 +172,10 @@ Point Lidar::PolarToCartesian(PointLidar polar_point, Robot robot)
 {
     Point point;
     RobotPosition_t robotPosition = robot.GetPosition();
-    point.x = robotPosition.x + polar_point.distance * cos((polar_point.angle / 100 + robotPosition.angle / 100) * M_PI / 180);
-    point.y = robotPosition.y + polar_point.distance * sin((polar_point.angle / 100 + robotPosition.angle / 100) * M_PI / 180);
+    float angle = polar_point.angle + robotPosition.angle;
+    angle /= 100;
+    point.x = robotPosition.x + polar_point.distance * cos(angle * M_PI / 180);
+    point.y = robotPosition.y + polar_point.distance * sin(angle * M_PI / 180);
 
     return point;
 }
@@ -207,7 +210,7 @@ void Lidar::ObstacleDetected(Tracker *tracker, uint8_t size)
 {
     obstacleTmp.size = size;
     Point mid = ComputeCenter(obstacleTmp);
-    tracker->track(mid);
+    tracker->track(mid, obstacleTmp.data, obstacleTmp.size);
     pointsCounter = 0;
 }
 
