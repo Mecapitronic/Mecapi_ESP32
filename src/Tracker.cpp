@@ -16,14 +16,12 @@ int Tracker::findMatchingPoint(Point newPoint)
     float best_match = 5000.0;
     int matching_point_index = -1;
 
-    Debugger::logPoint("Search point:", newPoint);
-    Debugger::log("tracked size: ", (int)tracked_points.size());
+    Debugger::logPoint("Search point:", newPoint, "", VERBOSE, true);
+    Debugger::log("tracked size: ", (int)tracked_points.size(), "", VERBOSE, true);
 
     for (int i = 0; i < tracked_points.size(); i++)
     {
-        Debugger::logPoint("Compare to:", tracked_points.at(i).point, "");
-        int time = tracked_points.at(i).lastUpdateTime;
-        Debugger::log("Timestamp:", time, "");
+        Debugger::logPoint("Compare to:", tracked_points.at(i).point, "", VERBOSE, true);
 
         float dist = sqrt(pow(newPoint.x - tracked_points.at(i).point.x, 2) + pow(newPoint.y - tracked_points.at(i).point.y, 2));
 
@@ -99,6 +97,21 @@ void Tracker::untrackOldObstacles(Robot robot)
         {
             tracked_points.erase(it);
             robot.WriteSerialdsPic(it - tracked_points.begin(), {0, 0});
+            Debugger::print("Untracking point: ");
+            Debugger::println(it - tracked_points.begin());
+        }
+    }
+}
+
+void Tracker::untrackOldObstacles(Robot robot)
+{
+    // iterate to find matching point to the predicate
+    for (auto it = tracked_points.begin(); it < tracked_points.end(); it++)
+    {
+        if (getTimeNowMs() - it->lastUpdateTime > IS_TOO_OLD)
+        {
+            tracked_points.erase(it);
+            robot.WriteSerial(it - tracked_points.begin(), {0, 0});
             Debugger::print("Untracking point: ");
             Debugger::println(it - tracked_points.begin());
         }
