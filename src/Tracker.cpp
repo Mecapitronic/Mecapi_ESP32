@@ -62,7 +62,15 @@ void Tracker::track(Point newPoint)
         }
         else
         {
-            Debugger::println("Updating point");
+            Debugger::print("Updating point from ");
+            Debugger::print((int)tracked_points[point_index].point.x);
+            Debugger::print(",");
+            Debugger::print((int)tracked_points[point_index].point.y);
+            Debugger::print(" to ");
+            Debugger::print((int)newPointTracker.point.x);
+            Debugger::print(",");
+            Debugger::println((int)newPointTracker.point.y);
+
             tracked_points[point_index] = newPointTracker;
         }
     }
