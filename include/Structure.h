@@ -1,5 +1,8 @@
 /**
- * All data structures used across program
+ * @file Structure.h
+ * @author Mecapitronic (mecapitronic@gmail.com)
+ * @brief All data structures used across program
+ *
  */
 
 #ifndef STRUCTURE_H
@@ -26,13 +29,12 @@ struct Point
     float x;
     float y;
 };
-struct TrackPoint
+struct PointTracker
 {
+    // point coordinates beeing tracked
     Point point;
-    static constexpr size_t kMaxPoints = _kMaxPoints;
-    PolarPoint data[kMaxPoints] = {0, 0, 0, 0, 0};
-    uint8_t size;
-    bool isNew;
+    // timestamp of the last time the tracker has been updated
+    int64_t lastUpdateTime;
 };
 
 struct RobotPosition_t

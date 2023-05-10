@@ -141,6 +141,20 @@ void Debugger::logArrayN(String prefix, int element, String interFix, int array[
         println("Invalid array printed !");
 }
 
+void Debugger::logPoint(String prefix, Point data, String suffix, Level level, boolean lineFeed)
+{
+    if (level < debugLevel)
+        return;
+    SERIAL_DEBUG.print(prefix);
+    SERIAL_DEBUG.print(" x: ");
+    SERIAL_DEBUG.print(data.x);
+    SERIAL_DEBUG.print(" y: ");
+    SERIAL_DEBUG.print(data.y);
+    SERIAL_DEBUG.print(suffix);
+    if (lineFeed)
+        SERIAL_DEBUG.println();
+}
+
 void Debugger::printPolarPoint(PolarPoint p, Level level)
 {
     if (level < debugLevel)
