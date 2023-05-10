@@ -7,6 +7,8 @@
 
 #include <Arduino.h>
 
+#define _kMaxPoints 25
+
 struct PolarPoint
 {
     double angle;
@@ -16,6 +18,9 @@ struct PolarPoint
     float y;
 };
 
+/**
+ * Represent a cartesian point, with x and y as coordinates
+ */
 struct Point
 {
     float x;
@@ -24,8 +29,8 @@ struct Point
 struct TrackPoint
 {
     Point point;
-    static constexpr size_t kMaxPoints = 20;
-    PolarPoint data[20] = {0, 0, 0, 0, 0};
+    static constexpr size_t kMaxPoints = _kMaxPoints;
+    PolarPoint data[kMaxPoints] = {0, 0, 0, 0, 0};
     uint8_t size;
     bool isNew;
 };
@@ -43,7 +48,7 @@ struct RobotPosition_t
  */
 struct Obstacle
 {
-    static constexpr size_t kMaxPoints = 20;
+    static constexpr size_t kMaxPoints = _kMaxPoints;
     PolarPoint data[kMaxPoints] = {0, 0, 0, 0, 0};
     uint8_t size = 0;
 };
