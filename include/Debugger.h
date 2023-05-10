@@ -68,6 +68,8 @@ public:
     static void logArrayN(String prefix, int element, String interFix, int array[], size_t size, char separator = ',', String suffix = ")",
                           Level level = VERBOSE);
 
+    static void logPoint(String prefix, Point data, String suffix, Level level, boolean lineFeed);
+
     static void printPolarPoint(PolarPoint p, Level level);
     static void printPoint(Point p, Level level);
 

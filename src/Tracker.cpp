@@ -5,7 +5,7 @@ Tracker::Tracker(float cutoff) : lpf_cutoff(cutoff)
     Debugger::println("Init Tracker");
 }
 
-std::vector<TrackPoint> Tracker::getPoints()
+std::vector<PointTracker> Tracker::getPoints()
 {
     return tracked_points;
 }
@@ -17,63 +17,93 @@ int Tracker::findMatchingPoint(Point newPoint)
     float best_match = 5000.0;
     int matching_point_index = -1;
 
-    Debugger::log("search point: x: ", newPoint.x, "  ", VERBOSE, false);
-    Debugger::log("y: ", newPoint.y, "", VERBOSE);
-    Debugger::log("tracked size: ", (int)tracked_points.size(), "", VERBOSE);
+    // Debugger::logPoint("Search point:", newPoint, "", VERBOSE, false);
+    // Debugger::log("tracked size: ", (int)tracked_points.size(), "", VERBOSE, true);
 
     for (int i = 0; i < tracked_points.size(); i++)
     {
-        Debugger::log("Compare to: x: ", tracked_points.at(i).point.x, "  ", VERBOSE, false);
-        Debugger::log("y: ", tracked_points.at(i).point.y, "  ", VERBOSE);
+        // Debugger::logPoint("Compare to:", tracked_points.at(i).point, "", VERBOSE, true);
 
         float dist = sqrt(pow(newPoint.x - tracked_points.at(i).point.x, 2) + pow(newPoint.y - tracked_points.at(i).point.y, 2));
 
         // If distance is smaller than lpf_cutoff, assume it's the same point
         if ((dist < lpf_cutoff) && (dist < best_match))
         {
-            Debugger::println("it's the same point");
+            // found matching point
             best_match = dist;
             matching_point_index = i;
         }
     }
 
     return matching_point_index;
-    return matching_point_index;
 }
 
 void Tracker::track(Point newPoint)
 {
     int point_index = findMatchingPoint(newPoint);
-    TrackPoint newTrackPoint;
-    newTrackPoint.point = newPoint;
-    newTrackPoint.isNew = true;
+    PointTracker newPointTracker = {
+        newPoint,       // point
+        getTimeNowMs(), // lastUpdateTime
+    };
 
     if (point_index == -1)
     {
         Debugger::println("New point detected, add to tracked");
-        // Add point to list of tracked points
-
-        tracked_points.push_back(newTrackPoint);
+        tracked_points.push_back(newPointTracker);
     }
     else
     {
-        // update with new value
-        Debugger::println("Point already tracked, updating");
-        tracked_points[point_index] = newTrackPoint;
+        Debugger::println("Point already tracked");
+        // TODO change to as high pass filter
+        if (tracked_points[point_index].point.x == newPointTracker.point.x &&
+            tracked_points[point_index].point.y == newPointTracker.point.y)
+        {
+            Debugger::println("This is exactly the same point, dropping");
+        }
+        else
+        {
+            Debugger::print("Updating point from ");
+            Debugger::print((int)tracked_points[point_index].point.x);
+            Debugger::print(",");
+            Debugger::print((int)tracked_points[point_index].point.y);
+            Debugger::print(" to ");
+            Debugger::print((int)newPointTracker.point.x);
+            Debugger::print(",");
+            Debugger::println((int)newPointTracker.point.y);
+
+            tracked_points[point_index] = newPointTracker;
+        }
     }
 }
 
 void Tracker::sendObstaclesToRobot(Robot robot)
 {
-    String varName = "graph";
-    // TODO detect big changes not to send too much data
+    String varName = "obs";
     for (int i = 0; i < tracked_points.size(); i++)
     {
-        if (tracked_points[i].isNew)
+        int64_t delta = getTimeNowMs() - tracked_points[i].lastUpdateTime;
+        if (delta < HAS_CHANGE_RECENTLY_HMS)
         {
-            tracked_points[i].isNew = false;
             robot.WriteSerial(i, tracked_points[i].point);
-            Debugger::plotPoint(tracked_points[i].point, varName);
+            Debugger::plotPoint(tracked_points[i].point, varName + i);
         }
     }
+}
+
+int64_t Tracker::getTimeNowMs()
+{
+    struct timeval tv_now;
+    gettimeofday(&tv_now, NULL);
+
+    int64_t time_ms = (int64_t)tv_now.tv_sec * 1000 + ((int64_t)tv_now.tv_usec / 1000);
+    return time_ms;
+}
+
+int64_t Tracker::getTimeNowUs()
+{
+    struct timeval tv_now;
+    gettimeofday(&tv_now, NULL);
+
+    int64_t time_us = (int64_t)tv_now.tv_sec * 1000000L + (int64_t)tv_now.tv_usec;
+    return time_us;
 }
