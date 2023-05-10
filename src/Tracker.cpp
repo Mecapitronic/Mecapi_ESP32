@@ -70,14 +70,14 @@ void Tracker::track(Point newPoint)
 
 void Tracker::sendObstaclesToRobot(Robot robot)
 {
-    String varName = "graph";
+    String varName = "obs";
     for (int i = 0; i < tracked_points.size(); i++)
     {
         int64_t delta = getTimeNowMs() - tracked_points[i].lastUpdateTime;
         if (delta < HAS_CHANGE_RECENTLY_HMS)
         {
             robot.WriteSerial(i, tracked_points[i].point);
-            Debugger::plotPoint(tracked_points[i].point, varName);
+            Debugger::plotPoint(tracked_points[i].point, varName + i);
         }
     }
 }
