@@ -8,7 +8,11 @@
 #include "Debugger.h"
 #include "Robot.h"
 
-#define DEFAULT_LPF_CUTOFF 200.0
+// maximal distance between to points to match them as the same point
+#define DEFAULT_LPF_CUTOFF 300.0
+
+// minimum movement needed to update position of tracked point
+#define DEFAULT_HPF_CUTOFF 100.0
 
 /**
  * lidar make 10 turns in 1 second, data are updated every 100 miliseconds
@@ -31,15 +35,14 @@
  */
 class Tracker
 {
-
-public:
+   public:
     /**
-     * @brief Construct a new Tracker object
-     * if no cutoff distance is provided use DEFAULT_LPF_CUTOFF
+     * @brief Construct a new Tracker object with settings for filters
      *
-     * @param cutoff maxmimal distance between to points to match them as the same point
+     * @param lpf_cutoff_distance maximal distance between to points to match them as the same point; default DEFAULT_LPF_CUTOFF
+     * @param hpf_cutoff_distance minimum movement needed to update position of tracked point; default DEFAULT_HPF_CUTOFF
      */
-    Tracker(float cutoff = DEFAULT_LPF_CUTOFF);
+    Tracker(float lpf_cutoff_distance = DEFAULT_LPF_CUTOFF, float hpf_cutoff_distance = DEFAULT_HPF_CUTOFF);
 
     /**
      * @brief Get the list of tracked points
@@ -61,7 +64,9 @@ public:
      * if the distance between a tracked point and newPoint is smaller than lpf_cutoff,
      *
      * @param newPoint
-     * @return int index of the matching point if the point is already tracked else return -1
+     * @return int index of the matching point if the point is already tracked;
+     *  -1 if the point is not already tracked;
+     *  -2 if the point is tracked but shouldn't be updated
      */
     int findMatchingPoint(Point newPoint);
 
@@ -96,7 +101,7 @@ public:
      */
     int64_t getTimeNowUs();
 
-private:
+   private:
     /**
      * @brief list of obstacles/points being tracked
      * the list is updarted with new data
@@ -109,5 +114,12 @@ private:
      * limits to define the closest robot to track matching points
      */
     float lpf_cutoff = DEFAULT_LPF_CUTOFF;
+
+    /**
+     * @brief cut off of the high pass filter
+     * limits to define the minimum movement a robot should do to be updated
+     * this covers the false positives due to lidar lack of precision
+     */
+    float hpf_cutoff = DEFAULT_HPF_CUTOFF;
 };
 #endif /* TRACKER_H */

@@ -1,9 +1,10 @@
 #include "Tracker.h"
 
-Tracker::Tracker(float cutoff) : lpf_cutoff(cutoff)
+Tracker::Tracker(float lpf_cutoff_distance, float hpf_cutoff_distance) : lpf_cutoff(lpf_cutoff_distance), hpf_cutoff(hpf_cutoff_distance)
 {
-    Debugger::print("Init Tracker with cutoff: ");
-    Debugger::println(cutoff);
+    Debugger::println("Init Tracker");
+    Debugger::log("Track new point if nothing close enough: ", lpf_cutoff, " mm", VERBOSE, true);
+    Debugger::log("Ignore movements under ", hpf_cutoff, " mm", VERBOSE, true);
 }
 
 std::vector<PointTracker> Tracker::getPoints() { return tracked_points; }
@@ -33,6 +34,11 @@ int Tracker::findMatchingPoint(Point newPoint)
         }
     }
 
+    if (best_match < hpf_cutoff)
+    {
+        matching_point_index = -2;
+    }
+
     return matching_point_index;
 }
 
@@ -48,29 +54,19 @@ void Tracker::track(Point newPoint, PolarPoint data[], uint8_t size)
     {
         Debugger::println("New point detected, add to tracked");
         tracked_points.push_back(newPointTracker);
+        return;
     }
-    else
-    {
-        Debugger::println("Point already tracked");
-        // TODO change to as high pass filter
-        if (tracked_points[point_index].point.x == newPointTracker.point.x && tracked_points[point_index].point.y == newPointTracker.point.y)
-        {
-            Debugger::println("This is exactly the same point, dropping");
-        }
-        else
-        {
-            Debugger::print("Updating point from ");
-            Debugger::print((int)tracked_points[point_index].point.x);
-            Debugger::print(",");
-            Debugger::print((int)tracked_points[point_index].point.y);
-            Debugger::print(" to ");
-            Debugger::print((int)newPointTracker.point.x);
-            Debugger::print(",");
-            Debugger::println((int)newPointTracker.point.y);
 
-            tracked_points[point_index] = newPointTracker;
-        }
+    if (point_index == -2)
+    {
+        Debugger::println("This is exactly the same point, dropping");
+        return;
     }
+
+    Debugger::println("Updating point");
+    Debugger::logPoint("from ", tracked_points[point_index].point, "", VERBOSE, true);
+    Debugger::logPoint("  to ", newPointTracker.point, "", VERBOSE, true);
+    tracked_points[point_index] = newPointTracker;
 }
 
 void Tracker::sendObstaclesToRobot(Robot robot)
