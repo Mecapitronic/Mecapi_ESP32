@@ -172,8 +172,9 @@ void Lidar::AggregatePoint(PointLidar polar_point, Point point, Tracker *tracker
     if (pointsCounter >= Obstacle::kMaxPoints)
     {
         ObstacleDetected(tracker, Obstacle::kMaxPoints);
-        return;
     }
+    else
+    {
 
     // if we are still under the maximum size of an obstacle
 
@@ -187,7 +188,7 @@ void Lidar::AggregatePoint(PointLidar polar_point, Point point, Tracker *tracker
             ObstacleDetected(tracker, pointsCounter);
         }
     }
-
+    }
     // save the coord of current lidar point
     obstacleTmp.data[pointsCounter++] = {(double)polar_point.angle,
                                          polar_point.distance,
