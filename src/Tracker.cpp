@@ -81,7 +81,7 @@ void Tracker::sendObstaclesToRobot(Robot robot)
         int64_t delta = getTimeNowMs() - tracked_points[i].lastUpdateTime;
         if (delta < HAS_CHANGE_RECENTLY_MS)
         {
-            robot.WriteSerial(i, tracked_points[i].point);
+            robot.WriteSerialdsPic(i, tracked_points[i].point);
             Debugger::plotPoint(tracked_points[i].point, varName + i);
             Debugger::plotTrackerPoints(tracked_points[i], "points");
         }
@@ -96,7 +96,7 @@ void Tracker::untrackOldObstacles(Robot robot)
         if (getTimeNowMs() - it->lastUpdateTime > IS_TOO_OLD)
         {
             tracked_points.erase(it);
-            robot.WriteSerial(it - tracked_points.begin(), {0, 0});
+            robot.WriteSerialdsPic(it - tracked_points.begin(), {0, 0});
             Debugger::print("Untracking point: ");
             Debugger::println(it - tracked_points.begin());
         }

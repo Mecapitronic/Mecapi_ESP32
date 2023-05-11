@@ -31,6 +31,11 @@ public:
     Robot();
 
     /**
+     * Enable or disable communication to dsPIC : used for debug as it re-route serial to PC
+     */
+    void dsPicSerial(State state);
+    State dsPicSerial();
+    /**
      * Read data coming from Robot PIC giving the actual position of the robot
      * put data in local buffer
      */
@@ -59,12 +64,13 @@ public:
     /**
      * Send data to robot PIC: send obstacle position given in args
      */
-    void WriteSerial(int n, Point p);
+    void WriteSerialdsPic(int n, Point p);
 
-private:
+   private:
     RobotPosition_t robotPosition = {0, 0, 0.0}; // x, y, angle
     uint32_t serialBuffer[ROBOT_SERIAL_PACKET_SIZE] = {0};
     uint8_t cursorTmp = 0;
+    State dsPicSerialStatus = Start;
 };
 
 #endif

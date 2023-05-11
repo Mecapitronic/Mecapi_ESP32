@@ -40,6 +40,7 @@ boolean Lidar::ReadSerial()
         // we are building a lidar packet
         // it always start with 0x54 0x2C and is 47 bytes long
         uint32_t tmpInt = SERIAL_LIDAR.read();
+        // SERIAL_ROBOT.write(tmpInt);
         if (tmpInt == 0x54 && cursorTmp == 0)
         {
             serialBuffer[cursorTmp++] = tmpInt;

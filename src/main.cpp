@@ -111,17 +111,34 @@ void Task2code(void *pvParameters)
                 Debugger::println(e.what());
             }
         }
-        if (cmd.startsWith("Robot:"))
+        if (cmd.startsWith("RobotXYA:"))
         {
             try
             {
-                // Robot:0000,0000,00000
-                // cmd.remove(0, 6);
-                int x = atoi(cmd.substring(6, 10).c_str());
-                int y = atoi(cmd.substring(11, 15).c_str());
-                int angle = atoi(cmd.substring(16, 21).c_str());
+                // RobotXYA:0000,0000,00000
+                int cmdLength = 9;
+                int x = atoi(cmd.substring(cmdLength, cmdLength + 4).c_str());
+                int y = atoi(cmd.substring(cmdLength + 5, cmdLength + 9).c_str());
+                int angle = atoi(cmd.substring(cmdLength + 10, cmdLength + 15).c_str());
                 robot.SetPosition(x, y, angle);
                 robot.PrintPosition();
+                // TODO : make a function for reading commands
+            }
+            catch (std::exception const &e)
+            {
+                Debugger::print("error : ");
+                Debugger::println(e.what());
+            }
+        }
+        if (cmd.startsWith("RobotState:"))
+        {
+            try
+            {
+                // RobotState:0
+                int cmdLength = 11;
+                int state = atoi(cmd.substring(cmdLength, cmdLength + 1).c_str());
+                robot.dsPicSerial((State)state);
+
                 // TODO : make a function for reading commands
             }
             catch (std::exception const &e)

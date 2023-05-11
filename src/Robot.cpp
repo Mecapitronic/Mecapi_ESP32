@@ -14,6 +14,31 @@ Robot::Robot()
     SERIAL_ROBOT.begin(250000, SERIAL_8N1, RX1, TX1);
 }
 
+void Robot::dsPicSerial(State state)
+{
+    dsPicSerialStatus = state;
+    SERIAL_ROBOT.end();
+    switch (dsPicSerialStatus)
+    {
+        case Stop:
+            /* code */
+            Debugger::println("dsPic Serial Stop");
+            break;
+        case Start:
+            Debugger::println("dsPic Serial Start");
+            SERIAL_ROBOT.begin(250000, SERIAL_8N1, RX1, TX1);
+            break;
+        case Debug:
+            Debugger::println("dsPic Serial Debug");
+            SERIAL_ROBOT.begin(230400, SERIAL_8N1, RX1, TX1);
+            break;
+
+        default:
+            break;
+    }
+}
+State Robot::dsPicSerial() { return dsPicSerialStatus; }
+
 RobotPosition_t Robot::GetPosition() { return robotPosition; }
 
 void Robot::SetPosition(int x, int y, int angle)
@@ -65,24 +90,27 @@ void Robot::PrintPosition()
     Debugger::log("A= ", robotPosition.angle / 100, "  ", VERBOSE);
 }
 
-void Robot::WriteSerial(int n, Point p)
+void Robot::WriteSerialdsPic(int n, Point p)
 {
-    // Starting char : '!'
-    SERIAL_ROBOT.write(0x21);
+    if (dsPicSerialStatus == Start)
+    {
+        // Starting char : '!'
+        SERIAL_ROBOT.write(0x21);
 
-    // Number
-    SERIAL_ROBOT.write(n);
+        // Number
+        SERIAL_ROBOT.write(n);
 
-    // X
-    int x = (int)p.x;
-    SERIAL_ROBOT.write(x % 256);
-    SERIAL_ROBOT.write(x >> 8);
+        // X
+        int x = (int)p.x;
+        SERIAL_ROBOT.write(x % 256);
+        SERIAL_ROBOT.write(x >> 8);
 
-    // Y
-    int y = (int)p.y;
-    SERIAL_ROBOT.write(y % 256);
-    SERIAL_ROBOT.write(y >> 8);
+        // Y
+        int y = (int)p.y;
+        SERIAL_ROBOT.write(y % 256);
+        SERIAL_ROBOT.write(y >> 8);
 
-    // Ending char : 'LF'
-    SERIAL_ROBOT.write(10);
+        // Ending char : 'LF'
+        SERIAL_ROBOT.write(10);
+    }
 }

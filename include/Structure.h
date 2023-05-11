@@ -12,6 +12,13 @@
 
 #define _kMaxPoints 25
 
+enum State
+{
+    Stop = 0,
+    Start = 1,
+    Debug = 2
+};
+
 struct PolarPoint
 {
     double angle;
