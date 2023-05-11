@@ -8,6 +8,12 @@
 #define ROBOT_H
 
 #define SERIAL_ROBOT Serial1
+
+// we change the UART 1 RX pin from 9 to 2
+// we change the UART 1 TX pin from 10 to 4
+#define RX1 2
+#define TX1 4
+
 #define ROBOT_SERIAL_PACKET_SIZE 32
 // '!' + "1000,1500,9000" + '\n' :  1 + 2 * 3 + 1;
 // 21 e8 03 dc 05 28 23 0A

@@ -11,10 +11,6 @@ Robot::Robot()
         serialBuffer[i] = 0;
     }
 
-    // we change the UART 1 RX pin from 9 to 2
-    // we change the UART 1 TX pin from 10 to 4
-    int8_t RX1 = 2;
-    int8_t TX1 = 4;
     SERIAL_ROBOT.begin(250000, SERIAL_8N1, RX1, TX1);
 }
 
