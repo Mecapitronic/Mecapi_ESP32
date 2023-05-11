@@ -189,11 +189,6 @@ bool Lidar::IsOutsideTable(Point point)
     return (point.x < table_margin || point.x > 2000 - table_margin || point.y < table_margin || point.y > 3000 - table_margin);
 }
 
-bool Lidar::IsOutsideTable(PointLidar polar_point, Robot robot)
-{
-    return IsOutsideTable(PolarToCartesian(polar_point, robot));
-}
-
 void Lidar::SearchForObstacles(PointLidar polar_point, Tracker *tracker, Robot robot)
 {
     // Ignore points outside of the table

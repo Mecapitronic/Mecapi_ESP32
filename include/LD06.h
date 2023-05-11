@@ -105,13 +105,6 @@ public:
     bool IsOutsideTable(Point point);
 
     /**
-     * returns whether or not the given point is outside the table
-     * the margin represents the distance between the center of the obstacle
-     * and the edges of the table
-     */
-    bool IsOutsideTable(PointLidar polar_point, Robot robot);
-
-    /**
      * detects if the points is on the table and agregate it if it is part of a obstacle
      * currently detected
      */
