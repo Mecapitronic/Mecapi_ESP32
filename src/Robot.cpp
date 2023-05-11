@@ -10,8 +10,7 @@ Robot::Robot()
     {
         serialBuffer[i] = 0;
     }
-
-    SERIAL_ROBOT.begin(250000, SERIAL_8N1, RX1, TX1);
+    dsPicSerial(Start);
 }
 
 void Robot::dsPicSerial(State state)
@@ -20,21 +19,21 @@ void Robot::dsPicSerial(State state)
     SERIAL_ROBOT.end();
     switch (dsPicSerialStatus)
     {
-        case Stop:
-            /* code */
-            Debugger::println("dsPic Serial Stop");
-            break;
-        case Start:
-            Debugger::println("dsPic Serial Start");
-            SERIAL_ROBOT.begin(250000, SERIAL_8N1, RX1, TX1);
-            break;
-        case Debug:
-            Debugger::println("dsPic Serial Debug");
-            SERIAL_ROBOT.begin(230400, SERIAL_8N1, RX1, TX1);
-            break;
+    case Stop:
+        /* code */
+        Debugger::println("dsPic Serial Stop");
+        break;
+    case Start:
+        Debugger::println("dsPic Serial Start");
+        SERIAL_ROBOT.begin(250000, SERIAL_8N1, RX1, TX1);
+        break;
+    case Debug:
+        Debugger::println("dsPic Serial Debug");
+        SERIAL_ROBOT.begin(230400, SERIAL_8N1, RX1, TX1);
+        break;
 
-        default:
-            break;
+    default:
+        break;
     }
 }
 State Robot::dsPicSerial() { return dsPicSerialStatus; }
