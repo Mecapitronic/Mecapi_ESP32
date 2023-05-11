@@ -65,7 +65,7 @@ void Task1code(void *pvParameters)
         for (int i = 0; i < LIDAR_DATA_PACKET_SIZE; i++)
         {
             // Filter point before sending to queue : increase speed for later calculus
-            // TODO increase the confidence limit to avoid abberations
+            // TODO increase the confidence limit to avoid aberrations
             if (lidarPacket.dataPoint[i].confidence != 0)
             {
                 xQueueSend(queue, &lidarPacket.dataPoint[i], 0);
@@ -103,6 +103,25 @@ void Task2code(void *pvParameters)
                 Debugger::print("Lidar: ");
                 Debugger::println(i);
                 lidar06.Config(-1, i, -1, -1, -1);
+                // TODO : make a function for reading commands
+            }
+            catch (std::exception const &e)
+            {
+                Debugger::print("error : ");
+                Debugger::println(e.what());
+            }
+        }
+        if (cmd.startsWith("Robot:"))
+        {
+            try
+            {
+                // Robot:0000,0000,00000
+                // cmd.remove(0, 6);
+                int x = atoi(cmd.substring(6, 10).c_str());
+                int y = atoi(cmd.substring(11, 15).c_str());
+                int angle = atoi(cmd.substring(16, 21).c_str());
+                robot.SetPosition(x, y, angle);
+                robot.PrintPosition();
                 // TODO : make a function for reading commands
             }
             catch (std::exception const &e)

@@ -16,6 +16,13 @@ Robot::Robot()
 
 RobotPosition_t Robot::GetPosition() { return robotPosition; }
 
+void Robot::SetPosition(int x, int y, int angle)
+{
+    robotPosition.x = x;
+    robotPosition.y = y;
+    robotPosition.angle = angle;
+}
+
 boolean Robot::ReadSerial()
 {
     if (SERIAL_ROBOT.available() > 0)
