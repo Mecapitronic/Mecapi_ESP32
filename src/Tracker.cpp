@@ -45,10 +45,14 @@ int Tracker::findMatchingPoint(Point newPoint)
 void Tracker::track(Point newPoint, PolarPoint data[], uint8_t size)
 {
     int point_index = findMatchingPoint(newPoint);
-    PointTracker newPointTracker = {
-        newPoint,        // point
-        getTimeNowMs(),  // lastUpdateTime
-    };
+    PointTracker newPointTracker;
+    newPointTracker.point = newPoint;                 // point
+    newPointTracker.lastUpdateTime = getTimeNowMs();  // lastUpdateTime
+    newPointTracker.size = size;                      // Size of the polar points array
+    for (size_t i = 0; i < size; i++)
+    {
+        newPointTracker.data[i] = data[i];  // Polar points associated
+    }
 
     if (point_index == -1)
     {

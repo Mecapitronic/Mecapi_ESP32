@@ -22,19 +22,24 @@ struct PolarPoint
 };
 
 /**
- * Represent a cartesian point, with x and y as coordinates
+ * Represent a Cartesian point, with x and y as coordinates
  */
 struct Point
 {
     float x;
     float y;
 };
+
 struct PointTracker
 {
     // point coordinates beeing tracked
     Point point;
     // timestamp of the last time the tracker has been updated
     int64_t lastUpdateTime;
+    // Polar points that define the mid point
+    PolarPoint data[_kMaxPoints] = {0, 0, 0, 0, 0};
+    // Size of the polar points array
+    uint8_t size = 0;
 };
 
 struct RobotPosition_t
