@@ -21,7 +21,9 @@ int Tracker::findMatchingPoint(Point newPoint)
 
     for (int i = 0; i < tracked_points.size(); i++)
     {
-        Debugger::logPoint("Compare to:", tracked_points.at(i).point, "", VERBOSE, true);
+        Debugger::logPoint("Compare to:", tracked_points.at(i).point, "", VERBOSE, false);
+        int time = tracked_points.at(i).lastUpdateTime;
+        Debugger::log("Timestamp:", time, "");
 
         float dist = sqrt(pow(newPoint.x - tracked_points.at(i).point.x, 2) + pow(newPoint.y - tracked_points.at(i).point.y, 2));
 
@@ -83,7 +85,7 @@ void Tracker::sendObstaclesToRobot(Robot robot)
         {
             robot.WriteSerialdsPic(i, tracked_points[i].point);
             Debugger::plotPoint(tracked_points[i].point, varName + i);
-            Debugger::plotTrackerPoints(tracked_points[i], "points");
+            Debugger::plotTrackerPoints(tracked_points[i], tracked_points[i].size, "points");
         }
     }
 }

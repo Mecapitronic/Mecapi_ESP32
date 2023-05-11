@@ -4,7 +4,7 @@ void Debugger::init()
 {
     if (enabled)
     {
-        SERIAL_DEBUG.begin(230400);
+        SERIAL_DEBUG.begin(500000);
 
         if (SERIAL_DEBUG.available() <= 0)
         {
@@ -193,12 +193,12 @@ void Debugger::printPoint(Point p, Level level)
     }
 }
 
-void Debugger::plotTrackerPoints(PointTracker p, String varName)
+void Debugger::plotTrackerPoints(PointTracker p, int size, String varName)
 {
     String data = ">" + varName + ":" + (int)(p.data[0].angle) + ":" + (int)p.data[0].distance;
     String separator = ";";
 
-    for (size_t i = 1; i < p.size; i++)
+    for (size_t i = 1; i < size; i++)
     {
         data += separator + (int)p.data[i].angle + ":" + (int)p.data[i].distance;
     }
