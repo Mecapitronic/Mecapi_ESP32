@@ -46,28 +46,19 @@ void loop()
 void Task1code(void *pvParameters)
 {
     PacketLidar lidarPacket;
-    RobotPosition_t robotPosition;
-    robotPosition.x = 0;
-    robotPosition.y = 0;
-    robotPosition.angle = 0;
 
     while (1)
     {
+        if (robot.ReadSerial())
+        {
+            // set the new robot position
+            robot.Analyze();
+        }
+
         if (lidar06.ReadSerial())
         {
             lidar06.Analyze();
             lidar06.CheckContinuity();
-        }
-        if (robot.ReadSerial())
-        {
-            robot.Analyze();
-            if (robotPosition.x != robot.GetPosition().x ||
-                robotPosition.y != robot.GetPosition().y ||
-                robotPosition.angle != robot.GetPosition().angle)
-            {
-                robotPosition = robot.GetPosition();
-                robot.PrintPosition();
-            }
         }
 
         lidarPacket = lidar06.GetData();
@@ -98,6 +89,7 @@ void Task2code(void *pvParameters)
             lidar06.SearchForObstacles(point, &tracker, robot);
         }
         tracker.sendObstaclesToRobot(robot);
+        tracker.untrackOldObstacles(robot);
 
         // Check if we get commands from operator via debug serial
         String cmd = Debugger::checkSerial();

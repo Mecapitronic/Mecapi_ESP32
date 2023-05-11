@@ -52,7 +52,7 @@ public:
     void WriteSerial(int n, Point p);
 
 private:
-    RobotPosition_t robotPosition;
+    RobotPosition_t robotPosition = {0, 0, 0.0}; // x, y, angle
     uint32_t serialBuffer[ROBOT_SERIAL_PACKET_SIZE] = {0};
     uint8_t cursorTmp = 0;
 };

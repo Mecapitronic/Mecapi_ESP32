@@ -1,6 +1,10 @@
 #include "Tracker.h"
 
-Tracker::Tracker(float cutoff) : lpf_cutoff(cutoff) { Debugger::println("Init Tracker"); }
+Tracker::Tracker(float cutoff) : lpf_cutoff(cutoff)
+{
+    Debugger::print("Init Tracker with cutoff: ");
+    Debugger::println(cutoff);
+}
 
 std::vector<PointTracker> Tracker::getPoints() { return tracked_points; }
 
@@ -11,12 +15,12 @@ int Tracker::findMatchingPoint(Point newPoint)
     float best_match = 5000.0;
     int matching_point_index = -1;
 
-    // Debugger::logPoint("Search point:", newPoint, "", VERBOSE, false);
-    // Debugger::log("tracked size: ", (int)tracked_points.size(), "", VERBOSE, true);
+    Debugger::logPoint("Search point:", newPoint, "", VERBOSE, true);
+    Debugger::log("tracked size: ", (int)tracked_points.size(), "", VERBOSE, true);
 
     for (int i = 0; i < tracked_points.size(); i++)
     {
-        // Debugger::logPoint("Compare to:", tracked_points.at(i).point, "", VERBOSE, true);
+        Debugger::logPoint("Compare to:", tracked_points.at(i).point, "", VERBOSE, true);
 
         float dist = sqrt(pow(newPoint.x - tracked_points.at(i).point.x, 2) + pow(newPoint.y - tracked_points.at(i).point.y, 2));
 
@@ -75,11 +79,26 @@ void Tracker::sendObstaclesToRobot(Robot robot)
     for (int i = 0; i < tracked_points.size(); i++)
     {
         int64_t delta = getTimeNowMs() - tracked_points[i].lastUpdateTime;
-        if (delta < HAS_CHANGE_RECENTLY_HMS)
+        if (delta < HAS_CHANGE_RECENTLY_MS)
         {
             robot.WriteSerial(i, tracked_points[i].point);
             Debugger::plotPoint(tracked_points[i].point, varName + i);
             Debugger::plotTrackerPoints(tracked_points[i], "points");
+        }
+    }
+}
+
+void Tracker::untrackOldObstacles(Robot robot)
+{
+    // iterate to find matching point to the predicate
+    for (auto it = tracked_points.begin(); it < tracked_points.end(); it++)
+    {
+        if (getTimeNowMs() - it->lastUpdateTime > IS_TOO_OLD)
+        {
+            tracked_points.erase(it);
+            robot.WriteSerial(it - tracked_points.begin(), {0, 0});
+            Debugger::print("Untracking point: ");
+            Debugger::println(it - tracked_points.begin());
         }
     }
 }
@@ -90,6 +109,10 @@ int64_t Tracker::getTimeNowMs()
     gettimeofday(&tv_now, NULL);
 
     int64_t time_ms = (int64_t)tv_now.tv_sec * 1000 + ((int64_t)tv_now.tv_usec / 1000);
+
+    // Debugger::print("time is: ");
+    // Debugger::println(String(time_ms));
+
     return time_ms;
 }
 

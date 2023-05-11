@@ -104,6 +104,7 @@ void Lidar::Analyze()
         }
     }
 }
+
 boolean Lidar::CheckContinuity()
 {
     // We compare the first point of this packet with the last point of the previous packet

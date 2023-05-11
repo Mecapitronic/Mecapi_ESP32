@@ -8,22 +8,23 @@
 #include "Debugger.h"
 #include "Robot.h"
 
-#define DEFAULT_LPF_CUTOFF 5000.0
+#define DEFAULT_LPF_CUTOFF 200.0
 
 /**
  * lidar make 10 turns in 1 second, data are updated every 100 miliseconds
- * data are send every 25 miliseconds to robot
- * because robot updates its data every 50 miliseconds
  * a recently updated data is younger than at least 200 second
+ *
+ * FIY: data are send every 25 miliseconds to robot
+ * because robot updates its data every 50 miliseconds
  */
-#define HAS_CHANGE_RECENTLY_HMS 2
+#define HAS_CHANGE_RECENTLY_MS 200
 
 /**
  * amount of time needed to delete a point from tracker
  * if it is not detected in this term
+ * we choose 3 seconds, therefore 3000 miliseconds
  */
-#define SECOND_FROM_MS 10
-#define IS_TOO_OLD 3 * SECOND_FROM_MS
+#define IS_TOO_OLD 3000
 
 /**
  * @brief In charge of tracking objects on the field based on Lidar detections and Kalman filter
@@ -74,6 +75,14 @@ public:
     void sendObstaclesToRobot(Robot robot);
 
     /**
+     * @brief Delete old obstacles from tracked list
+     * if the object has not been updated for IS_TOO_OLD time we should stop tracking it
+     *
+     * @param robot the robot object to send untracked points
+     */
+    void untrackOldObstacles(Robot robot);
+
+    /**
      * @brief Get the current time with milisecond precision
      *
      * @return int64_t current time in milisecond
@@ -99,6 +108,6 @@ private:
      * @brief cut off of the low pass filter
      * limits to define the closest robot to track matching points
      */
-    float lpf_cutoff;
+    float lpf_cutoff = DEFAULT_LPF_CUTOFF;
 };
 #endif /* TRACKER_H */
