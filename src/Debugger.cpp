@@ -155,6 +155,18 @@ void Debugger::logPoint(String prefix, Point data, String suffix, Level level, b
         SERIAL_DEBUG.println();
 }
 
+void Debugger::logPolarPoint(String prefix, PolarPoint data, String suffix, Level level, boolean lineFeed)
+{
+    if (level < debugLevel) return;
+    SERIAL_DEBUG.print(prefix);
+    SERIAL_DEBUG.print(" angle: ");
+    SERIAL_DEBUG.print(data.angle / 100);
+    SERIAL_DEBUG.print(" distance: ");
+    SERIAL_DEBUG.print(data.distance);
+    SERIAL_DEBUG.print(suffix);
+    if (lineFeed) SERIAL_DEBUG.println();
+}
+
 void Debugger::printPolarPoint(PolarPoint p, Level level)
 {
     if (level < debugLevel)

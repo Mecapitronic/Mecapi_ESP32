@@ -69,6 +69,7 @@ public:
                           Level level = VERBOSE);
 
     static void logPoint(String prefix, Point data, String suffix, Level level, boolean lineFeed);
+    static void logPolarPoint(String prefix, PolarPoint data, String suffix, Level level, boolean lineFeed);
 
     static void printPolarPoint(PolarPoint p, Level level);
     static void printPoint(Point p, Level level);
