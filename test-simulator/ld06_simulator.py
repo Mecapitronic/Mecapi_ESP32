@@ -8,7 +8,7 @@ from typing import List
 
 import serial
 
-FILE = "data_ld06_2.txt"
+FILE = "data_ld06_3.txt"
 
 
 BAUDRATE = 230400
