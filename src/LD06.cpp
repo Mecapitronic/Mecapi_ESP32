@@ -13,22 +13,32 @@ void Lidar::Config(int min = -1, int max = -1, int quality = -1, int distance = 
 {
     if (min != -1)
     {
+        Debugger::log("Lidar Config 'Distance Min' from ", lidarConfig.minDistance, "", INFO, false);
+        Debugger::log(" to ", min);
         lidarConfig.minDistance = min;
     }
     if (max != -1)
     {
+        Debugger::log("Lidar Config 'Distance Max' from ", lidarConfig.maxDistance, "", INFO, false);
+        Debugger::log(" to ", max);
         lidarConfig.maxDistance = max;
     }
     if (quality != -1)
     {
+        Debugger::log("Lidar Config 'Quality' from ", lidarConfig.minQuality, "", INFO, false);
+        Debugger::log(" to ", quality);
         lidarConfig.minQuality = quality;
     }
     if (distance != -1)
     {
+        Debugger::log("Lidar Config 'Distance Threshold' from ", lidarConfig.distanceThreshold, "", INFO, false);
+        Debugger::log(" to ", distance);
         lidarConfig.distanceThreshold = distance;
     }
     if (angle != -1)
     {
+        Debugger::log("Lidar Config 'Angle Threshold' from ", lidarConfig.angleThreshold, "", INFO, false);
+        Debugger::log(" to ", angle);
         lidarConfig.angleThreshold = angle;
     }
 }
@@ -140,6 +150,7 @@ void Lidar::SearchForObstacles(PointLidar polar_point, Tracker *tracker, Robot r
 
     if (IsOutsideTable(point))
     {
+        Debugger::logPoint("Outside table : ", point);
         return;
     }
 
@@ -181,6 +192,7 @@ void Lidar::AggregatePoint(PointLidar polar_point, Point point, Tracker *tracker
     // Determine if it is a new obstacle
     if (NewObstacleThreshold(polar_point))
     {
+            Debugger::print("NewObstacleThreshold");
         // if we have sufficient data for this obstacle
         // we move to save another obstacle
         if (pointsCounter >= obstacleMinPoints)
@@ -189,6 +201,7 @@ void Lidar::AggregatePoint(PointLidar polar_point, Point point, Tracker *tracker
         }
     }
     }
+    Debugger::log("PointsCounter : ", pointsCounter);
     // save the coord of current lidar point
     obstacleTmp.data[pointsCounter++] = {(double)polar_point.angle,
                                          polar_point.distance,
@@ -199,8 +212,10 @@ void Lidar::AggregatePoint(PointLidar polar_point, Point point, Tracker *tracker
 
 void Lidar::ObstacleDetected(Tracker *tracker, uint8_t size)
 {
+    Debugger::log("Size obs :", size);
     obstacleTmp.size = size;
     Point mid = ComputeCenter(obstacleTmp);
+    Debugger::logPoint("Mid :", mid);
     tracker->track(mid, obstacleTmp.data, obstacleTmp.size);
     pointsCounter = 0;
 }
