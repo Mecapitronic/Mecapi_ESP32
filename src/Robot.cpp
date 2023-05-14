@@ -4,7 +4,8 @@ Robot::Robot()
 {
     Debugger::println("Init Robot");
 
-    robotPosition = {0, 0, 0.0};
+    robotPosition = {1000, 1000, 0.0};
+    PrintPosition();
     cursorTmp = 0;
     for (size_t i = 0; i < ROBOT_SERIAL_PACKET_SIZE; i++)
     {
