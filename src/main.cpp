@@ -59,16 +59,18 @@ void Task1code(void *pvParameters)
         {
             lidar06.Analyze();
             lidar06.CheckContinuity();
-        }
 
-        lidarPacket = lidar06.GetData();
-        for (int i = 0; i < LIDAR_DATA_PACKET_SIZE; i++)
-        {
-            // Filter point before sending to queue : increase speed for later calculus
-            // TODO increase the confidence limit to avoid aberrations
-            if (lidarPacket.dataPoint[i].confidence != 0)
+            lidarPacket = lidar06.GetData();
+            for (int i = 0; i < LIDAR_DATA_PACKET_SIZE; i++)
             {
-                xQueueSend(queue, &lidarPacket.dataPoint[i], 0);
+                // Filter point before sending to queue : increase speed for later calculus
+                // TODO increase the confidence limit to avoid aberrations
+
+                // TODO at least send 1 or 2 points to the queue (min max ?, middle ?) to end aggregation for obstacle
+                if (lidarPacket.dataPoint[i].confidence != 0)
+                {
+                    xQueueSend(queue, &lidarPacket.dataPoint[i], 0);
+                }
             }
         }
         vTaskDelay(1);
@@ -85,8 +87,10 @@ void Task2code(void *pvParameters)
     {
         if (uxQueueMessagesWaiting(queue) > 0)
         {
-            xQueueReceive(queue, &point, portTICK_PERIOD_MS * 0);
-            lidar06.SearchForObstacles(point, &tracker, robot);
+            if (xQueueReceive(queue, &point, portTICK_PERIOD_MS * 0))
+            {
+                lidar06.SearchForObstacles(point, &tracker, robot);
+            }
         }
         tracker.sendObstaclesToRobot(robot);
         tracker.untrackOldObstacles(robot);
