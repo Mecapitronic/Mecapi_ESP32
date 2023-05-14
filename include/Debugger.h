@@ -68,8 +68,8 @@ public:
     static void logArrayN(String prefix, int element, String interFix, int array[], size_t size, char separator = ',', String suffix = ")",
                           Level level = VERBOSE);
 
-    static void logPoint(String prefix, Point data, String suffix, Level level, boolean lineFeed);
-    static void logPolarPoint(String prefix, PolarPoint data, String suffix, Level level, boolean lineFeed);
+    static void logPoint(String prefix, Point data, String suffix = "", Level level = VERBOSE, boolean lineFeed = true);
+    static void logPolarPoint(String prefix, PolarPoint data, String suffix = "", Level level = VERBOSE, boolean lineFeed = true);
 
     static void printPolarPoint(PolarPoint p, Level level);
     static void printPoint(Point p, Level level);
@@ -77,7 +77,7 @@ public:
     /**
      * send point data on serial for teleplot to trace x and y in a graph
      */
-    static void plotTrackerPoints(PointTracker p, int size,  String varName);
+    static void plotTrackerPoints(PointTracker p, int size, String varName);
 
     /**
      * send point data on serial for teleplot to trace x and y in a graph
