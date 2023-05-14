@@ -16,12 +16,12 @@ int Tracker::findMatchingPoint(Point newPoint)
     float best_match = 5000.0;
     int matching_point_index = -1;
 
-    Debugger::logPoint("Search point:", newPoint, "", VERBOSE, true);
-    Debugger::log("tracked size: ", (int)tracked_points.size(), "", VERBOSE, true);
+    Debugger::logPoint("Search point:", newPoint);
+    Debugger::log("tracked size: ", (int)tracked_points.size());
 
     for (int i = 0; i < tracked_points.size(); i++)
     {
-        Debugger::logPoint("Compare to:", tracked_points.at(i).point, "", VERBOSE, false);
+        Debugger::logPoint("Compare to:", tracked_points.at(i).point, "");
         int time = tracked_points.at(i).lastUpdateTime;
         Debugger::log("Timestamp:", time, "");
 
@@ -48,12 +48,12 @@ void Tracker::track(Point newPoint, PolarPoint data[], uint8_t size)
 {
     int point_index = findMatchingPoint(newPoint);
     PointTracker newPointTracker;
-    newPointTracker.point = newPoint;                 // point
-    newPointTracker.lastUpdateTime = getTimeNowMs();  // lastUpdateTime
-    newPointTracker.size = size;                      // Size of the polar points array
+    newPointTracker.point = newPoint;                // point
+    newPointTracker.lastUpdateTime = getTimeNowMs(); // lastUpdateTime
+    newPointTracker.size = size;                     // Size of the polar points array
     for (size_t i = 0; i < size; i++)
     {
-        newPointTracker.data[i] = data[i];  // Polar points associated
+        newPointTracker.data[i] = data[i]; // Polar points associated
     }
 
     if (point_index == -1)
@@ -69,7 +69,7 @@ void Tracker::track(Point newPoint, PolarPoint data[], uint8_t size)
         return;
     }
 
-    Debugger::println("Updating point");
+    Debugger::log("Updating point ", point_index, " ", INFO, false);
     Debugger::logPoint("from ", tracked_points[point_index].point, "", VERBOSE, true);
     Debugger::logPoint("  to ", newPointTracker.point, "", VERBOSE, true);
     tracked_points[point_index] = newPointTracker;
