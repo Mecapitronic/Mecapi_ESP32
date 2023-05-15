@@ -144,20 +144,6 @@ boolean Lidar::CheckContinuity()
 
 PacketLidar Lidar::GetData() { return lidarPacket; }
 
-void Lidar::SearchForObstacles(PointLidar lidar_point, Tracker *tracker, Robot robot)
-{
-    // Ignore points outside of the table
-    Point point = PolarToCartesian(lidar_point, robot);
-
-    if (IsOutsideTable(point))
-    {
-        Debugger::logPoint("Outside table : ", point);
-        return;
-    }
-
-    AggregatePoint(lidar_point, point, tracker);
-}
-
 Point Lidar::PolarToCartesian(PointLidar lidar_point, Robot robot)
 {
     Point point;
@@ -178,8 +164,18 @@ bool Lidar::IsOutsideTable(Point point)
     return (point.x < table_margin || point.x > 2000 - table_margin || point.y < table_margin || point.y > 3000 - table_margin);
 }
 
-void Lidar::AggregatePoint(PointLidar lidar_point, Point point, Tracker *tracker)
+void Lidar::AggregatePoint(PointLidar lidar_point, Tracker *tracker, Robot robot)
 {
+
+    // Ignore points outside of the table
+    Point point = PolarToCartesian(lidar_point, robot);
+
+    if (IsOutsideTable(point))
+    {
+        Debugger::logPoint("Outside table : ", point);
+        return;
+    }
+
     // if we have too much data for this obstacle, we move to save another obstacle
     if (pointsCounter >= Obstacle::kMaxPoints)
     {

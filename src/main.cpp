@@ -61,6 +61,7 @@ void Task1code(void *pvParameters)
             lidar06.CheckContinuity();
 
             lidarPacket = lidar06.GetData();
+            int counter = 0;
             for (int i = 0; i < LIDAR_DATA_PACKET_SIZE; i++)
             {
                 // Filter point before sending to queue : increase speed for later calculus
@@ -71,6 +72,15 @@ void Task1code(void *pvParameters)
                 {
                     xQueueSend(queue, &lidarPacket.dataPoint[i], 0);
                 }
+                else
+                {
+                    counter++;
+                }
+            }
+            if (counter == LIDAR_DATA_PACKET_SIZE - 1)
+            {
+                // we did not have any point to send, we send at least the last one.
+                xQueueSend(queue, &lidarPacket.dataPoint[LIDAR_DATA_PACKET_SIZE - 1], 0);
             }
         }
         vTaskDelay(1);
@@ -89,7 +99,7 @@ void Task2code(void *pvParameters)
         {
             if (xQueueReceive(queue, &point, portTICK_PERIOD_MS * 0))
             {
-                lidar06.SearchForObstacles(point, &tracker, robot);
+                lidar06.AggregatePoint(point, &tracker, robot);
             }
         }
         tracker.sendObstaclesToRobot(robot);

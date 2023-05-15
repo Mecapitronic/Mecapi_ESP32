@@ -87,12 +87,6 @@ public:
     PacketLidar GetData();
 
     /**
-     * detects if the points is on the table and agregate it if it is part of a obstacle
-     * currently detected
-     */
-    void SearchForObstacles(PointLidar polar_point, Tracker *tracker, Robot robot);
-
-    /**
      * convert detected position from polar coordinates to cartesian coordinates
      * according to robot position on the field
      */
@@ -109,7 +103,7 @@ public:
      * Custom segmentation algorithm to detect cylinders in 2D plan
      * Send data to object tracker that send it to the PIC
      */
-    void AggregatePoint(PointLidar polar_point, Point point, Tracker *tracker);
+    void AggregatePoint(PointLidar lidar_point, Tracker *tracker, Robot robot);
 
     void ObstacleDetected(Tracker *tracker, uint8_t size);
 
