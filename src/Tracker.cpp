@@ -103,21 +103,6 @@ void Tracker::untrackOldObstacles(Robot robot)
     }
 }
 
-void Tracker::untrackOldObstacles(Robot robot)
-{
-    // iterate to find matching point to the predicate
-    for (auto it = tracked_points.begin(); it < tracked_points.end(); it++)
-    {
-        if (getTimeNowMs() - it->lastUpdateTime > IS_TOO_OLD)
-        {
-            tracked_points.erase(it);
-            robot.WriteSerial(it - tracked_points.begin(), {0, 0});
-            Debugger::print("Untracking point: ");
-            Debugger::println(it - tracked_points.begin());
-        }
-    }
-}
-
 int64_t Tracker::getTimeNowMs()
 {
     struct timeval tv_now;
