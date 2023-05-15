@@ -189,137 +189,146 @@ void Lidar::AggregatePoint(PointLidar polar_point, Point point, Tracker *tracker
     {
 
         // if we are still under the maximum size of an obstacle
+        // if we are still under the maximum size of an obstacle
 
         // Determine if it is a new obstacle
         if (NewObstacleThreshold(polar_point))
         {
-            Debugger::print("NewObstacleThreshold");
-            // if we have sufficient data for this obstacle
-            // we move to save another obstacle
-            if (pointsCounter >= obstacleMinPoints)
+            // Determine if it is a new obstacle
+            if (NewObstacleThreshold(polar_point))
             {
-                ObstacleDetected(tracker, pointsCounter);
+                Debugger::print("NewObstacleThreshold");
+                // if we have sufficient data for this obstacle
+                // we move to save another obstacle
+                if (pointsCounter >= obstacleMinPoints)
+                {
+                    ObstacleDetected(tracker, pointsCounter);
+                }
+                else
+                {
+                    // not enough point, we drop the current obstacle
+                    pointsCounter = 0;
+                }
             }
         }
+        Debugger::log("PointsCounter : ", pointsCounter);
+        // save the coord of current lidar point
+        obstacleTmp.data[pointsCounter++] = {(double)polar_point.angle,
+                                             polar_point.distance,
+                                             polar_point.confidence,
+                                             point.x,
+                                             point.y};
     }
-    Debugger::log("PointsCounter : ", pointsCounter);
-    // save the coord of current lidar point
-    obstacleTmp.data[pointsCounter++] = {(double)polar_point.angle,
-                                         polar_point.distance,
-                                         polar_point.confidence,
-                                         point.x,
-                                         point.y};
-}
 
-void Lidar::ObstacleDetected(Tracker *tracker, uint8_t size)
-{
-    Debugger::log("Size obs :", size);
-    obstacleTmp.size = size;
-    Point mid = ComputeCenter(obstacleTmp);
-    Debugger::logPoint("Mid :", mid);
-    tracker->track(mid, obstacleTmp.data, obstacleTmp.size);
-    pointsCounter = 0;
-}
-
-bool Lidar::NewObstacleThreshold(PointLidar polar_point)
-{
-    return (fabsf(obstacleTmp.data[pointsCounter - 1].distance - polar_point.distance) > lidarConfig.distanceThreshold ||
-            fabsf(obstacleTmp.data[pointsCounter - 1].angle) - fabsf(polar_point.angle) > lidarConfig.angleThreshold * 100);
-}
-
-void Lidar::PrintPacket(PacketLidar packet)
-{
-    Debugger::print("dataLength:");
-    Debugger::print(packet.dataLength);
-    Debugger::print(" radarSpeed:");
-    Debugger::print(packet.radarSpeed);
-    Debugger::print(" startAngle:");
-    Debugger::print(packet.startAngle);
-    Debugger::print(" endAngle: ");
-    Debugger::print(packet.endAngle);
-    Debugger::print(" timestamp: ");
-    Debugger::println(packet.timestamp);
-    for (uint8_t i = 0; i < LIDAR_DATA_PACKET_SIZE; i++)
+    void Lidar::ObstacleDetected(Tracker * tracker, uint8_t size)
     {
-        Debugger::print("   Point ");
-        Debugger::print(i);
-        Debugger::print(") ");
+        Debugger::log("Size obs :", size);
+        obstacleTmp.size = size;
+        Point mid = ComputeCenter(obstacleTmp);
+        Debugger::logPoint("Mid :", mid);
+        tracker->track(mid, obstacleTmp.data, obstacleTmp.size);
+        pointsCounter = 0;
+    }
+
+    bool Lidar::NewObstacleThreshold(PointLidar polar_point)
+    {
+        return (fabsf(obstacleTmp.data[pointsCounter - 1].distance - polar_point.distance) > lidarConfig.distanceThreshold ||
+                fabsf(obstacleTmp.data[pointsCounter - 1].angle) - fabsf(polar_point.angle) > lidarConfig.angleThreshold * 100);
+    }
+
+    void Lidar::PrintPacket(PacketLidar packet)
+    {
+        Debugger::print("dataLength:");
+        Debugger::print(packet.dataLength);
+        Debugger::print(" radarSpeed:");
+        Debugger::print(packet.radarSpeed);
+        Debugger::print(" startAngle:");
+        Debugger::print(packet.startAngle);
+        Debugger::print(" endAngle: ");
+        Debugger::print(packet.endAngle);
+        Debugger::print(" timestamp: ");
+        Debugger::println(packet.timestamp);
+        for (uint8_t i = 0; i < LIDAR_DATA_PACKET_SIZE; i++)
+        {
+            Debugger::print("   Point ");
+            Debugger::print(i);
+            Debugger::print(") ");
+            Debugger::print("A:");
+            Debugger::print(packet.dataPoint[i].angle);
+            Debugger::print(" D:");
+            Debugger::print(packet.dataPoint[i].distance);
+            Debugger::print(" C:");
+            Debugger::println(packet.dataPoint[i].confidence);
+        }
+    }
+
+    void Lidar::PrintPoint(PointLidar point)
+    {
+        Debugger::print("Point ");
         Debugger::print("A:");
-        Debugger::print(packet.dataPoint[i].angle);
+        Debugger::print(point.angle);
         Debugger::print(" D:");
-        Debugger::print(packet.dataPoint[i].distance);
+        Debugger::print(point.distance);
         Debugger::print(" C:");
-        Debugger::println(packet.dataPoint[i].confidence);
+        Debugger::println(point.confidence);
     }
-}
 
-void Lidar::PrintPoint(PointLidar point)
-{
-    Debugger::print("Point ");
-    Debugger::print("A:");
-    Debugger::print(point.angle);
-    Debugger::print(" D:");
-    Debugger::print(point.distance);
-    Debugger::print(" C:");
-    Debugger::println(point.confidence);
-}
-
-Point Lidar::ComputeCenter(Obstacle lidar_obstacle)
-{
-    Point mid = {0, 0};
-    for (int8_t d = 0; d < lidar_obstacle.size; d++)
+    Point Lidar::ComputeCenter(Obstacle lidar_obstacle)
     {
-        mid.x += lidar_obstacle.data[d].x;
-        mid.y += lidar_obstacle.data[d].y;
+        Point mid = {0, 0};
+        for (int8_t d = 0; d < lidar_obstacle.size; d++)
+        {
+            mid.x += lidar_obstacle.data[d].x;
+            mid.y += lidar_obstacle.data[d].y;
+        }
+        mid.x = mid.x / lidar_obstacle.size;
+        mid.y = mid.y / lidar_obstacle.size;
+
+        return mid;
     }
-    mid.x = mid.x / lidar_obstacle.size;
-    mid.y = mid.y / lidar_obstacle.size;
 
-    return mid;
-}
+    Point Lidar::FindCircle(Point p1, Point p2, Point p3) { return FindCircle(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y); }
 
-Point Lidar::FindCircle(Point p1, Point p2, Point p3) { return FindCircle(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y); }
+    Point Lidar::FindCircle(float x1, float y1, float x2, float y2, float x3, float y3)
+    {
+        float x12 = x1 - x2;
+        float x13 = x1 - x3;
 
-Point Lidar::FindCircle(float x1, float y1, float x2, float y2, float x3, float y3)
-{
-    float x12 = x1 - x2;
-    float x13 = x1 - x3;
+        float y12 = y1 - y2;
+        float y13 = y1 - y3;
 
-    float y12 = y1 - y2;
-    float y13 = y1 - y3;
+        float y31 = y3 - y1;
+        float y21 = y2 - y1;
 
-    float y31 = y3 - y1;
-    float y21 = y2 - y1;
+        float x31 = x3 - x1;
+        float x21 = x2 - x1;
 
-    float x31 = x3 - x1;
-    float x21 = x2 - x1;
+        // x1^2 - x3^2
+        float sx13 = pow(x1, 2) - pow(x3, 2);
 
-    // x1^2 - x3^2
-    float sx13 = pow(x1, 2) - pow(x3, 2);
+        // y1^2 - y3^2
+        float sy13 = pow(y1, 2) - pow(y3, 2);
 
-    // y1^2 - y3^2
-    float sy13 = pow(y1, 2) - pow(y3, 2);
+        float sx21 = pow(x2, 2) - pow(x1, 2);
+        float sy21 = pow(y2, 2) - pow(y1, 2);
 
-    float sx21 = pow(x2, 2) - pow(x1, 2);
-    float sy21 = pow(y2, 2) - pow(y1, 2);
+        float f = ((sx13) * (x12) + (sy13) * (x12) + (sx21) * (x13) + (sy21) * (x13)) / (2 * ((y31) * (x12) - (y21) * (x13)));
+        float g = ((sx13) * (y12) + (sy13) * (y12) + (sx21) * (y13) + (sy21) * (y13)) / (2 * ((x31) * (y12) - (x21) * (y13)));
 
-    float f = ((sx13) * (x12) + (sy13) * (x12) + (sx21) * (x13) + (sy21) * (x13)) / (2 * ((y31) * (x12) - (y21) * (x13)));
-    float g = ((sx13) * (y12) + (sy13) * (y12) + (sx21) * (y13) + (sy21) * (y13)) / (2 * ((x31) * (y12) - (x21) * (y13)));
+        // float c = -pow(x1, 2) - pow(y1, 2) - 2 * g * x1 - 2 * f * y1;
 
-    // float c = -pow(x1, 2) - pow(y1, 2) - 2 * g * x1 - 2 * f * y1;
+        // eqn of circle be x^2 + y^2 + 2*g*x + 2*f*y + c = 0
+        // where centre is (h = -g, k = -f) and radius r
+        // as r^2 = h^2 + k^2 - c
+        float h = -g;
+        float k = -f;
+        // float sqr_of_r = h * h + k * k - c;
 
-    // eqn of circle be x^2 + y^2 + 2*g*x + 2*f*y + c = 0
-    // where centre is (h = -g, k = -f) and radius r
-    // as r^2 = h^2 + k^2 - c
-    float h = -g;
-    float k = -f;
-    // float sqr_of_r = h * h + k * k - c;
+        // r is the radius
+        // float r = sqrt(sqr_of_r);
 
-    // r is the radius
-    // float r = sqrt(sqr_of_r);
-
-    // cout << "Centre = (" << h << ", " << k << ")" << endl;
-    // cout << "Radius = " << r;
-    Point center = {h, k};
-    return center;
-}
+        // cout << "Centre = (" << h << ", " << k << ")" << endl;
+        // cout << "Radius = " << r;
+        Point center = {h, k};
+        return center;
+    }
