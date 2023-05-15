@@ -43,6 +43,11 @@ void Lidar::Config(int min = -1, int max = -1, int quality = -1, int distance = 
     }
 }
 
+ConfigLidar Lidar::GetConfig()
+{
+    return lidarConfig;
+}
+
 boolean Lidar::ReadSerial()
 {
     while (SERIAL_LIDAR.available() > 0)
@@ -105,17 +110,8 @@ void Lidar::Analyze()
         lidarPacket.dataPoint[i].angle = 360 * 100 - (rawDeg <= 360 * 100 ? rawDeg : rawDeg - 360 * 100);
         lidarPacket.dataPoint[i].confidence = (serialBuffer[8 + i * 3]);
         lidarPacket.dataPoint[i].distance = (int(serialBuffer[8 + i * 3 - 1] << 8 | serialBuffer[8 + i * 3 - 2]));
-
-        // if the point is out of bound, we will not use it
-        if (lidarPacket.dataPoint[i].distance < lidarConfig.minDistance ||
-            lidarPacket.dataPoint[i].distance > lidarConfig.maxDistance ||
-            lidarPacket.dataPoint[i].confidence < lidarConfig.minQuality)
-        {
-            lidarPacket.dataPoint[i].confidence = 0;
         }
     }
-    PrintPacket(lidarPacket);
-}
 
 boolean Lidar::CheckContinuity()
 {

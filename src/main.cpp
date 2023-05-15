@@ -67,20 +67,32 @@ void Task1code(void *pvParameters)
                 // Filter point before sending to queue : increase speed for later calculus
                 // TODO increase the confidence limit to avoid aberrations
 
-                // TODO at least send 1 or 2 points to the queue (min max ?, middle ?) to end aggregation for obstacle
-                if (lidarPacket.dataPoint[i].confidence != 0)
+                // if the point is out of bound, we will not use it
+                if (lidarPacket.dataPoint[i].distance < lidar06.GetConfig().minDistance ||
+                    lidarPacket.dataPoint[i].distance > lidar06.GetConfig().maxDistance ||
+                    lidarPacket.dataPoint[i].confidence < lidar06.GetConfig().minQuality)
                 {
-                    xQueueSend(queue, &lidarPacket.dataPoint[i], 0);
+
+                    counter++;
                 }
                 else
                 {
-                    counter++;
+                    xQueueSend(queue, &lidarPacket.dataPoint[i], 0);
                 }
+                lidar06.PrintPoint(lidarPacket.dataPoint[i]);
             }
-            if (counter == LIDAR_DATA_PACKET_SIZE - 1)
+            // TODO at least send 1 or 2 points to the queue (min max ?, middle ?) to end aggregation for obstacle
+            if (counter == LIDAR_DATA_PACKET_SIZE)
             {
                 // we did not have any point to send, we send at least the last one.
                 xQueueSend(queue, &lidarPacket.dataPoint[LIDAR_DATA_PACKET_SIZE - 1], 0);
+
+                Debugger::println("No point to send, Sending dull point");
+                lidar06.PrintPoint(lidarPacket.dataPoint[LIDAR_DATA_PACKET_SIZE - 1]);
+            }
+            else
+            {
+                Debugger::log("Sending ", LIDAR_DATA_PACKET_SIZE - counter, " point");
             }
         }
         vTaskDelay(1);

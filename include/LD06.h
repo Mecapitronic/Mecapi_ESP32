@@ -66,6 +66,11 @@ public:
     void Config(int min, int max, int quality, int distance, int angle);
 
     /**
+     * Get Lidar Configuration
+     */
+    ConfigLidar GetConfig();
+
+    /**
      * Read data from serial and put in a buffer if it comes form the Lidar LD06
      */
     boolean ReadSerial();
