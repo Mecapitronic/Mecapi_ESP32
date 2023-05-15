@@ -35,7 +35,7 @@
  */
 class Tracker
 {
-   public:
+public:
     /**
      * @brief Construct a new Tracker object with settings for filters
      *
@@ -101,7 +101,7 @@ class Tracker
      */
     int64_t getTimeNowUs();
 
-   private:
+private:
     /**
      * @brief list of obstacles/points being tracked
      * the list is updarted with new data
