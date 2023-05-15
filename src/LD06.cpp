@@ -114,6 +114,7 @@ void Lidar::Analyze()
             lidarPacket.dataPoint[i].confidence = 0;
         }
     }
+    PrintPacket(lidarPacket);
 }
 
 boolean Lidar::CheckContinuity()
