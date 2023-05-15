@@ -6,7 +6,7 @@
 #ifndef LD06_H
 #define LD06_H
 
-// Serial 2 : U2TX = GPIO17 ; U2RX = GPIO16
+// Serial 2 : U2TX = GPIO17 (Not Used for Lidar LD06); U2RX = GPIO16
 #define SERIAL_LIDAR Serial2
 // 47 = 1(Start) + 1(Datalen) + 2(Speed) + 2(StartAngle) + 36(12 * 3 DataByte) + 2(EndAngle) + 2(TimeStamp) + 1(CRC)
 #define LIDAR_SERIAL_PACKET_SIZE 47
@@ -82,14 +82,10 @@ public:
     PacketLidar GetData();
 
     /**
-     * Debugging print: pretty print all data stored in lidarPacket
+     * detects if the points is on the table and agregate it if it is part of a obstacle
+     * currently detected
      */
-    void PrintPacket(PacketLidar packet);
-
-    /**
-     * Debugging print: pretty print data stored in one PointLidar
-     */
-    void PrintPoint(PointLidar point);
+    void SearchForObstacles(PointLidar polar_point, Tracker *tracker, Robot robot);
 
     /**
      * convert detected position from polar coordinates to cartesian coordinates
@@ -105,17 +101,10 @@ public:
     bool IsOutsideTable(Point point);
 
     /**
-     * returns whether or not the given point is outside the table
-     * the margin represents the distance between the center of the obstacle
-     * and the edges of the table
+     * Custom segmentation algorithm to detect cylinders in 2D plan
+     * Send data to object tracker that send it to the PIC
      */
-    bool IsOutsideTable(PointLidar polar_point, Robot robot);
-
-    /**
-     * detects if the points is on the table and agregate it if it is part of a obstacle
-     * currently detected
-     */
-    void SearchForObstacles(PointLidar polar_point, Tracker *tracker, Robot robot);
+    void AggregatePoint(PointLidar polar_point, Point point, Tracker *tracker);
 
     void ObstacleDetected(Tracker *tracker, uint8_t size);
 
@@ -126,10 +115,14 @@ public:
     bool NewObstacleThreshold(PointLidar polar_point);
 
     /**
-     * Custom segmentation algorithm to detect cylinders in 2D plan
-     * Send data to object tracker that send it to the PIC
+     * Debugging print: pretty print all data stored in lidarPacket
      */
-    void AggregatePoint(PointLidar polar_point, Point point, Tracker *tracker);
+    void PrintPacket(PacketLidar packet);
+
+    /**
+     * Debugging print: pretty print data stored in one PointLidar
+     */
+    void PrintPoint(PointLidar point);
 
     /**
      * Compute the center of local var lidar_obstacle
@@ -152,7 +145,7 @@ private:
     // minimum number of points needed to qualify as an obstacle
     static const uint8_t obstacleMinPoints = 3;
 
-    // Maximum angle between Lidar packet admissible
+    // Maximum angle between Lidar packet admissible  = angle * 100
     static const uint8_t angleMaxDiscontinuity = 160; // TODO move into config ?
 
     // counter of points while detecting an obstacle from data

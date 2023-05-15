@@ -4,21 +4,49 @@ Robot::Robot()
 {
     Debugger::println("Init Robot");
 
-    robotPosition = {0, 0, 0.0};
+    robotPosition = {1000, 1000, 0.0};
+    PrintPosition();
     cursorTmp = 0;
     for (size_t i = 0; i < ROBOT_SERIAL_PACKET_SIZE; i++)
     {
         serialBuffer[i] = 0;
     }
-
-    // we change the UART 1 RX pin from 9 to 2
-    // we change the UART 1 TX pin from 10 to 4
-    int8_t RX1 = 2;
-    int8_t TX1 = 4;
-    SERIAL_ROBOT.begin(250000, SERIAL_8N1, RX1, TX1);
+    dsPicSerial(Start);
 }
 
+void Robot::dsPicSerial(State state)
+{
+    dsPicSerialStatus = state;
+    SERIAL_ROBOT.end();
+    switch (dsPicSerialStatus)
+    {
+    case Stop:
+        /* code */
+        Debugger::println("dsPic Serial Stop");
+        break;
+    case Start:
+        Debugger::println("dsPic Serial Start");
+        SERIAL_ROBOT.begin(250000, SERIAL_8N1, RX1, TX1);
+        break;
+    case Debug:
+        Debugger::println("dsPic Serial Debug");
+        SERIAL_ROBOT.begin(230400, SERIAL_8N1, RX1, TX1);
+        break;
+
+    default:
+        break;
+    }
+}
+State Robot::dsPicSerial() { return dsPicSerialStatus; }
+
 RobotPosition_t Robot::GetPosition() { return robotPosition; }
+
+void Robot::SetPosition(int x, int y, int angle)
+{
+    robotPosition.x = x;
+    robotPosition.y = y;
+    robotPosition.angle = angle;
+}
 
 boolean Robot::ReadSerial()
 {
@@ -62,24 +90,27 @@ void Robot::PrintPosition()
     Debugger::log("A= ", robotPosition.angle / 100, "  ", VERBOSE);
 }
 
-void Robot::WriteSerial(int n, Point p)
+void Robot::WriteSerialdsPic(int n, Point p)
 {
-    // Starting char : '!'
-    SERIAL_ROBOT.write(0x21);
+    if (dsPicSerialStatus == Start)
+    {
+        // Starting char : '!'
+        SERIAL_ROBOT.write(0x21);
 
-    // Number
-    SERIAL_ROBOT.write(n);
+        // Number
+        SERIAL_ROBOT.write(n);
 
-    // X
-    int x = (int)p.x;
-    SERIAL_ROBOT.write(x % 256);
-    SERIAL_ROBOT.write(x >> 8);
+        // X
+        int x = (int)p.x;
+        SERIAL_ROBOT.write(x % 256);
+        SERIAL_ROBOT.write(x >> 8);
 
-    // Y
-    int y = (int)p.y;
-    SERIAL_ROBOT.write(y % 256);
-    SERIAL_ROBOT.write(y >> 8);
+        // Y
+        int y = (int)p.y;
+        SERIAL_ROBOT.write(y % 256);
+        SERIAL_ROBOT.write(y >> 8);
 
-    // Ending char : 'LF'
-    SERIAL_ROBOT.write(10);
+        // Ending char : 'LF'
+        SERIAL_ROBOT.write(10);
+    }
 }

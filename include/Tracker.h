@@ -8,37 +8,41 @@
 #include "Debugger.h"
 #include "Robot.h"
 
-#define DEFAULT_LPF_CUTOFF 5000.0
+// maximal distance between to points to match them as the same point
+#define DEFAULT_LPF_CUTOFF 300.0
+
+// minimum movement needed to update position of tracked point
+#define DEFAULT_HPF_CUTOFF 100.0
 
 /**
  * lidar make 10 turns in 1 second, data are updated every 100 miliseconds
- * data are send every 25 miliseconds to robot
- * because robot updates its data every 50 miliseconds
  * a recently updated data is younger than at least 200 second
+ *
+ * FIY: data are send every 25 miliseconds to robot
+ * because robot updates its data every 50 miliseconds
  */
-#define HAS_CHANGE_RECENTLY_HMS 2
+#define HAS_CHANGE_RECENTLY_MS 200
 
 /**
  * amount of time needed to delete a point from tracker
  * if it is not detected in this term
+ * we choose 3 seconds, therefore 3000 miliseconds
  */
-#define SECOND_FROM_MS 10
-#define IS_TOO_OLD 3 * SECOND_FROM_MS
+#define IS_TOO_OLD 3000
 
 /**
  * @brief In charge of tracking objects on the field based on Lidar detections and Kalman filter
  */
 class Tracker
 {
-
-public:
+   public:
     /**
-     * @brief Construct a new Tracker object
-     * if no cutoff distance is provided use DEFAULT_LPF_CUTOFF
+     * @brief Construct a new Tracker object with settings for filters
      *
-     * @param cutoff maxmimal distance between to points to match them as the same point
+     * @param lpf_cutoff_distance maximal distance between to points to match them as the same point; default DEFAULT_LPF_CUTOFF
+     * @param hpf_cutoff_distance minimum movement needed to update position of tracked point; default DEFAULT_HPF_CUTOFF
      */
-    Tracker(float cutoff = DEFAULT_LPF_CUTOFF);
+    Tracker(float lpf_cutoff_distance = DEFAULT_LPF_CUTOFF, float hpf_cutoff_distance = DEFAULT_HPF_CUTOFF);
 
     /**
      * @brief Get the list of tracked points
@@ -52,7 +56,7 @@ public:
      * automatically detects if the point is new,
      * in that case add it to list of tracked points
      */
-    void track(Point newPoint);
+    void track(Point newPoint, PolarPoint data[], uint8_t size);
 
     /**
      * @brief filter (low pass) the given point to search if it is already tracked
@@ -60,7 +64,9 @@ public:
      * if the distance between a tracked point and newPoint is smaller than lpf_cutoff,
      *
      * @param newPoint
-     * @return int index of the matching point if the point is already tracked else return -1
+     * @return int index of the matching point if the point is already tracked;
+     *  -1 if the point is not already tracked;
+     *  -2 if the point is tracked but shouldn't be updated
      */
     int findMatchingPoint(Point newPoint);
 
@@ -72,6 +78,14 @@ public:
      * @param robot the robot object to send data to
      */
     void sendObstaclesToRobot(Robot robot);
+
+    /**
+     * @brief Delete old obstacles from tracked list
+     * if the object has not been updated for IS_TOO_OLD time we should stop tracking it
+     *
+     * @param robot the robot object to send untracked points
+     */
+    void untrackOldObstacles(Robot robot);
 
     /**
      * @brief Get the current time with milisecond precision
@@ -87,7 +101,7 @@ public:
      */
     int64_t getTimeNowUs();
 
-private:
+   private:
     /**
      * @brief list of obstacles/points being tracked
      * the list is updarted with new data
@@ -99,6 +113,13 @@ private:
      * @brief cut off of the low pass filter
      * limits to define the closest robot to track matching points
      */
-    float lpf_cutoff;
+    float lpf_cutoff = DEFAULT_LPF_CUTOFF;
+
+    /**
+     * @brief cut off of the high pass filter
+     * limits to define the minimum movement a robot should do to be updated
+     * this covers the false positives due to lidar lack of precision
+     */
+    float hpf_cutoff = DEFAULT_HPF_CUTOFF;
 };
 #endif /* TRACKER_H */

@@ -8,6 +8,12 @@
 #define ROBOT_H
 
 #define SERIAL_ROBOT Serial1
+
+// we change the UART 1 RX pin from 9 to 2
+// we change the UART 1 TX pin from 10 to 4
+#define RX1 2
+#define TX1 4
+
 #define ROBOT_SERIAL_PACKET_SIZE 32
 // '!' + "1000,1500,9000" + '\n' :  1 + 2 * 3 + 1;
 // 21 e8 03 dc 05 28 23 0A
@@ -24,6 +30,11 @@ public:
      */
     Robot();
 
+    /**
+     * Enable or disable communication to dsPIC : used for debug as it re-route serial to PC
+     */
+    void dsPicSerial(State state);
+    State dsPicSerial();
     /**
      * Read data coming from Robot PIC giving the actual position of the robot
      * put data in local buffer
@@ -42,6 +53,10 @@ public:
     RobotPosition_t GetPosition();
 
     /**
+     * Set the robotPosition with the coordinates x, y and angle
+     */
+    void SetPosition(int x, int y, int angle);
+    /**
      * Debug print: pretty print robot position and orientation
      */
     void PrintPosition();
@@ -49,12 +64,13 @@ public:
     /**
      * Send data to robot PIC: send obstacle position given in args
      */
-    void WriteSerial(int n, Point p);
+    void WriteSerialdsPic(int n, Point p);
 
-private:
-    RobotPosition_t robotPosition;
+   private:
+    RobotPosition_t robotPosition = {0, 0, 0.0}; // x, y, angle
     uint32_t serialBuffer[ROBOT_SERIAL_PACKET_SIZE] = {0};
     uint8_t cursorTmp = 0;
+    State dsPicSerialStatus = Start;
 };
 
 #endif

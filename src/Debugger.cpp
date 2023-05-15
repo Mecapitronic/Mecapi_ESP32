@@ -4,7 +4,7 @@ void Debugger::init()
 {
     if (enabled)
     {
-        SERIAL_DEBUG.begin(230400);
+        SERIAL_DEBUG.begin(500000);
 
         if (SERIAL_DEBUG.available() <= 0)
         {
@@ -155,6 +155,18 @@ void Debugger::logPoint(String prefix, Point data, String suffix, Level level, b
         SERIAL_DEBUG.println();
 }
 
+void Debugger::logPolarPoint(String prefix, PolarPoint data, String suffix, Level level, boolean lineFeed)
+{
+    if (level < debugLevel) return;
+    SERIAL_DEBUG.print(prefix);
+    SERIAL_DEBUG.print(" angle: ");
+    SERIAL_DEBUG.print(data.angle / 100);
+    SERIAL_DEBUG.print(" distance: ");
+    SERIAL_DEBUG.print(data.distance);
+    SERIAL_DEBUG.print(suffix);
+    if (lineFeed) SERIAL_DEBUG.println();
+}
+
 void Debugger::printPolarPoint(PolarPoint p, Level level)
 {
     if (level < debugLevel)
@@ -191,6 +203,19 @@ void Debugger::printPoint(Point p, Level level)
         SERIAL_DEBUG.print(" Y:");
         SERIAL_DEBUG.print((int)p.y);
     }
+}
+
+void Debugger::plotTrackerPoints(PointTracker p, int size, String varName)
+{
+    String data = ">" + varName + ":" + (int)(p.data[0].angle) + ":" + (int)p.data[0].distance;
+    String separator = ";";
+
+    for (size_t i = 1; i < size; i++)
+    {
+        data += separator + (int)p.data[i].angle + ":" + (int)p.data[i].distance;
+    }
+    data += "|xy";
+    SERIAL_DEBUG.println(data);
 }
 
 void Debugger::plotPoint(Point p, String varName)

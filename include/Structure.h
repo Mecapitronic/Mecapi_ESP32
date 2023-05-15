@@ -10,6 +10,15 @@
 
 #include <Arduino.h>
 
+#define _kMaxPoints 25
+
+enum State
+{
+    Stop = 0,
+    Start = 1,
+    Debug = 2
+};
+
 struct PolarPoint
 {
     double angle;
@@ -19,17 +28,25 @@ struct PolarPoint
     float y;
 };
 
+/**
+ * Represent a Cartesian point, with x and y as coordinates
+ */
 struct Point
 {
     float x;
     float y;
 };
+
 struct PointTracker
 {
     // point coordinates beeing tracked
     Point point;
     // timestamp of the last time the tracker has been updated
     int64_t lastUpdateTime;
+    // Polar points that define the mid point
+    PolarPoint data[_kMaxPoints] = {0, 0, 0, 0, 0};
+    // Size of the polar points array
+    uint8_t size = 0;
 };
 
 struct RobotPosition_t
@@ -45,7 +62,7 @@ struct RobotPosition_t
  */
 struct Obstacle
 {
-    static constexpr size_t kMaxPoints = 20;
+    static constexpr size_t kMaxPoints = _kMaxPoints;
     PolarPoint data[kMaxPoints] = {0, 0, 0, 0, 0};
     uint8_t size = 0;
 };

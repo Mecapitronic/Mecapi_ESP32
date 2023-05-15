@@ -46,38 +46,31 @@ void loop()
 void Task1code(void *pvParameters)
 {
     PacketLidar lidarPacket;
-    RobotPosition_t robotPosition;
-    robotPosition.x = 0;
-    robotPosition.y = 0;
-    robotPosition.angle = 0;
 
     while (1)
     {
+        if (robot.ReadSerial())
+        {
+            // set the new robot position
+            robot.Analyze();
+        }
+
         if (lidar06.ReadSerial())
         {
             lidar06.Analyze();
             lidar06.CheckContinuity();
-        }
-        if (robot.ReadSerial())
-        {
-            robot.Analyze();
-            if (robotPosition.x != robot.GetPosition().x ||
-                robotPosition.y != robot.GetPosition().y ||
-                robotPosition.angle != robot.GetPosition().angle)
-            {
-                robotPosition = robot.GetPosition();
-                robot.PrintPosition();
-            }
-        }
 
-        lidarPacket = lidar06.GetData();
-        for (int i = 0; i < LIDAR_DATA_PACKET_SIZE; i++)
-        {
-            // Filter point before sending to queue : increase speed for later calculus
-            // TODO increase the confidence limit to avoid abberations
-            if (lidarPacket.dataPoint[i].confidence != 0)
+            lidarPacket = lidar06.GetData();
+            for (int i = 0; i < LIDAR_DATA_PACKET_SIZE; i++)
             {
-                xQueueSend(queue, &lidarPacket.dataPoint[i], 0);
+                // Filter point before sending to queue : increase speed for later calculus
+                // TODO increase the confidence limit to avoid aberrations
+
+                // TODO at least send 1 or 2 points to the queue (min max ?, middle ?) to end aggregation for obstacle
+                if (lidarPacket.dataPoint[i].confidence != 0)
+                {
+                    xQueueSend(queue, &lidarPacket.dataPoint[i], 0);
+                }
             }
         }
         vTaskDelay(1);
@@ -94,10 +87,13 @@ void Task2code(void *pvParameters)
     {
         if (uxQueueMessagesWaiting(queue) > 0)
         {
-            xQueueReceive(queue, &point, portTICK_PERIOD_MS * 0);
-            lidar06.SearchForObstacles(point, &tracker, robot);
+            if (xQueueReceive(queue, &point, portTICK_PERIOD_MS * 0))
+            {
+                lidar06.SearchForObstacles(point, &tracker, robot);
+            }
         }
         tracker.sendObstaclesToRobot(robot);
+        tracker.untrackOldObstacles(robot);
 
         // Check if we get commands from operator via debug serial
         String cmd = Debugger::checkSerial();
@@ -111,6 +107,42 @@ void Task2code(void *pvParameters)
                 Debugger::print("Lidar: ");
                 Debugger::println(i);
                 lidar06.Config(-1, i, -1, -1, -1);
+                // TODO : make a function for reading commands
+            }
+            catch (std::exception const &e)
+            {
+                Debugger::print("error : ");
+                Debugger::println(e.what());
+            }
+        }
+        if (cmd.startsWith("RobotXYA:"))
+        {
+            try
+            {
+                // RobotXYA:0000,0000,00000
+                int cmdLength = 9;
+                int x = atoi(cmd.substring(cmdLength, cmdLength + 4).c_str());
+                int y = atoi(cmd.substring(cmdLength + 5, cmdLength + 9).c_str());
+                int angle = atoi(cmd.substring(cmdLength + 10, cmdLength + 15).c_str());
+                robot.SetPosition(x, y, angle);
+                robot.PrintPosition();
+                // TODO : make a function for reading commands
+            }
+            catch (std::exception const &e)
+            {
+                Debugger::print("error : ");
+                Debugger::println(e.what());
+            }
+        }
+        if (cmd.startsWith("RobotState:"))
+        {
+            try
+            {
+                // RobotState:0
+                int cmdLength = 11;
+                int state = atoi(cmd.substring(cmdLength, cmdLength + 1).c_str());
+                robot.dsPicSerial((State)state);
+
                 // TODO : make a function for reading commands
             }
             catch (std::exception const &e)

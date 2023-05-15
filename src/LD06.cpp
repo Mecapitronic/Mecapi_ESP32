@@ -5,7 +5,7 @@ Lidar::Lidar()
     Debugger::println("Init Lidar");
 
     // minDistance, maxDistance, minQuality, distanceThreshold, angleThreshold;
-    Config(0, 2000, 200, 200, 5);
+    Config(0, 3500, 200, 150, 0.8 * 5);
     SERIAL_LIDAR.begin(230400);
 }
 
@@ -13,22 +13,32 @@ void Lidar::Config(int min = -1, int max = -1, int quality = -1, int distance = 
 {
     if (min != -1)
     {
+        Debugger::log("Lidar Config 'Distance Min' from ", lidarConfig.minDistance, "", INFO, false);
+        Debugger::log(" to ", min);
         lidarConfig.minDistance = min;
     }
     if (max != -1)
     {
+        Debugger::log("Lidar Config 'Distance Max' from ", lidarConfig.maxDistance, "", INFO, false);
+        Debugger::log(" to ", max);
         lidarConfig.maxDistance = max;
     }
     if (quality != -1)
     {
+        Debugger::log("Lidar Config 'Quality' from ", lidarConfig.minQuality, "", INFO, false);
+        Debugger::log(" to ", quality);
         lidarConfig.minQuality = quality;
     }
     if (distance != -1)
     {
+        Debugger::log("Lidar Config 'Distance Threshold' from ", lidarConfig.distanceThreshold, "", INFO, false);
+        Debugger::log(" to ", distance);
         lidarConfig.distanceThreshold = distance;
     }
     if (angle != -1)
     {
+        Debugger::log("Lidar Config 'Angle Threshold' from ", lidarConfig.angleThreshold, "", INFO, false);
+        Debugger::log(" to ", angle);
         lidarConfig.angleThreshold = angle;
     }
 }
@@ -40,6 +50,7 @@ boolean Lidar::ReadSerial()
         // we are building a lidar packet
         // it always start with 0x54 0x2C and is 47 bytes long
         uint32_t tmpInt = SERIAL_LIDAR.read();
+        // SERIAL_ROBOT.write(tmpInt);
         if (tmpInt == 0x54 && cursorTmp == 0)
         {
             serialBuffer[cursorTmp++] = tmpInt;
@@ -90,7 +101,8 @@ void Lidar::Analyze()
     for (int i = 0; i < LIDAR_DATA_PACKET_SIZE; i++)
     {
         int rawDeg = lidarPacket.startAngle + i * angleStep;
-        lidarPacket.dataPoint[i].angle = (rawDeg <= 360 * 100 ? rawDeg : rawDeg - 360 * 100);
+        // Raw angle are inverted
+        lidarPacket.dataPoint[i].angle = 360 * 100 - (rawDeg <= 360 * 100 ? rawDeg : rawDeg - 360 * 100);
         lidarPacket.dataPoint[i].confidence = (serialBuffer[8 + i * 3]);
         lidarPacket.dataPoint[i].distance = (int(serialBuffer[8 + i * 3 - 1] << 8 | serialBuffer[8 + i * 3 - 2]));
 
@@ -103,13 +115,14 @@ void Lidar::Analyze()
         }
     }
 }
+
 boolean Lidar::CheckContinuity()
 {
     // We compare the first point of this packet with the last point of the previous packet
     // we do not care about distance and confidence as we only seek continuity in angle
-    int delta = lidarPacket.dataPoint[0].angle - lidarLastPacket.dataPoint[LIDAR_DATA_PACKET_SIZE - 1].angle;
+    int delta = lidarLastPacket.dataPoint[LIDAR_DATA_PACKET_SIZE - 1].angle - lidarPacket.dataPoint[0].angle;
     // previous packet was before 0° and current after
-    if (lidarLastPacket.dataPoint[LIDAR_DATA_PACKET_SIZE - 1].angle >= lidarPacket.dataPoint[0].angle)
+    if (lidarLastPacket.dataPoint[LIDAR_DATA_PACKET_SIZE - 1].angle <= lidarPacket.dataPoint[0].angle)
     {
         delta += 36000;
     }
@@ -129,6 +142,89 @@ boolean Lidar::CheckContinuity()
 }
 
 PacketLidar Lidar::GetData() { return lidarPacket; }
+
+void Lidar::SearchForObstacles(PointLidar polar_point, Tracker *tracker, Robot robot)
+{
+    // Ignore points outside of the table
+    Point point = PolarToCartesian(polar_point, robot);
+
+    if (IsOutsideTable(point))
+    {
+        Debugger::logPoint("Outside table : ", point);
+        return;
+    }
+
+    AggregatePoint(polar_point, point, tracker);
+}
+
+Point Lidar::PolarToCartesian(PointLidar polar_point, Robot robot)
+{
+    Point point;
+    RobotPosition_t robotPosition = robot.GetPosition();
+    float angle = polar_point.angle + robotPosition.angle;
+    angle /= 100;
+    point.x = robotPosition.x + polar_point.distance * cos(angle * M_PI / 180);
+    point.y = robotPosition.y + polar_point.distance * sin(angle * M_PI / 180);
+
+    return point;
+}
+
+bool Lidar::IsOutsideTable(Point point)
+{
+    // the margin represents the distance between the center of the obstacle
+    // and the edges of the table (which is 3000mm long and 2000mm large)
+    const float table_margin = 50;
+    return (point.x < table_margin || point.x > 2000 - table_margin || point.y < table_margin || point.y > 3000 - table_margin);
+}
+
+void Lidar::AggregatePoint(PointLidar polar_point, Point point, Tracker *tracker)
+{
+    // if we have too much data for this obstacle, we move to save another obstacle
+    if (pointsCounter >= Obstacle::kMaxPoints)
+    {
+        ObstacleDetected(tracker, Obstacle::kMaxPoints);
+    }
+    else
+    {
+
+    // if we are still under the maximum size of an obstacle
+
+    // Determine if it is a new obstacle
+    if (NewObstacleThreshold(polar_point))
+    {
+            Debugger::print("NewObstacleThreshold");
+        // if we have sufficient data for this obstacle
+        // we move to save another obstacle
+        if (pointsCounter >= obstacleMinPoints)
+        {
+            ObstacleDetected(tracker, pointsCounter);
+        }
+    }
+    }
+    Debugger::log("PointsCounter : ", pointsCounter);
+    // save the coord of current lidar point
+    obstacleTmp.data[pointsCounter++] = {(double)polar_point.angle,
+                                         polar_point.distance,
+                                         polar_point.confidence,
+                                         point.x,
+                                         point.y};
+}
+
+void Lidar::ObstacleDetected(Tracker *tracker, uint8_t size)
+{
+    Debugger::log("Size obs :", size);
+    obstacleTmp.size = size;
+    Point mid = ComputeCenter(obstacleTmp);
+    Debugger::logPoint("Mid :", mid);
+    tracker->track(mid, obstacleTmp.data, obstacleTmp.size);
+    pointsCounter = 0;
+}
+
+bool Lidar::NewObstacleThreshold(PointLidar polar_point)
+{
+    return (fabsf(obstacleTmp.data[pointsCounter - 1].distance - polar_point.distance) > lidarConfig.distanceThreshold ||
+            fabsf(obstacleTmp.data[pointsCounter - 1].angle) - fabsf(polar_point.angle) > lidarConfig.angleThreshold * 100);
+}
 
 void Lidar::PrintPacket(PacketLidar packet)
 {
@@ -165,86 +261,6 @@ void Lidar::PrintPoint(PointLidar point)
     Debugger::print(point.distance);
     Debugger::print(" C:");
     Debugger::println(point.confidence);
-}
-
-Point Lidar::PolarToCartesian(PointLidar polar_point, Robot robot)
-{
-    Point point;
-    RobotPosition_t robotPosition = robot.GetPosition();
-    point.x = robotPosition.x + polar_point.distance * cos((polar_point.angle / 100 + robotPosition.angle / 100) * M_PI / 180);
-    point.y = robotPosition.y + polar_point.distance * sin((polar_point.angle / 100 + robotPosition.angle / 100) * M_PI / 180);
-
-    return point;
-}
-
-bool Lidar::IsOutsideTable(Point point)
-{
-    // the margin represents the distance between the center of the obstacle
-    // and the edges of the table (which is 3000mm long and 2000mm large)
-    const float table_margin = 50;
-    return (point.x < table_margin || point.x > 2000 - table_margin || point.y < table_margin || point.y > 3000 - table_margin);
-}
-
-bool Lidar::IsOutsideTable(PointLidar polar_point, Robot robot)
-{
-    return IsOutsideTable(PolarToCartesian(polar_point, robot));
-}
-
-void Lidar::SearchForObstacles(PointLidar polar_point, Tracker *tracker, Robot robot)
-{
-    // Ignore points outside of the table
-    Point point = PolarToCartesian(polar_point, robot);
-
-    if (IsOutsideTable(point))
-    {
-        return;
-    }
-
-    AggregatePoint(polar_point, point, tracker);
-}
-
-void Lidar::ObstacleDetected(Tracker *tracker, uint8_t size)
-{
-    obstacleTmp.size = size;
-    Point mid = ComputeCenter(obstacleTmp);
-    tracker->track(mid);
-    pointsCounter = 0;
-}
-
-bool Lidar::NewObstacleThreshold(PointLidar polar_point)
-{
-    return (fabsf(obstacleTmp.data[pointsCounter - 1].distance - polar_point.distance) > lidarConfig.distanceThreshold ||
-            fabsf(obstacleTmp.data[pointsCounter - 1].angle) - fabsf(polar_point.angle) > lidarConfig.angleThreshold * 100);
-}
-
-void Lidar::AggregatePoint(PointLidar polar_point, Point point, Tracker *tracker)
-{
-    // if we have too much data for this obstacle, we move to save another obstacle
-    if (pointsCounter >= Obstacle::kMaxPoints)
-    {
-        ObstacleDetected(tracker, Obstacle::kMaxPoints);
-        return;
-    }
-
-    // if we are still under the maximum size of an obstacle
-
-    // Determine if it is a new obstacle
-    if (NewObstacleThreshold(polar_point))
-    {
-        // if we have sufficient data for this obstacle
-        // we move to save another obstacle
-        if (pointsCounter >= obstacleMinPoints)
-        {
-            ObstacleDetected(tracker, pointsCounter);
-        }
-    }
-
-    // save the coord of current lidar point
-    obstacleTmp.data[pointsCounter++] = {(double)polar_point.angle,
-                                         polar_point.distance,
-                                         polar_point.confidence,
-                                         point.x,
-                                         point.y};
 }
 
 Point Lidar::ComputeCenter(Obstacle lidar_obstacle)
