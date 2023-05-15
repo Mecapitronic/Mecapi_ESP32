@@ -110,8 +110,8 @@ void Lidar::Analyze()
         lidarPacket.dataPoint[i].angle = 360 * 100 - (rawDeg <= 360 * 100 ? rawDeg : rawDeg - 360 * 100);
         lidarPacket.dataPoint[i].confidence = (serialBuffer[8 + i * 3]);
         lidarPacket.dataPoint[i].distance = (int(serialBuffer[8 + i * 3 - 1] << 8 | serialBuffer[8 + i * 3 - 2]));
-        }
     }
+}
 
 boolean Lidar::CheckContinuity()
 {
@@ -162,6 +162,7 @@ bool Lidar::IsOutsideTable(Point point)
 
 void Lidar::AggregatePoint(PointLidar lidar_point, Tracker *tracker, Robot robot)
 {
+    boolean aggregate = true;
 
     // Ignore points outside of the table
     Point point = PolarToCartesian(lidar_point, robot);
@@ -169,7 +170,15 @@ void Lidar::AggregatePoint(PointLidar lidar_point, Tracker *tracker, Robot robot
     if (IsOutsideTable(point))
     {
         Debugger::logPoint("Outside table : ", point);
-        return;
+        aggregate = false;
+    }
+
+    if (lidar_point.distance < lidarConfig.minDistance ||
+        lidar_point.distance > lidarConfig.maxDistance ||
+        lidar_point.confidence < lidarConfig.minQuality)
+    {
+        Debugger::logPoint("Outside config : ", point);
+        aggregate = false;
     }
 
     // if we have too much data for this obstacle, we move to save another obstacle
@@ -184,7 +193,7 @@ void Lidar::AggregatePoint(PointLidar lidar_point, Tracker *tracker, Robot robot
         // Determine if it is a new obstacle
         if (NewObstacleThreshold(lidar_point))
         {
-            Debugger::print("NewObstacleThreshold");
+            Debugger::println("NewObstacleThreshold");
             // if we have sufficient data for this obstacle
             // we move to save another obstacle
             if (pointsCounter >= obstacleMinPoints)
@@ -199,12 +208,15 @@ void Lidar::AggregatePoint(PointLidar lidar_point, Tracker *tracker, Robot robot
         }
     }
     Debugger::log("PointsCounter : ", pointsCounter);
-    // save the coord of current lidar point
-    obstacleTmp.data[pointsCounter++] = {(double)lidar_point.angle,
-                                         lidar_point.distance,
-                                         lidar_point.confidence,
-                                         point.x,
-                                         point.y};
+    if (aggregate)
+    {
+        // save the coord of current lidar point
+        obstacleTmp.data[pointsCounter++] = {(double)lidar_point.angle,
+                                             lidar_point.distance,
+                                             lidar_point.confidence,
+                                             point.x,
+                                             point.y};
+    }
 }
 
 void Lidar::ObstacleDetected(Tracker *tracker, uint8_t size)
