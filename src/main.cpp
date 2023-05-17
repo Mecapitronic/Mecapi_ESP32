@@ -68,9 +68,10 @@ void Task1code(void *pvParameters)
                 // TODO increase the confidence limit to avoid aberrations
 
                 // if the point is out of bound, we will not use it
-                if (lidarPacket.dataPoint[i].distance < lidar06.GetConfig().minDistance ||
-                    lidarPacket.dataPoint[i].distance > lidar06.GetConfig().maxDistance ||
-                    lidarPacket.dataPoint[i].confidence < lidar06.GetConfig().minQuality)
+                ConfigLidar configLidar = lidar06.GetConfig();
+                if (lidarPacket.dataPoint[i].distance < configLidar.minDistance ||
+                    lidarPacket.dataPoint[i].distance > configLidar.maxDistance ||
+                    lidarPacket.dataPoint[i].confidence < configLidar.minQuality)
                 {
 
                     counter++;
