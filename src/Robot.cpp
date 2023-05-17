@@ -2,7 +2,7 @@
 
 Robot::Robot()
 {
-    Debugger::println("Init Robot");
+    Debugger::log("Init Robot", INFO);
 
     robotPosition = {1000, 1000, 0.0};
     PrintPosition();
@@ -22,14 +22,14 @@ void Robot::dsPicSerial(State state)
     {
     case Stop:
         /* code */
-        Debugger::println("dsPic Serial Stop");
+        Debugger::log("dsPic Serial Stop", INFO);
         break;
     case Start:
-        Debugger::println("dsPic Serial Start");
+        Debugger::log("dsPic Serial Start", INFO);
         SERIAL_ROBOT.begin(250000, SERIAL_8N1, RX1, TX1);
         break;
     case Debug:
-        Debugger::println("dsPic Serial Debug");
+        Debugger::log("dsPic Serial Debug");
         SERIAL_ROBOT.begin(230400, SERIAL_8N1, RX1, TX1);
         break;
 

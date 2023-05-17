@@ -8,7 +8,7 @@ void setup()
     queue = xQueueCreate(queueSize, sizeof(PointLidar));
     if (queue == NULL)
     {
-        Debugger::println("Error creating the queue");
+        Debugger::log("Error creating the queue", ERROR);
     }
     robot = Robot();
     delay(500);
@@ -79,16 +79,13 @@ void Task1code(void *pvParameters)
                 {
                     xQueueSend(queue, &lidarPacket.dataPoint[i], 0);
                 }
-                // lidar06.PrintPoint(lidarPacket.dataPoint[i]);
             }
             // TODO at least send 1 or 2 points to the queue (min max ?, middle ?) to end aggregation for obstacle
             if (counter == LIDAR_DATA_PACKET_SIZE)
             {
                 // we did not have any point to send, we send at least the last one.
                 xQueueSend(queue, &lidarPacket.dataPoint[LIDAR_DATA_PACKET_SIZE - 1], 0);
-
-                Debugger::println("No point to send, Sending dull point");
-                lidar06.PrintPoint(lidarPacket.dataPoint[LIDAR_DATA_PACKET_SIZE - 1]);
+                Debugger::log("No point to send, Sending dull point", lidarPacket.dataPoint[LIDAR_DATA_PACKET_SIZE - 1]);
             }
             else
             {
@@ -126,15 +123,13 @@ void Task2code(void *pvParameters)
             {
                 cmd.remove(0, 6);
                 int i = atoi(cmd.c_str());
-                Debugger::print("Lidar: ");
-                Debugger::println(i);
+                Debugger::log("Lidar: ", i);
                 lidar06.Config(-1, i, -1, -1, -1);
                 // TODO : make a function for reading commands
             }
             catch (std::exception const &e)
             {
-                Debugger::print("error : ");
-                Debugger::println(e.what());
+                Debugger::log("error : ", e.what());
             }
         }
         if (cmd.startsWith("RobotXYA:"))
@@ -152,8 +147,7 @@ void Task2code(void *pvParameters)
             }
             catch (std::exception const &e)
             {
-                Debugger::print("error : ");
-                Debugger::println(e.what());
+                Debugger::log("error : ", e.what());
             }
         }
         if (cmd.startsWith("RobotState:"))
@@ -169,8 +163,7 @@ void Task2code(void *pvParameters)
             }
             catch (std::exception const &e)
             {
-                Debugger::print("error : ");
-                Debugger::println(e.what());
+                Debugger::log("error : ", e.what());
             }
         }
 

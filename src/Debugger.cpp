@@ -162,11 +162,12 @@ void Debugger::log(String prefix, PolarPoint data, String suffix, Level level, b
 {
     if (level < debugLevel)
         return;
-    SERIAL_DEBUG.print(prefix);
-    SERIAL_DEBUG.print(" angle: ");
-    SERIAL_DEBUG.print(data.angle / 100);
-    SERIAL_DEBUG.print(" distance: ");
+    SERIAL_DEBUG.print("A: ");
+    SERIAL_DEBUG.print((int)(data.angle / 100));
+    SERIAL_DEBUG.print(" D: ");
     SERIAL_DEBUG.print(data.distance);
+    SERIAL_DEBUG.print(" C: ");
+    SERIAL_DEBUG.println(data.confidence);
     SERIAL_DEBUG.print(suffix);
     if (lineFeed)
         SERIAL_DEBUG.println();
@@ -186,6 +187,41 @@ void Debugger::log(String prefix, RobotPosition data, String suffix, Level level
     SERIAL_DEBUG.print(suffix);
     if (lineFeed)
         SERIAL_DEBUG.println();
+}
+
+void Debugger::log(String prefix, PacketLidar data, String suffix, Level level, boolean lineFeed)
+
+{
+    if (level < debugLevel)
+        return;
+    SERIAL_DEBUG.print(prefix);
+
+    SERIAL_DEBUG.print("dataLength:");
+    SERIAL_DEBUG.print(packet.dataLength);
+    SERIAL_DEBUG.print(" radarSpeed:");
+    SERIAL_DEBUG.print(packet.radarSpeed);
+    SERIAL_DEBUG.print(" startAngle:");
+    SERIAL_DEBUG.print(packet.startAngle);
+    SERIAL_DEBUG.print(" endAngle: ");
+    SERIAL_DEBUG.print(packet.endAngle);
+    SERIAL_DEBUG.print(" timestamp: ");
+    SERIAL_DEBUG.println(packet.timestamp);
+    for (uint8_t i = 0; i < LIDAR_DATA_PACKET_SIZE; i++)
+    {
+        Debugger::print("   Point ");
+        Debugger::print(i);
+        Debugger::print(") ");
+        Debugger::print("A:");
+        Debugger::print(packet.dataPoint[i].angle);
+        Debugger::print(" D:");
+        Debugger::print(packet.dataPoint[i].distance);
+        Debugger::print(" C:");
+        Debugger::println(packet.dataPoint[i].confidence);
+    }
+    SERIAL_DEBUG.print(suffix);
+    if (lineFeed)
+        SERIAL_DEBUG.println();
+}
 }
 
 void Debugger::logArray(String prefix, int array[], size_t size, char separator, String suffix, Level level)
@@ -224,44 +260,6 @@ void Debugger::logArrayN(String prefix, int element, String interFix, int array[
     }
     else
         SERIAL_DEBUG.println("Invalid array printed !");
-}
-
-void Debugger::printPolarPoint(PolarPoint p, Level level)
-{
-    if (level < debugLevel)
-    {
-        SERIAL_DEBUG.print((int)p.angle);
-        SERIAL_DEBUG.print(";");
-        SERIAL_DEBUG.print(p.distance);
-        SERIAL_DEBUG.print(";");
-        SERIAL_DEBUG.println(p.confidence);
-    }
-    else
-    {
-        SERIAL_DEBUG.print("Angle:");
-        SERIAL_DEBUG.print((int)p.angle);
-        SERIAL_DEBUG.print(" Distance:");
-        SERIAL_DEBUG.print(p.distance);
-        SERIAL_DEBUG.print(" Confidence:");
-        SERIAL_DEBUG.println(p.confidence);
-    }
-}
-
-void Debugger::printPoint(Point p, Level level)
-{
-    if (level < debugLevel)
-    {
-        SERIAL_DEBUG.print((int)p.x);
-        SERIAL_DEBUG.print(";");
-        SERIAL_DEBUG.print((int)p.y);
-    }
-    else
-    {
-        SERIAL_DEBUG.print("X:");
-        SERIAL_DEBUG.print((int)p.x);
-        SERIAL_DEBUG.print(" Y:");
-        SERIAL_DEBUG.print((int)p.y);
-    }
 }
 
 void Debugger::plotTrackerPoints(PointTracker p, int size, String varName)

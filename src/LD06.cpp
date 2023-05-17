@@ -2,7 +2,7 @@
 
 Lidar::Lidar()
 {
-    Debugger::println("Init Lidar");
+    Debugger::log("Init Lidar");
 
     // minDistance, maxDistance, minQuality, distanceThreshold, angleThreshold;
     Config(0, 3500, 200, 150, 0.8 * 5);
@@ -193,7 +193,6 @@ void Lidar::AggregatePoint(PointLidar lidar_point, Tracker *tracker, Robot robot
         // Determine if it is a new obstacle
         if (NewObstacleThreshold(lidar_point))
         {
-            // Debugger::println("NewObstacleThreshold");
             //  if we have sufficient data for this obstacle
             //  we move to save another obstacle
             if (pointsCounter >= obstacleMinPoints)
@@ -233,43 +232,6 @@ bool Lidar::NewObstacleThreshold(PointLidar lidar_point)
 {
     return (fabsf(obstacleTmp.data[pointsCounter - 1].distance - lidar_point.distance) > lidarConfig.distanceThreshold ||
             fabsf(obstacleTmp.data[pointsCounter - 1].angle) - fabsf(lidar_point.angle) > lidarConfig.angleThreshold * 100);
-}
-
-void Lidar::PrintPacket(PacketLidar packet)
-{
-    Debugger::print("dataLength:");
-    Debugger::print(packet.dataLength);
-    Debugger::print(" radarSpeed:");
-    Debugger::print(packet.radarSpeed);
-    Debugger::print(" startAngle:");
-    Debugger::print(packet.startAngle);
-    Debugger::print(" endAngle: ");
-    Debugger::print(packet.endAngle);
-    Debugger::print(" timestamp: ");
-    Debugger::println(packet.timestamp);
-    for (uint8_t i = 0; i < LIDAR_DATA_PACKET_SIZE; i++)
-    {
-        Debugger::print("   Point ");
-        Debugger::print(i);
-        Debugger::print(") ");
-        Debugger::print("A:");
-        Debugger::print(packet.dataPoint[i].angle);
-        Debugger::print(" D:");
-        Debugger::print(packet.dataPoint[i].distance);
-        Debugger::print(" C:");
-        Debugger::println(packet.dataPoint[i].confidence);
-    }
-}
-
-void Lidar::PrintPoint(PointLidar point)
-{
-    Debugger::print("Point ");
-    Debugger::print("A:");
-    Debugger::print(point.angle);
-    Debugger::print(" D:");
-    Debugger::print(point.distance);
-    Debugger::print(" C:");
-    Debugger::println(point.confidence);
 }
 
 Point Lidar::ComputeCenter(Obstacle lidar_obstacle)

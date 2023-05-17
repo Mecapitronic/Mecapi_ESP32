@@ -113,16 +113,6 @@ public:
     bool NewObstacleThreshold(PointLidar polar_point);
 
     /**
-     * Debugging print: pretty print all data stored in lidarPacket
-     */
-    void PrintPacket(PacketLidar packet);
-
-    /**
-     * Debugging print: pretty print data stored in one PointLidar
-     */
-    void PrintPoint(PointLidar point);
-
-    /**
      * Compute the center of local var lidar_obstacle
      * computes the mean of all points position to approximate circle center (without offset)
      * based on the fact that it is a cylinder of 70mm diameter

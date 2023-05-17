@@ -2,7 +2,7 @@
 
 Tracker::Tracker(float lpf_cutoff_distance, float hpf_cutoff_distance) : lpf_cutoff(lpf_cutoff_distance), hpf_cutoff(hpf_cutoff_distance)
 {
-    Debugger::println("Init Tracker");
+    Debugger::log("Init Tracker", INFO);
     Debugger::log("Track new point if nothing close enough: ", lpf_cutoff, " mm", VERBOSE, true);
     Debugger::log("Ignore movements under ", hpf_cutoff, " mm", VERBOSE, true);
 }
@@ -48,21 +48,21 @@ void Tracker::track(Point newPoint, PolarPoint data[], uint8_t size)
 
     if (best_match < hpf_cutoff)
     {
-        Debugger::println("This is exactly the same point; do nothing");
+        Debugger::log("This is exactly the same point; do nothing");
         return;
     }
 
     // TODO what to do if found nothing and no slot???
     if (matching_point_index == -1 && first_available_slot == -1)
     {
-        Debugger::println("No slot available for new point: drop it");
+        Debugger::log("No slot available for new point: drop it");
         return;
     }
 
     if (matching_point_index == -1 && first_available_slot != -1)
     {
         matching_point_index = first_available_slot;
-        Debugger::println("New point detected, add to tracked");
+        Debugger::log("New point detected, add to tracked");
     }
 
     PointTracker newPointTracker;
@@ -108,7 +108,7 @@ void Tracker::untrackOldObstacles(Robot robot)
             robot.WriteSerialdsPic(i, {0, 0});
 
             Debugger::plotPoint({0, 0}, varName + i);
-            Debugger::println("Untracking point: " + i);
+            Debugger::log("Untracking point: ", i);
         }
     }
 }
@@ -119,10 +119,6 @@ int64_t Tracker::getTimeNowMs()
     gettimeofday(&tv_now, NULL);
 
     int64_t time_ms = (int64_t)tv_now.tv_sec * 1000 + ((int64_t)tv_now.tv_usec / 1000);
-
-    // Debugger::print("time is: ");
-    // Debugger::println(String(time_ms));
-
     return time_ms;
 }
 
