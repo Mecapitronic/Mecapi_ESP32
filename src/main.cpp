@@ -79,7 +79,7 @@ void Task1code(void *pvParameters)
                 {
                     xQueueSend(queue, &lidarPacket.dataPoint[i], 0);
                 }
-                lidar06.PrintPoint(lidarPacket.dataPoint[i]);
+                // lidar06.PrintPoint(lidarPacket.dataPoint[i]);
             }
             // TODO at least send 1 or 2 points to the queue (min max ?, middle ?) to end aggregation for obstacle
             if (counter == LIDAR_DATA_PACKET_SIZE)
