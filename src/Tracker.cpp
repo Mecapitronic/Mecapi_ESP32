@@ -60,6 +60,7 @@ void Tracker::track(Point newPoint, PolarPoint data[], uint8_t size)
     if (best_match < hpf_cutoff)
     {
         Debugger::log("This is exactly the same point; do nothing");
+        tracked_points[matching_point_index].lastUpdateTime = getTimeNowMs();
         return;
     }
 
