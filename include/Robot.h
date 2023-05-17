@@ -50,7 +50,7 @@ public:
     /**
      * Return robotPosition: last known robot position
      */
-    RobotPosition_t GetPosition();
+    RobotPosition GetPosition();
 
     /**
      * Set the robotPosition with the coordinates x, y and angle
@@ -67,7 +67,7 @@ public:
     void WriteSerialdsPic(int n, Point p);
 
 private:
-    RobotPosition_t robotPosition = {0, 0, 0.0}; // x, y, angle
+    RobotPosition robotPosition = {0, 0, 0.0}; // x, y, angle
     uint32_t serialBuffer[ROBOT_SERIAL_PACKET_SIZE] = {0};
     uint8_t cursorTmp = 0;
     State dsPicSerialStatus = Start;

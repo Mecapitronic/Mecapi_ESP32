@@ -43,21 +43,14 @@ String Debugger::checkSerial()
     return "";
 }
 
-void Debugger::println(String message) { SERIAL_DEBUG.println(message); }
-
-void Debugger::println(char c) { SERIAL_DEBUG.println(c); }
-
-void Debugger::println(float data) { SERIAL_DEBUG.println(data); }
-
-void Debugger::println(int data) { SERIAL_DEBUG.println(data); }
-
-void Debugger::print(String message) { SERIAL_DEBUG.print(message); }
-
-void Debugger::print(char c) { SERIAL_DEBUG.print(c); }
-
-void Debugger::print(float data) { SERIAL_DEBUG.print(data); }
-
-void Debugger::print(int data) { SERIAL_DEBUG.print(data); }
+void Debugger::log(String data, Level level, boolean lineFeed)
+{
+    if (level < debugLevel)
+        return;
+    SERIAL_DEBUG.print(data);
+    if (lineFeed)
+        SERIAL_DEBUG.println();
+}
 
 void Debugger::log(String prefix, int data, String suffix, Level level, boolean lineFeed)
 {
@@ -103,20 +96,112 @@ void Debugger::log(String prefix, bool data, String suffix, Level level, boolean
         SERIAL_DEBUG.println();
 }
 
+/*
+void Debugger::log(String prefix, Obstacle data, String suffix, Level level, boolean lineFeed)
+{
+    if (level < debugLevel)
+        return;
+
+    SERIAL_DEBUG.print(prefix);
+    for (size_t i; i < data.size; i++)
+    {
+        SERIAL_DEBUG.print(data.data[i]); // which data to print??
+        SERIAL_DEBUG.print(", ");
+    }
+    SERIAL_DEBUG.print(suffix);
+    if (lineFeed)
+        SERIAL_DEBUG.println();
+}
+*/
+
+void Debugger::log(String prefix, Point data, String suffix, Level level, boolean lineFeed)
+{
+    if (level < debugLevel)
+        return;
+    SERIAL_DEBUG.print(prefix);
+    SERIAL_DEBUG.print("x: ");
+    SERIAL_DEBUG.print(data.x);
+    SERIAL_DEBUG.print(" y: ");
+    SERIAL_DEBUG.print(data.y);
+    SERIAL_DEBUG.print(suffix);
+    if (lineFeed)
+        SERIAL_DEBUG.println();
+}
+
+void Debugger::log(String prefix, PointLidar data, String suffix, Level level, boolean lineFeed)
+{
+    if (level < debugLevel)
+        return;
+    SERIAL_DEBUG.print(prefix);
+    SERIAL_DEBUG.print("angle: ");
+    SERIAL_DEBUG.print(data.angle);
+    SERIAL_DEBUG.print(" distance: ");
+    SERIAL_DEBUG.print(data.distance);
+    SERIAL_DEBUG.print(" confidence: ");
+    SERIAL_DEBUG.print(data.confidence);
+    SERIAL_DEBUG.print(suffix);
+    if (lineFeed)
+        SERIAL_DEBUG.println();
+}
+void Debugger::log(String prefix, PointTracker data, String suffix, Level level, boolean lineFeed)
+{
+    if (level < debugLevel)
+        return;
+    SERIAL_DEBUG.print(prefix);
+    log("point: ", data.point, "", level, false);
+    SERIAL_DEBUG.print(" last update: ");
+    SERIAL_DEBUG.print(data.lastUpdateTime);
+    SERIAL_DEBUG.print(" has been sent to robot: ");
+    SERIAL_DEBUG.print(data.hasBeenSent);
+    SERIAL_DEBUG.print(suffix);
+    if (lineFeed)
+        SERIAL_DEBUG.println();
+}
+
+void Debugger::log(String prefix, PolarPoint data, String suffix, Level level, boolean lineFeed)
+{
+    if (level < debugLevel)
+        return;
+    SERIAL_DEBUG.print(prefix);
+    SERIAL_DEBUG.print(" angle: ");
+    SERIAL_DEBUG.print(data.angle / 100);
+    SERIAL_DEBUG.print(" distance: ");
+    SERIAL_DEBUG.print(data.distance);
+    SERIAL_DEBUG.print(suffix);
+    if (lineFeed)
+        SERIAL_DEBUG.println();
+}
+
+void Debugger::log(String prefix, RobotPosition data, String suffix, Level level, boolean lineFeed)
+{
+    if (level < debugLevel)
+        return;
+    SERIAL_DEBUG.print(prefix);
+    SERIAL_DEBUG.print("x: ");
+    SERIAL_DEBUG.print(data.x);
+    SERIAL_DEBUG.print(" y: ");
+    SERIAL_DEBUG.print(data.y);
+    SERIAL_DEBUG.print(" angle: ");
+    SERIAL_DEBUG.print(data.angle / 100);
+    SERIAL_DEBUG.print(suffix);
+    if (lineFeed)
+        SERIAL_DEBUG.println();
+}
+
 void Debugger::logArray(String prefix, int array[], size_t size, char separator, String suffix, Level level)
 {
     if (level < debugLevel)
         return;
     if (size > 0)
     {
-        print(prefix);
+        SERIAL_DEBUG.print(prefix);
         for (size_t i = 0; i < size - 1; i++)
         {
-            print(array[i]);
-            print(separator);
+            SERIAL_DEBUG.print(array[i]);
+            SERIAL_DEBUG.print(separator);
         }
-        print(array[size - 1]);
-        println(suffix);
+        SERIAL_DEBUG.print(array[size - 1]);
+        SERIAL_DEBUG.println(suffix);
     }
 }
 
@@ -126,45 +211,19 @@ void Debugger::logArrayN(String prefix, int element, String interFix, int array[
         return;
     if (size > 0)
     {
-        print(prefix);
-        print(element);
-        print(interFix);
+        SERIAL_DEBUG.print(prefix);
+        SERIAL_DEBUG.print(element);
+        SERIAL_DEBUG.print(interFix);
         for (size_t i = 0; i < size - 1; i++)
         {
-            print(array[i]);
-            print(separator);
+            SERIAL_DEBUG.print(array[i]);
+            SERIAL_DEBUG.print(separator);
         }
-        print(array[size - 1]);
-        println(suffix);
+        SERIAL_DEBUG.print(array[size - 1]);
+        SERIAL_DEBUG.println(suffix);
     }
     else
-        println("Invalid array printed !");
-}
-
-void Debugger::logPoint(String prefix, Point data, String suffix, Level level, boolean lineFeed)
-{
-    if (level < debugLevel)
-        return;
-    SERIAL_DEBUG.print(prefix);
-    SERIAL_DEBUG.print(" x: ");
-    SERIAL_DEBUG.print(data.x);
-    SERIAL_DEBUG.print(" y: ");
-    SERIAL_DEBUG.print(data.y);
-    SERIAL_DEBUG.print(suffix);
-    if (lineFeed)
-        SERIAL_DEBUG.println();
-}
-
-void Debugger::logPolarPoint(String prefix, PolarPoint data, String suffix, Level level, boolean lineFeed)
-{
-    if (level < debugLevel) return;
-    SERIAL_DEBUG.print(prefix);
-    SERIAL_DEBUG.print(" angle: ");
-    SERIAL_DEBUG.print(data.angle / 100);
-    SERIAL_DEBUG.print(" distance: ");
-    SERIAL_DEBUG.print(data.distance);
-    SERIAL_DEBUG.print(suffix);
-    if (lineFeed) SERIAL_DEBUG.println();
+        SERIAL_DEBUG.println("Invalid array printed !");
 }
 
 void Debugger::printPolarPoint(PolarPoint p, Level level)

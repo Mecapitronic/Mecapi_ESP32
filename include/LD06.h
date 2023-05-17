@@ -32,12 +32,6 @@ struct ConfigLidar
     int distanceThreshold; // represents the distance threshold to differentiate two obstacles
     int angleThreshold;    // represents the angle threshold to differentiate two obstacles
 };
-struct PointLidar
-{
-    int angle;
-    int distance;
-    uint16_t confidence;
-};
 
 struct PacketLidar
 {

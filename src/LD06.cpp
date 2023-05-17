@@ -143,7 +143,7 @@ PacketLidar Lidar::GetData() { return lidarPacket; }
 Point Lidar::PolarToCartesian(PointLidar lidar_point, Robot robot)
 {
     Point point;
-    RobotPosition_t robotPosition = robot.GetPosition();
+    RobotPosition robotPosition = robot.GetPosition();
     float angle = lidar_point.angle + robotPosition.angle;
     angle /= 100;
     point.x = robotPosition.x + lidar_point.distance * cos(angle * M_PI / 180);

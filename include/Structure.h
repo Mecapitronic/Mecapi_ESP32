@@ -19,6 +19,20 @@ enum State
     Debug = 2
 };
 
+/**
+ * @brief Represents a Cartesian point, with x and y as coordinates
+ */
+struct Point
+{
+    float x;
+    float y;
+};
+
+/**
+ * @brief Represents a Polar point, with angle and distance as coordinates
+ * Has confidence and cartesian coordinates too
+ *
+ */
 struct PolarPoint
 {
     double angle;
@@ -29,12 +43,14 @@ struct PolarPoint
 };
 
 /**
- * Represent a Cartesian point, with x and y as coordinates
+ * @brief Represents a Polar point with confidence from Lidar, with angle and distance as coordinates
+ *
  */
-struct Point
+struct PointLidar
 {
-    float x;
-    float y;
+    int angle;
+    int distance;
+    uint16_t confidence;
 };
 
 struct PointTracker
@@ -51,7 +67,7 @@ struct PointTracker
     bool hasBeenSent = false;
 };
 
-struct RobotPosition_t
+struct RobotPosition
 {
     int x;
     int y;

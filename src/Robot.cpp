@@ -39,7 +39,7 @@ void Robot::dsPicSerial(State state)
 }
 State Robot::dsPicSerial() { return dsPicSerialStatus; }
 
-RobotPosition_t Robot::GetPosition() { return robotPosition; }
+RobotPosition Robot::GetPosition() { return robotPosition; }
 
 void Robot::SetPosition(int x, int y, int angle)
 {
