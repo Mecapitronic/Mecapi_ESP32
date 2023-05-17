@@ -5,7 +5,7 @@ Robot::Robot()
     Debugger::log("Init Robot", INFO);
 
     robotPosition = {1000, 1000, 0.0};
-    PrintPosition();
+    Debugger::log("Robot Position : ", robotPosition);
     cursorTmp = 0;
     for (size_t i = 0; i < ROBOT_SERIAL_PACKET_SIZE; i++)
     {
@@ -81,13 +81,6 @@ void Robot::Analyze()
     robotPosition.y = serialBuffer[4] << 8 | serialBuffer[3];
     robotPosition.angle = serialBuffer[6] << 8 | serialBuffer[5];
     int8_t footer = serialBuffer[7];
-}
-
-void Robot::PrintPosition()
-{
-    Debugger::log("Robot Position : X= ", robotPosition.x, "  ", VERBOSE, false);
-    Debugger::log("Y= ", robotPosition.y, "  ", VERBOSE, false);
-    Debugger::log("A= ", robotPosition.angle / 100, "  ", VERBOSE);
 }
 
 void Robot::WriteSerialdsPic(int n, Point p)

@@ -56,10 +56,6 @@ public:
      * Set the robotPosition with the coordinates x, y and angle
      */
     void SetPosition(int x, int y, int angle);
-    /**
-     * Debug print: pretty print robot position and orientation
-     */
-    void PrintPosition();
 
     /**
      * Send data to robot PIC: send obstacle position given in args

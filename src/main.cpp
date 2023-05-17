@@ -144,7 +144,7 @@ void Task2code(void *pvParameters)
                     int y = atoi(cmd.substring(cmdLength + 5, cmdLength + 9).c_str());
                     int angle = atoi(cmd.substring(cmdLength + 10, cmdLength + 15).c_str());
                     robot.SetPosition(x, y, angle);
-                    robot.PrintPosition();
+                    Debugger::log("Robot Position : ", robot.GetPosition());
                     // TODO : make a function for reading commands
                 }
                 catch (std::exception const &e)
