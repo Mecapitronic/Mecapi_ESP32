@@ -262,8 +262,10 @@ void Debugger::logArrayN(String prefix, int element, String interFix, int array[
         SERIAL_DEBUG.println("Invalid array printed !");
 }
 
-void Debugger::plotTrackerPoints(PointTracker p, int size, String varName)
+void Debugger::plotTrackerPoints(PointTracker p, int size, String varName, Level level)
 {
+    if (level < debugLevel)
+        return;
     String data = ">" + varName + ":" + (int)(p.data[0].angle) + ":" + (int)p.data[0].distance;
     String separator = ";";
 
@@ -275,14 +277,18 @@ void Debugger::plotTrackerPoints(PointTracker p, int size, String varName)
     SERIAL_DEBUG.println(data);
 }
 
-void Debugger::plotPoint(Point p, String varName)
+void Debugger::plotPoint(Point p, String varName, Level level)
 {
+    if (level < debugLevel)
+        return;
     String data = ">" + varName + ":" + (int)p.x + ":" + (int)p.y + "|xy";
     SERIAL_DEBUG.println(data);
 }
 
-void Debugger::plotPoint(Point p)
+void Debugger::plotPoint(Point p, Level level)
 {
+    if (level < debugLevel)
+        return;
     SERIAL_DEBUG.print(">x:");
     SERIAL_DEBUG.println((int)p.x);
     SERIAL_DEBUG.print(">y:");

@@ -14,31 +14,31 @@ void Lidar::Config(int min = -1, int max = -1, int quality = -1, int distance = 
     if (min != -1)
     {
         Debugger::log("Lidar Config 'Distance Min' from ", lidarConfig.minDistance, "", INFO, false);
-        Debugger::log(" to ", min);
+        Debugger::log(" to ", min, "", INFO);
         lidarConfig.minDistance = min;
     }
     if (max != -1)
     {
         Debugger::log("Lidar Config 'Distance Max' from ", lidarConfig.maxDistance, "", INFO, false);
-        Debugger::log(" to ", max);
+        Debugger::log(" to ", max, "", INFO);
         lidarConfig.maxDistance = max;
     }
     if (quality != -1)
     {
         Debugger::log("Lidar Config 'Quality' from ", lidarConfig.minQuality, "", INFO, false);
-        Debugger::log(" to ", quality);
+        Debugger::log(" to ", quality, "", INFO);
         lidarConfig.minQuality = quality;
     }
     if (distance != -1)
     {
         Debugger::log("Lidar Config 'Distance Threshold' from ", lidarConfig.distanceThreshold, "", INFO, false);
-        Debugger::log(" to ", distance);
+        Debugger::log(" to ", distance, "", INFO);
         lidarConfig.distanceThreshold = distance;
     }
     if (angle != -1)
     {
         Debugger::log("Lidar Config 'Angle Threshold' from ", lidarConfig.angleThreshold, "", INFO, false);
-        Debugger::log(" to ", angle);
+        Debugger::log(" to ", angle, "", INFO);
         lidarConfig.angleThreshold = angle;
     }
 }

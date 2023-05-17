@@ -71,20 +71,20 @@ public:
     /**
      * send point data on serial for teleplot to trace x and y in a graph
      */
-    static void plotTrackerPoints(PointTracker p, int size, String varName);
+    static void plotTrackerPoints(PointTracker p, int size, String varName, Level level = INFO);
 
     /**
      * send point data on serial for teleplot to trace x and y in a graph
      */
-    static void plotPoint(Point p, String varName);
+    static void plotPoint(Point p, String varName, Level level = INFO);
 
     /**
      * send point data on serial for teleplot to trace x and y as two separate graphs
      */
-    static void plotPoint(Point p);
+    static void plotPoint(Point p, Level level = INFO);
 
 private:
     static const boolean enabled = true;
-    static const Level debugLevel = VERBOSE;
+    static const Level debugLevel = INFO;
 };
 #endif
