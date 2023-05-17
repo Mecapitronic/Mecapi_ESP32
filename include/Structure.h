@@ -47,6 +47,8 @@ struct PointTracker
     PolarPoint data[_kMaxPoints] = {0, 0, 0, 0, 0};
     // Size of the polar points array
     uint8_t size = 0;
+    // avoid to send the same points twice
+    bool hasBeenSent = false;
 };
 
 struct RobotPosition_t

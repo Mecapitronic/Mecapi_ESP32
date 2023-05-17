@@ -15,15 +15,6 @@
 #define DEFAULT_HPF_CUTOFF 100.0
 
 /**
- * lidar make 10 turns in 1 second, data are updated every 100 miliseconds
- * a recently updated data is younger than at least 200 second
- *
- * FIY: data are send every 25 miliseconds to robot
- * because robot updates its data every 50 miliseconds
- */
-#define HAS_CHANGE_RECENTLY_MS 200
-
-/**
  * amount of time needed to delete a point from tracker
  * if it is not detected in this term
  * we choose 3 seconds, therefore 3000 miliseconds

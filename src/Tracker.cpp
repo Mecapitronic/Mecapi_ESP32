@@ -46,9 +46,10 @@ void Tracker::track(Point newPoint, PolarPoint data[], uint8_t size)
 {
     int point_index = findMatchingPoint(newPoint);
     PointTracker newPointTracker;
-    newPointTracker.point = newPoint;                // point
-    newPointTracker.lastUpdateTime = getTimeNowMs(); // lastUpdateTime
-    newPointTracker.size = size;                     // Size of the polar points array
+    newPointTracker.point = newPoint;
+    newPointTracker.lastUpdateTime = getTimeNowMs();
+    newPointTracker.hasBeenSent = false; // not yet sent to robot
+    newPointTracker.size = size;         // Size of the polar points array
     for (size_t i = 0; i < size; i++)
     {
         newPointTracker.data[i] = data[i]; // Polar points associated
@@ -78,10 +79,10 @@ void Tracker::sendObstaclesToRobot(Robot robot)
     String varName = "obs";
     for (int i = 0; i < tracked_points.size(); i++)
     {
-        int64_t delta = getTimeNowMs() - tracked_points[i].lastUpdateTime;
-        if (delta < HAS_CHANGE_RECENTLY_MS)
+        if (!tracked_points[i].hasBeenSent)
         {
             robot.WriteSerialdsPic(i, tracked_points[i].point);
+            tracked_points[i].hasBeenSent = true;
             Debugger::plotPoint(tracked_points[i].point, varName + i);
             Debugger::plotTrackerPoints(tracked_points[i], tracked_points[i].size, "points");
         }
