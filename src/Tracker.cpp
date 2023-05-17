@@ -86,7 +86,7 @@ void Tracker::track(Point newPoint, PolarPoint data[], uint8_t size)
         newPointTracker.data[i] = data[i]; // Polar points associated
     }
 
-    Debugger::log("Updating point ", matching_point_index, " ", INFO, false);
+    Debugger::log("Updating point ", matching_point_index, " ", VERBOSE, false);
     Debugger::log("from ", tracked_points[matching_point_index].point, "", VERBOSE, true);
     Debugger::log("  to ", newPointTracker.point, "", VERBOSE, true);
     tracked_points[matching_point_index] = newPointTracker;
