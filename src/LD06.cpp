@@ -100,7 +100,7 @@ void Lidar::Analyze()
     // compute lidar result with previously defined angle step
     for (int i = 0; i < LIDAR_DATA_PACKET_SIZE; i++)
     {
-        int rawDeg = lidarPacket.startAngle + i * angleStep;
+        int rawDeg = lidarPacket.startAngle + i * angleStep + LIDAR_ROBOT_ANGLE_OFFSET;
         // Raw angle are inverted
         lidarPacket.dataPoint[i].angle = 360 * 100 - (rawDeg <= 360 * 100 ? rawDeg : rawDeg - 360 * 100);
         lidarPacket.dataPoint[i].confidence = (serialBuffer[8 + i * 3]);
@@ -187,19 +187,19 @@ void Lidar::AggregatePoint(PointLidar polar_point, Point point, Tracker *tracker
     else
     {
 
-    // if we are still under the maximum size of an obstacle
+        // if we are still under the maximum size of an obstacle
 
-    // Determine if it is a new obstacle
-    if (NewObstacleThreshold(polar_point))
-    {
-            Debugger::print("NewObstacleThreshold");
-        // if we have sufficient data for this obstacle
-        // we move to save another obstacle
-        if (pointsCounter >= obstacleMinPoints)
+        // Determine if it is a new obstacle
+        if (NewObstacleThreshold(polar_point))
         {
-            ObstacleDetected(tracker, pointsCounter);
+            Debugger::print("NewObstacleThreshold");
+            // if we have sufficient data for this obstacle
+            // we move to save another obstacle
+            if (pointsCounter >= obstacleMinPoints)
+            {
+                ObstacleDetected(tracker, pointsCounter);
+            }
         }
-    }
     }
     Debugger::log("PointsCounter : ", pointsCounter);
     // save the coord of current lidar point

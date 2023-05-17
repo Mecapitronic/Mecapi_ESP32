@@ -12,6 +12,11 @@
 #define LIDAR_SERIAL_PACKET_SIZE 47
 #define LIDAR_DATA_PACKET_SIZE 12
 
+// angular offset between robot and lidar
+// if the lidar and the robot have different origins
+// positive in trigonometric way
+#define LIDAR_ROBOT_ANGLE_OFFSET 0
+
 #include <Arduino.h>
 #include "Debugger.h"
 #include "Robot.h"
