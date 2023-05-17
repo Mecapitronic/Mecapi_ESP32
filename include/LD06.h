@@ -146,6 +146,6 @@ private:
 
     PacketLidar lidarPacket;
     PacketLidar lidarLastPacket;
-    ConfigLidar lidarConfig;
+    ConfigLidar lidarConfig = {0, 0, 0, 0, 0};
 };
 #endif

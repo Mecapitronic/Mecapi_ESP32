@@ -3,8 +3,19 @@
 Tracker::Tracker(float lpf_cutoff_distance, float hpf_cutoff_distance) : lpf_cutoff(lpf_cutoff_distance), hpf_cutoff(hpf_cutoff_distance)
 {
     Debugger::log("Init Tracker", INFO);
-    Debugger::log("Track new point if nothing close enough: ", lpf_cutoff, " mm", VERBOSE, true);
-    Debugger::log("Ignore movements under ", hpf_cutoff, " mm", VERBOSE, true);
+    Debugger::log("Track new point if nothing close enough: ", lpf_cutoff, " mm", INFO);
+    Debugger::log("Ignore movements under ", hpf_cutoff, " mm", INFO);
+    for (int i = 0; i < TRACKED_POINTS_SIZE; i++)
+    {
+        tracked_points[i].point = {0, 0};
+        tracked_points[i].hasBeenSent = true;
+        tracked_points[i].lastUpdateTime = 0;
+        tracked_points[i].size = 0;
+        for (int j = 0; j < kMaxPoints; j++)
+        {
+            tracked_points[i].data[j] = {0, 0, 0, 0, 0};
+        }
+    }
 }
 bool Tracker::PointIsEqual(Point a, Point b)
 {

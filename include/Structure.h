@@ -10,7 +10,7 @@
 
 #include <Arduino.h>
 
-#define _kMaxPoints 25
+#define kMaxPoints 25
 
 enum State
 {
@@ -60,7 +60,7 @@ struct PointTracker
     // timestamp of the last time the tracker has been updated
     int64_t lastUpdateTime;
     // Polar points that define the mid point
-    PolarPoint data[_kMaxPoints] = {0, 0, 0, 0, 0};
+    PolarPoint data[kMaxPoints] = {0, 0, 0, 0, 0};
     // Size of the polar points array
     uint8_t size = 0;
     // avoid to send the same points twice
@@ -80,7 +80,6 @@ struct RobotPosition
  */
 struct Obstacle
 {
-    static constexpr size_t kMaxPoints = _kMaxPoints;
     PolarPoint data[kMaxPoints] = {0, 0, 0, 0, 0};
     uint8_t size = 0;
 };

@@ -182,9 +182,9 @@ void Lidar::AggregatePoint(PointLidar lidar_point, Tracker *tracker, Robot robot
     }
 
     // if we have too much data for this obstacle, we move to save another obstacle
-    if (pointsCounter >= Obstacle::kMaxPoints)
+    if (pointsCounter >= kMaxPoints)
     {
-        ObstacleDetected(tracker, Obstacle::kMaxPoints);
+        ObstacleDetected(tracker, kMaxPoints);
     }
     else
     {
