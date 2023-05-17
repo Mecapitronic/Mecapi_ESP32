@@ -181,6 +181,14 @@ void Lidar::AggregatePoint(PointLidar lidar_point, Tracker *tracker, Robot robot
         aggregate = false;
     }
 
+    // TEMP FIX TO DETECT ONLY ON FRONT OF THE ROBOT (90°)
+
+    if (lidar_point.angle > 4500 || lidar_point.angle < 31500)
+    {
+        // Debugger::log("Not in front of robot : ", point);
+        aggregate = false;
+    }
+
     // if we have too much data for this obstacle, we move to save another obstacle
     if (pointsCounter >= kMaxPoints)
     {

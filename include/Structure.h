@@ -48,7 +48,7 @@ struct PolarPoint
  */
 struct PointLidar
 {
-    int angle;
+    int angle; // angle from 0° which is in front of the lidar in (° * 100)
     int distance;
     uint16_t confidence;
 };
