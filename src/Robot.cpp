@@ -11,7 +11,7 @@ Robot::Robot()
     {
         serialBuffer[i] = 0;
     }
-    dsPicSerial(Start);
+    dsPicSerial(Debug);
 }
 
 void Robot::dsPicSerial(State state)
