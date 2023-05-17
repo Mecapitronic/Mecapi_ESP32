@@ -58,7 +58,7 @@ public:
     static void log(String prefix, PointTracker data, String suffix = "", Level level = VERBOSE, boolean lineFeed = true);
     static void log(String prefix, PolarPoint data, String suffix = "", Level level = VERBOSE, boolean lineFeed = true);
     static void log(String prefix, RobotPosition data, String suffix = "", Level level = VERBOSE, boolean lineFeed = true);
-    static void log(String prefix, PacketLidar data, String suffix = "", Level level = VERBOSE, boolean lineFeed = true);
+    // static void log(String prefix, PacketLidar data, String suffix = "", Level level = VERBOSE, boolean lineFeed = true);
 
     // bool needs to be the last because it overrides all functions
     static void log(String prefix, bool data, String suffix = "", Level level = VERBOSE, boolean lineFeed = true);

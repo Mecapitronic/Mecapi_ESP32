@@ -189,8 +189,8 @@ void Debugger::log(String prefix, RobotPosition data, String suffix, Level level
         SERIAL_DEBUG.println();
 }
 
+/*
 void Debugger::log(String prefix, PacketLidar data, String suffix, Level level, boolean lineFeed)
-
 {
     if (level < debugLevel)
         return;
@@ -222,7 +222,7 @@ void Debugger::log(String prefix, PacketLidar data, String suffix, Level level, 
     if (lineFeed)
         SERIAL_DEBUG.println();
 }
-}
+*/
 
 void Debugger::logArray(String prefix, int array[], size_t size, char separator, String suffix, Level level)
 {

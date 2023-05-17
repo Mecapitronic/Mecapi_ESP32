@@ -169,7 +169,7 @@ void Lidar::AggregatePoint(PointLidar lidar_point, Tracker *tracker, Robot robot
 
     if (IsOutsideTable(point))
     {
-        // Debugger::logPoint("Outside table : ", point);
+        // Debugger::log("Outside table : ", point);
         aggregate = false;
     }
 
@@ -177,7 +177,7 @@ void Lidar::AggregatePoint(PointLidar lidar_point, Tracker *tracker, Robot robot
         lidar_point.distance > lidarConfig.maxDistance ||
         lidar_point.confidence < lidarConfig.minQuality)
     {
-        // Debugger::logPoint("Outside config : ", point);
+        // Debugger::log("Outside config : ", point);
         aggregate = false;
     }
 
@@ -223,7 +223,7 @@ void Lidar::ObstacleDetected(Tracker *tracker, uint8_t size)
     Debugger::log("Size obs :", size);
     obstacleTmp.size = size;
     Point mid = ComputeCenter(obstacleTmp);
-    Debugger::logPoint("Mid :", mid);
+    Debugger::log("Mid :", mid);
     tracker->track(mid, obstacleTmp.data, obstacleTmp.size);
     pointsCounter = 0;
 }

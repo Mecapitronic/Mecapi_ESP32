@@ -18,7 +18,7 @@ void Tracker::track(Point newPoint, PolarPoint data[], uint8_t size)
     int matching_point_index = -1;
     int first_available_slot = -1; // free slot to add new point
 
-    Debugger::logPoint("Search point:", newPoint, "", VERBOSE, true);
+    Debugger::log("Search point:", newPoint, "", VERBOSE, true);
 
     for (int i = 0; i < TRACKED_POINTS_SIZE; i++)
     {
@@ -31,7 +31,7 @@ void Tracker::track(Point newPoint, PolarPoint data[], uint8_t size)
         }
         else
         {
-            Debugger::logPoint("Compare to:", tracked_points[i].point, "", VERBOSE, true);
+            Debugger::log("Compare to:", tracked_points[i].point, "", VERBOSE, true);
 
             // TODO remove sqrt and use x and y comparison
             float dist = sqrt(pow(newPoint.x - tracked_points[i].point.x, 2) + pow(newPoint.y - tracked_points[i].point.y, 2));
@@ -76,8 +76,8 @@ void Tracker::track(Point newPoint, PolarPoint data[], uint8_t size)
     }
 
     Debugger::log("Updating point ", matching_point_index, " ", INFO, false);
-    Debugger::logPoint("from ", tracked_points[matching_point_index].point, "", VERBOSE, true);
-    Debugger::logPoint("  to ", newPointTracker.point, "", VERBOSE, true);
+    Debugger::log("from ", tracked_points[matching_point_index].point, "", VERBOSE, true);
+    Debugger::log("  to ", newPointTracker.point, "", VERBOSE, true);
     tracked_points[matching_point_index] = newPointTracker;
 }
 
