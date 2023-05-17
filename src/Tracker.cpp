@@ -6,45 +6,65 @@ Tracker::Tracker(float lpf_cutoff_distance, float hpf_cutoff_distance) : lpf_cut
     Debugger::log("Track new point if nothing close enough: ", lpf_cutoff, " mm", VERBOSE, true);
     Debugger::log("Ignore movements under ", hpf_cutoff, " mm", VERBOSE, true);
 }
-
-std::vector<PointTracker> Tracker::getPoints() { return tracked_points; }
-
-int Tracker::findMatchingPoint(Point newPoint)
+bool Tracker::PointIsEqual(Point a, Point b)
 {
-    // to hold the closest point to the new one
+    return (a.x == b.x && a.y == b.y);
+}
+
+void Tracker::track(Point newPoint, PolarPoint data[], uint8_t size)
+{
     // A point can not be further than 5000.0 as it is the field size
-    float best_match = 5000.0;
+    float best_match = 5000.0; // hold the closest point to the new one
     int matching_point_index = -1;
+    int first_available_slot = -1; // free slot to add new point
 
     Debugger::logPoint("Search point:", newPoint, "", VERBOSE, true);
-    Debugger::log("tracked size: ", (int)tracked_points.size(), "", VERBOSE, true);
 
-    for (int i = 0; i < tracked_points.size(); i++)
+    for (int i = 0; i < TRACKED_POINTS_SIZE; i++)
     {
-        Debugger::logPoint("Compare to:", tracked_points.at(i).point, "", VERBOSE, true);
-
-        float dist = sqrt(pow(newPoint.x - tracked_points.at(i).point.x, 2) + pow(newPoint.y - tracked_points.at(i).point.y, 2));
-
-        // If distance is smaller than lpf_cutoff, assume it's the same point
-        if ((dist < lpf_cutoff) && (dist < best_match))
+        if (PointIsEqual(tracked_points[i].point, {0, 0}))
         {
-            // found matching point
-            best_match = dist;
-            matching_point_index = i;
+            if (first_available_slot == -1)
+            {
+                first_available_slot = i;
+            }
+        }
+        else
+        {
+            Debugger::logPoint("Compare to:", tracked_points[i].point, "", VERBOSE, true);
+
+            // TODO remove sqrt and use x and y comparison
+            float dist = sqrt(pow(newPoint.x - tracked_points[i].point.x, 2) + pow(newPoint.y - tracked_points[i].point.y, 2));
+
+            // If distance is smaller than lpf_cutoff, assume it's the same point
+            if ((dist < lpf_cutoff) && (dist < best_match))
+            {
+                // found matching point
+                best_match = dist;
+                matching_point_index = i;
+            }
         }
     }
 
     if (best_match < hpf_cutoff)
     {
-        matching_point_index = -2;
+        Debugger::println("This is exactly the same point; do nothing");
+        return;
     }
 
-    return matching_point_index;
-}
+    // TODO what to do if found nothing and no slot???
+    if (matching_point_index == -1 && first_available_slot == -1)
+    {
+        Debugger::println("No slot available for new point: drop it");
+        return;
+    }
 
-void Tracker::track(Point newPoint, PolarPoint data[], uint8_t size)
-{
-    int point_index = findMatchingPoint(newPoint);
+    if (matching_point_index == -1 && first_available_slot != -1)
+    {
+        matching_point_index = first_available_slot;
+        Debugger::println("New point detected, add to tracked");
+    }
+
     PointTracker newPointTracker;
     newPointTracker.point = newPoint;
     newPointTracker.lastUpdateTime = getTimeNowMs();
@@ -55,29 +75,16 @@ void Tracker::track(Point newPoint, PolarPoint data[], uint8_t size)
         newPointTracker.data[i] = data[i]; // Polar points associated
     }
 
-    if (point_index == -1)
-    {
-        Debugger::println("New point detected, add to tracked");
-        tracked_points.push_back(newPointTracker);
-        return;
-    }
-
-    if (point_index == -2)
-    {
-        Debugger::println("This is exactly the same point, dropping");
-        return;
-    }
-
-    Debugger::log("Updating point ", point_index, " ", INFO, false);
-    Debugger::logPoint("from ", tracked_points[point_index].point, "", VERBOSE, true);
+    Debugger::log("Updating point ", matching_point_index, " ", INFO, false);
+    Debugger::logPoint("from ", tracked_points[matching_point_index].point, "", VERBOSE, true);
     Debugger::logPoint("  to ", newPointTracker.point, "", VERBOSE, true);
-    tracked_points[point_index] = newPointTracker;
+    tracked_points[matching_point_index] = newPointTracker;
 }
 
 void Tracker::sendObstaclesToRobot(Robot robot)
 {
     String varName = "obs";
-    for (int i = 0; i < tracked_points.size(); i++)
+    for (int i = 0; i < TRACKED_POINTS_SIZE; i++)
     {
         if (!tracked_points[i].hasBeenSent)
         {
@@ -91,15 +98,17 @@ void Tracker::sendObstaclesToRobot(Robot robot)
 
 void Tracker::untrackOldObstacles(Robot robot)
 {
+    String varName = "obs";
     // iterate to find matching point to the predicate
-    for (auto it = tracked_points.begin(); it < tracked_points.end(); it++)
+    for (int i = 0; i < TRACKED_POINTS_SIZE; i++)
     {
-        if (getTimeNowMs() - it->lastUpdateTime > IS_TOO_OLD)
+        if (!PointIsEqual(tracked_points[i].point, {0, 0}) && getTimeNowMs() - tracked_points[i].lastUpdateTime > IS_TOO_OLD)
         {
-            tracked_points.erase(it);
-            robot.WriteSerialdsPic(it - tracked_points.begin(), {0, 0});
-            Debugger::print("Untracking point: ");
-            Debugger::println(it - tracked_points.begin());
+            tracked_points[i].point = {0, 0};
+            robot.WriteSerialdsPic(i, {0, 0});
+
+            Debugger::plotPoint({0, 0}, varName + i);
+            Debugger::println("Untracking point: " + i);
         }
     }
 }

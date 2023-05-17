@@ -21,6 +21,8 @@
  */
 #define IS_TOO_OLD 3000
 
+#define TRACKED_POINTS_SIZE 5
+
 /**
  * @brief In charge of tracking objects on the field based on Lidar detections and Kalman filter
  */
@@ -34,13 +36,6 @@ public:
      * @param hpf_cutoff_distance minimum movement needed to update position of tracked point; default DEFAULT_HPF_CUTOFF
      */
     Tracker(float lpf_cutoff_distance = DEFAULT_LPF_CUTOFF, float hpf_cutoff_distance = DEFAULT_HPF_CUTOFF);
-
-    /**
-     * @brief Get the list of tracked points
-     *
-     * @return std::vector<PointTracker> list of tracked points
-     */
-    std::vector<PointTracker> getPoints();
 
     /**
      * @brief send new point to tracker
@@ -92,13 +87,15 @@ public:
      */
     int64_t getTimeNowUs();
 
+    bool PointIsEqual(Point a, Point b);
+
 private:
     /**
      * @brief list of obstacles/points being tracked
      * the list is updarted with new data
      * and cleaned up if some points are not updated for a long time
      */
-    std::vector<PointTracker> tracked_points;
+    PointTracker tracked_points[TRACKED_POINTS_SIZE];
 
     /**
      * @brief cut off of the low pass filter
