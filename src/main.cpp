@@ -117,53 +117,56 @@ void Task2code(void *pvParameters)
         // Check if we get commands from operator via debug serial
         String cmd = Debugger::checkSerial();
 
-        if (cmd.startsWith("Lidar:"))
+        if (cmd != "")
         {
-            try
+            if (cmd.startsWith("Lidar:"))
             {
-                cmd.remove(0, 6);
-                int i = atoi(cmd.c_str());
-                Debugger::log("Lidar: ", i);
-                lidar06.Config(-1, i, -1, -1, -1);
-                // TODO : make a function for reading commands
+                try
+                {
+                    cmd.remove(0, 6);
+                    int i = atoi(cmd.c_str());
+                    Debugger::log("Lidar: ", i);
+                    lidar06.Config(-1, i, -1, -1, -1);
+                    // TODO : make a function for reading commands
+                }
+                catch (std::exception const &e)
+                {
+                    Debugger::log("error : ", e.what());
+                }
             }
-            catch (std::exception const &e)
+            if (cmd.startsWith("RobotXYA:"))
             {
-                Debugger::log("error : ", e.what());
+                try
+                {
+                    // RobotXYA:0000,0000,00000
+                    int cmdLength = 9;
+                    int x = atoi(cmd.substring(cmdLength, cmdLength + 4).c_str());
+                    int y = atoi(cmd.substring(cmdLength + 5, cmdLength + 9).c_str());
+                    int angle = atoi(cmd.substring(cmdLength + 10, cmdLength + 15).c_str());
+                    robot.SetPosition(x, y, angle);
+                    robot.PrintPosition();
+                    // TODO : make a function for reading commands
+                }
+                catch (std::exception const &e)
+                {
+                    Debugger::log("error : ", e.what());
+                }
             }
-        }
-        if (cmd.startsWith("RobotXYA:"))
-        {
-            try
+            if (cmd.startsWith("RobotState:"))
             {
-                // RobotXYA:0000,0000,00000
-                int cmdLength = 9;
-                int x = atoi(cmd.substring(cmdLength, cmdLength + 4).c_str());
-                int y = atoi(cmd.substring(cmdLength + 5, cmdLength + 9).c_str());
-                int angle = atoi(cmd.substring(cmdLength + 10, cmdLength + 15).c_str());
-                robot.SetPosition(x, y, angle);
-                robot.PrintPosition();
-                // TODO : make a function for reading commands
-            }
-            catch (std::exception const &e)
-            {
-                Debugger::log("error : ", e.what());
-            }
-        }
-        if (cmd.startsWith("RobotState:"))
-        {
-            try
-            {
-                // RobotState:0
-                int cmdLength = 11;
-                int state = atoi(cmd.substring(cmdLength, cmdLength + 1).c_str());
-                robot.dsPicSerial((State)state);
+                try
+                {
+                    // RobotState:0
+                    int cmdLength = 11;
+                    int state = atoi(cmd.substring(cmdLength, cmdLength + 1).c_str());
+                    robot.dsPicSerial((State)state);
 
-                // TODO : make a function for reading commands
-            }
-            catch (std::exception const &e)
-            {
-                Debugger::log("error : ", e.what());
+                    // TODO : make a function for reading commands
+                }
+                catch (std::exception const &e)
+                {
+                    Debugger::log("error : ", e.what());
+                }
             }
         }
 
