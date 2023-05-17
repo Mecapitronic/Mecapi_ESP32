@@ -103,7 +103,7 @@ void Tracker::sendObstaclesToRobot(Robot robot)
             robot.WriteSerialdsPic(i, tracked_points[i].point);
             tracked_points[i].hasBeenSent = true;
             Debugger::plotPoint(tracked_points[i].point, varName + i);
-            Debugger::plotTrackerPoints(tracked_points[i], tracked_points[i].size, "points");
+            // Debugger::plotTrackerPoints(tracked_points[i], tracked_points[i].size, "points");
         }
     }
 }
