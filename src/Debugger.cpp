@@ -4,7 +4,7 @@ void Debugger::init()
 {
     if (enabled)
     {
-        SERIAL_DEBUG.begin(500000);
+        SERIAL_DEBUG.begin(576000);
 
         if (SERIAL_DEBUG.available() <= 0)
         {
@@ -75,17 +75,6 @@ void Debugger::log(String prefix, char data, String suffix, Level level, boolean
 }
 
 void Debugger::log(String prefix, float data, String suffix, Level level, boolean lineFeed)
-{
-    if (level < debugLevel)
-        return;
-    SERIAL_DEBUG.print(prefix);
-    SERIAL_DEBUG.print(data);
-    SERIAL_DEBUG.print(suffix);
-    if (lineFeed)
-        SERIAL_DEBUG.println();
-}
-
-void Debugger::log(String prefix, bool data, String suffix, Level level, boolean lineFeed)
 {
     if (level < debugLevel)
         return;
@@ -223,6 +212,17 @@ void Debugger::log(String prefix, PacketLidar data, String suffix, Level level, 
         SERIAL_DEBUG.println();
 }
 */
+
+void Debugger::log(String prefix, bool data, String suffix, Level level, boolean lineFeed)
+{
+    if (level < debugLevel)
+        return;
+    SERIAL_DEBUG.print(prefix);
+    SERIAL_DEBUG.print(data);
+    SERIAL_DEBUG.print(suffix);
+    if (lineFeed)
+        SERIAL_DEBUG.println();
+}
 
 void Debugger::logArray(String prefix, int array[], size_t size, char separator, String suffix, Level level)
 {

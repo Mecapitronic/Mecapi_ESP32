@@ -5,7 +5,7 @@ Robot::Robot()
     Debugger::log("Init Robot", INFO);
 
     robotPosition = {1000, 1000, 0.0};
-    Debugger::log("Robot Position : ", robotPosition);
+    Debugger::log("Robot Position : ", robotPosition, "", INFO);
     cursorTmp = 0;
     for (size_t i = 0; i < ROBOT_SERIAL_PACKET_SIZE; i++)
     {
