@@ -5,7 +5,7 @@ Lidar::Lidar()
     Debugger::log("Init Lidar");
 
     // minDistance, maxDistance, minQuality, distanceThreshold, angleThreshold;
-    Config(0, 1500, 200, 150, 0.8 * 5);
+    Config(100, 1500, 200, 200, 0.8 * 5);
     SERIAL_LIDAR.begin(230400);
 }
 
@@ -156,7 +156,7 @@ bool Lidar::IsOutsideTable(Point point)
 {
     // the margin represents the distance between the center of the obstacle
     // and the edges of the table (which is 3000mm long and 2000mm large)
-    const float table_margin = 50;
+    const float table_margin = 100;
     return (point.x < table_margin || point.x > 2000 - table_margin || point.y < table_margin || point.y > 3000 - table_margin);
 }
 
@@ -238,6 +238,7 @@ void Lidar::ObstacleDetected(Tracker *tracker, uint8_t size)
 
 bool Lidar::NewObstacleThreshold(PointLidar lidar_point)
 {
+    // TODO recalculate minimum angle threshold, or convert it to distance to have a better threshold config
     return (fabsf(obstacleTmp.data[pointsCounter - 1].distance - lidar_point.distance) > lidarConfig.distanceThreshold ||
             fabsf(obstacleTmp.data[pointsCounter - 1].angle) - fabsf(lidar_point.angle) > lidarConfig.angleThreshold * 100);
 }

@@ -9,10 +9,10 @@
 #include "Robot.h"
 
 // maximal distance between to points to match them as the same point
-#define DEFAULT_LPF_CUTOFF 300.0
+#define DEFAULT_LPF_CUTOFF 300.0 // a robot diameter ish~
 
 // minimum movement needed to update position of tracked point
-#define DEFAULT_HPF_CUTOFF 100.0
+#define DEFAULT_HPF_CUTOFF 50.0 // 5 cm
 
 /**
  * amount of time needed to delete a point from tracker
@@ -21,7 +21,7 @@
  */
 #define IS_TOO_OLD 3000
 
-#define TRACKED_POINTS_SIZE 5
+#define TRACKED_POINTS_SIZE 10
 
 /**
  * @brief In charge of tracking objects on the field based on Lidar detections and Kalman filter
