@@ -2,6 +2,7 @@
 #define MAIN_H
 
 #include <Arduino.h>
+#include "A010.h"
 #include "Debugger.h"
 #include "Structure.h"
 
