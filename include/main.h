@@ -24,4 +24,6 @@ TaskHandle_t Task2;
 QueueHandle_t queue;
 int queueSize = 500;
 
+A010 a010;
+
 #endif

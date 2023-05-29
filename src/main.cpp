@@ -14,6 +14,9 @@ void setup()
         Debugger::log("Error creating the queue", ERROR);
     }
 
+    a010 = A010();
+    delay(500);
+
     // create a task that will be executed in the Task1code() function, with priority 1 and executed on core 0
     xTaskCreatePinnedToCore(Task1code, /* Task function. */
                             "Task1",   /* name of task. */
@@ -46,9 +49,13 @@ void Task1code(void *pvParameters)
     int send = 0;
     while (1)
     {
-        // we send one int
-        xQueueSend(queue, &send, 0);
-        send++;
+        if (a010.ReadSerial())
+        {
+            // we send one int
+            xQueueSend(queue, &send, 0);
+            Debugger::log("Sending ", send);
+            send++;
+        }
     }
     vTaskDelay(1);
 }
@@ -63,6 +70,7 @@ void Task2code(void *pvParameters)
         {
             if (xQueueReceive(queue, &receive, portTICK_PERIOD_MS * 0))
             {
+                Debugger::log("Receiving ", receive);
             }
         }
 
