@@ -12,6 +12,14 @@
 #define A010_SERIAL_PACKET_SIZE 64
 #define A010_FIRST_PACKET_BYTE 0x54
 
+#define SERIAL_A010_COPY Serial1
+
+// we change the UART 1 RX pin from 9 to 2
+// we change the UART 1 TX pin from 10 to 4
+
+#define RX1 2
+#define TX1 4
+
 #include <Arduino.h>
 #include "Debugger.h"
 
