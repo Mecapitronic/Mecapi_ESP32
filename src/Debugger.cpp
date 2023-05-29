@@ -4,7 +4,7 @@ void Debugger::init()
 {
     if (enabled)
     {
-        SERIAL_DEBUG.begin(576000);
+        SERIAL_DEBUG.begin(115200);
 
         if (SERIAL_DEBUG.available() <= 0)
         {

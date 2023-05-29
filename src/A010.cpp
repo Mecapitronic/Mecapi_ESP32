@@ -6,7 +6,7 @@ A010::A010()
 
     // minDistance, maxDistance
     Config(100, 1500);
-    SERIAL_A010.begin(230400);
+    SERIAL_A010.begin(115200);
 }
 
 void A010::Config(int min = -1, int max = -1)
