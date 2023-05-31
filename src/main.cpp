@@ -56,8 +56,8 @@ void Task1code(void *pvParameters)
             Debugger::log("Sending ", send);
             send++;
         }
+        vTaskDelay(1);
     }
-    vTaskDelay(1);
 }
 
 // Note the 1 Tick delay, this is need so the watchdog doesn't get confused
