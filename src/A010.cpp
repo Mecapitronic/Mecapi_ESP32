@@ -8,6 +8,25 @@ A010::A010()
     Config(100, 1500);
     SERIAL_A010.begin(115200);
 
+    // wait A010 power up
+    delay(1000);
+
+    // AT commands configuration
+    // https://wiki.sipeed.com/hardware/en/maixsense/maixsense-a010/at_command_en.html
+    // https://wiki.sipeed.com/hardware/en/metasense/metasense-a010/metasense-a010.html
+    SERIAL_A010.println("AT+BINN=4");      // pixel merged : 1=1x1 (100x100), 2=2x2 (50x50), 4=4x4 (25x25)
+    SERIAL_A010.println("AT+DISP=5");      // 2=usb, 3=usb+lcd, 4=uart, 5=uart+lcd, 6=usb+uart, 7=usb+uart+lcd
+    SERIAL_A010.println("AT+FPS=20");      // FPS from 1 to 20 (30?)
+    SERIAL_A010.println("AT+ANTIMMI=-1");  // Automatic anti-multi-machine interference is turned on and off (susceptible to interference, the effect
+                                           // of turning off is better)
+    SERIAL_A010.println("AT+AE=0");        // Ev:Exposure gap control (leftmost represents AE, others are fixed exposure time)
+    // FIXME: fait planter le lcd et ne sauvegarde rien... SERIAL_A010.println("AT+SAVE"); // The current configuration of the TOF camera is cured,
+    // and it needs to be reset afterwards
+    SERIAL_A010.println("AT+BAUD=3");  // 6=1M, 7=2M, 8=3M
+    SERIAL_A010.flush();
+    SERIAL_A010.end();
+    SERIAL_A010.begin(230400);
+
     // Debugger::log("Init A010 COPY");
     // SERIAL_A010_COPY.begin(115200, SERIAL_8N1, RX1, TX1);
 
