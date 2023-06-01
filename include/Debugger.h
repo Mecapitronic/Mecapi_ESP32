@@ -12,6 +12,7 @@
 
 #include <Arduino.h>
 #include "Structure.h"
+#include "frame_struct.h"
 
 #define SERIAL_PC Serial
 #define SERIAL_DEBUG SERIAL_PC
