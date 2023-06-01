@@ -24,10 +24,8 @@
 #define A010_END_PACKET_BYTE 0xDD
 
 #define SERIAL_A010_COPY Serial1
-
 // we change the UART 1 RX pin from 9 to 2
 // we change the UART 1 TX pin from 10 to 4
-
 #define RX1 2
 #define TX1 4
 

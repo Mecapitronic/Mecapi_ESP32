@@ -8,8 +8,8 @@ A010::A010()
     Config(100, 1500);
     SERIAL_A010.begin(115200);
 
-    Debugger::log("Init A010 COPY");
-    SERIAL_A010_COPY.begin(115200, SERIAL_8N1, RX1, TX1);
+    // Debugger::log("Init A010 COPY");
+    // SERIAL_A010_COPY.begin(115200, SERIAL_8N1, RX1, TX1);
 
     serialBuffer.clear();
 }
@@ -35,7 +35,8 @@ boolean A010::ReadSerial()
     while (SERIAL_A010.available() > 0)
     {
         uint32_t tmpInt = SERIAL_A010.read();
-        SERIAL_A010_COPY.write(tmpInt);
+        SERIAL_DEBUG.print(tmpInt,HEX);
+        SERIAL_DEBUG.print(" ");
 
         if (cursorTmp == 0 && tmpInt == A010_FIRST_PACKET_BYTE)  // First byte of packet
         {
