@@ -46,11 +46,15 @@ void loop()
 // Note the 1 Tick delay, this is need so the watchdog doesn't get confused
 void Task1code(void *pvParameters)
 {
+    a010_frame_t a010Packet;
     int send = 0;
     while (1)
     {
         if (a010.ReadSerial())
         {
+            a010.Analyze();
+            a010Packet = a010.GetData();
+            Debugger::log("", a010Packet);
             // we send one int
             xQueueSend(queue, &send, 0);
             Debugger::log("Sending ", send);

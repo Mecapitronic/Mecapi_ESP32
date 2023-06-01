@@ -9,8 +9,15 @@
 // Serial 2 : U2TX = GPIO17 ; U2RX = GPIO16
 #define SERIAL_A010 Serial2
 
-// 47 = 2(Start) + 2(Datalen) + 16(Other) + ?(Image frame) + 1(CRC) + 1(End)
+// 20+?+2 = 2(Start) + 2(Datalen) + 16(Other) + ?(Image frame) + 1(CRC) + 1(End)
 // #define A010_SERIAL_PACKET_SIZE 1024
+
+// Protocol : 2Byte header + 2Byte length + 1Byte command + 1Byte output_mode + 1Byte Sensor Temp + 1Byte Driver Temp
+// 4Bytes exposure time + 1Byte error code + 1Byte reserved1 + 1Byte res rows + 1Byte res cols
+// 2Byte Frame ID + 1 Byte ISP version + 1 Byte reserved3
+// frame data : 100 x 100 bytes ?
+// 1Byte checksum + 1Byte tail
+// length count from Byte4 to the Byte before Checksum
 
 #define A010_FIRST_PACKET_BYTE 0x00
 #define A010_SECOND_PACKET_BYTE 0xFF
@@ -27,6 +34,7 @@
 #include <Arduino.h>
 #include <vector>
 #include "Debugger.h"
+#include "frame_struct.h"
 
 struct ConfigA010
 {
@@ -54,6 +62,8 @@ class A010
      * Read data from serial and put in a buffer if it comes from the A010
      */
     boolean ReadSerial();
+    void Analyze();
+    a010_frame_t GetData();
 
    private:
     std::vector<uint8_t> serialBuffer;
@@ -61,5 +71,7 @@ class A010
     uint16_t packetSize = 0;
 
     ConfigA010 a010Config = {0, 0};
+
+    a010_frame_t a010Packet;
 };
 #endif

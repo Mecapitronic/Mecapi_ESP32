@@ -39,6 +39,7 @@ boolean A010::ReadSerial()
 
         if (cursorTmp == 0 && tmpInt == A010_FIRST_PACKET_BYTE)  // First byte of packet
         {
+            serialBuffer.clear();
             serialBuffer.push_back(tmpInt);
             cursorTmp++;
         }
@@ -65,12 +66,13 @@ boolean A010::ReadSerial()
             serialBuffer.push_back(tmpInt);
             cursorTmp++;
             packetSize = serialBuffer[3] << 8 | serialBuffer[2];
+            Debugger::log("packetSize", packetSize);
         }
         else if (cursorTmp > 3)
         {
             serialBuffer.push_back(tmpInt);
             cursorTmp++;
-            if (cursorTmp == packetSize)
+            if (cursorTmp == packetSize + 4 + 2)  // length count from Byte4 to the Byte before Checksum
             {
                 cursorTmp = 0;
                 return true;
@@ -79,3 +81,29 @@ boolean A010::ReadSerial()
     }
     return false;
 }
+
+void A010::Analyze()
+{
+    a010Packet.frame_head.frame_begin_flag = serialBuffer[1] << 8 | serialBuffer[0];
+    a010Packet.frame_head.frame_data_len = serialBuffer[3] << 8 | serialBuffer[2];
+    a010Packet.frame_head.reserved1 = serialBuffer[4];
+    a010Packet.frame_head.output_mode = serialBuffer[5];
+    a010Packet.frame_head.senser_temp = serialBuffer[6];
+    a010Packet.frame_head.driver_temp = serialBuffer[7];
+    a010Packet.frame_head.exposure_time[0] = serialBuffer[8];
+    a010Packet.frame_head.exposure_time[1] = serialBuffer[9];
+    a010Packet.frame_head.exposure_time[2] = serialBuffer[10];
+    a010Packet.frame_head.exposure_time[3] = serialBuffer[11];
+    a010Packet.frame_head.error_code = serialBuffer[12];
+    a010Packet.frame_head.reserved2 = serialBuffer[13];
+    a010Packet.frame_head.resolution_rows = serialBuffer[14];
+    a010Packet.frame_head.resolution_cols = serialBuffer[15];
+    a010Packet.frame_head.frame_id = serialBuffer[17] << 8 | serialBuffer[16];
+    a010Packet.frame_head.isp_version = serialBuffer[18];
+    a010Packet.frame_head.reserved3 = serialBuffer[19];
+
+    a010Packet.frame_tail.checksum = serialBuffer[serialBuffer.size() - 2];
+    a010Packet.frame_tail.frame_end_flag = serialBuffer[serialBuffer.size() - 1];
+}
+
+a010_frame_t A010::GetData() { return a010Packet; }

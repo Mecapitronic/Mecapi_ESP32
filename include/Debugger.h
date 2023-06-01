@@ -54,6 +54,7 @@ class Debugger
 
     static void log(String prefix, Point data, String suffix = "", Level level = VERBOSE, boolean lineFeed = true);
     static void log(String prefix, PolarPoint data, String suffix = "", Level level = VERBOSE, boolean lineFeed = true);
+    static void log(String prefix, a010_frame_t data, String suffix = "", Level level = VERBOSE, boolean lineFeed = true);
 
     // bool needs to be the last because it overrides all functions
     static void log(String prefix, bool data, String suffix = "", Level level = VERBOSE, boolean lineFeed = true);
