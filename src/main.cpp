@@ -83,13 +83,14 @@ void Task2code(void *pvParameters)
 
         if (cmd != "")
         {
-            if (cmd.startsWith("cmd:"))
+            if (cmd.startsWith("cmdAT:"))
             {
                 try
                 {
-                    cmd.remove(0, 4);
-                    int i = atoi(cmd.c_str());
-                    Debugger::log("cmd: ", i);
+                    cmd.remove(0, 6);
+                    // int i = atoi(cmd.c_str());
+                    Debugger::log("cmdAT: ", cmd);
+                    SERIAL_A010.write(cmd.c_str());
                 }
                 catch (std::exception const &e)
                 {
