@@ -29,6 +29,8 @@
 #define RX1 2
 #define TX1 4
 
+#define QUANTIZATION_VALUE 1 // depth data resolution in mm (1 to 9)
+
 #include <Arduino.h>
 #include <vector>
 #include "Debugger.h"

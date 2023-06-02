@@ -16,10 +16,14 @@ A010::A010()
     // https://wiki.sipeed.com/hardware/en/metasense/metasense-a010/metasense-a010.html
     SERIAL_A010.println("AT+BINN=4");      // pixel merged : 1=1x1 (100x100), 2=2x2 (50x50), 4=4x4 (25x25)
     SERIAL_A010.println("AT+DISP=5");      // 2=usb, 3=usb+lcd, 4=uart, 5=uart+lcd, 6=usb+uart, 7=usb+uart+lcd
+    SERIAL_A010.println("AT+UNIT=4");      // 1 to 9, Represents quantization in x mm. The smaller the value, the more details and the shorter the visual distance.
     SERIAL_A010.println("AT+FPS=20");      // FPS from 1 to 20 (30?)
     SERIAL_A010.println("AT+ANTIMMI=-1");  // Automatic anti-multi-machine interference is turned on and off (susceptible to interference, the effect
                                            // of turning off is better)
     SERIAL_A010.println("AT+AE=0");        // Ev:Exposure gap control (leftmost represents AE, others are fixed exposure time)
+
+    // TODO: receive command response to see if it's OK !
+
     // FIXME: fait planter le lcd et ne sauvegarde rien... SERIAL_A010.println("AT+SAVE"); // The current configuration of the TOF camera is cured,
     // and it needs to be reset afterwards
     SERIAL_A010.println("AT+BAUD=3");  // 6=1M, 7=2M, 8=3M
@@ -58,10 +62,10 @@ boolean A010::ReadSerial()
         if (cursorTmp == 0)  // First byte of packet
         {
             if (tmpInt == A010_FIRST_PACKET_BYTE)
-        {
-            serialBuffer.clear();
-            serialBuffer.push_back(tmpInt);
-            cursorTmp++;
+            {
+                serialBuffer.clear();
+                serialBuffer.push_back(tmpInt);
+                cursorTmp++;
             }
             else
             {
