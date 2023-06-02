@@ -38,5 +38,5 @@ struct a010_frame_t
 {
     a010_frame_head_t frame_head;
     a010_frame_tail_t frame_tail;
-    uint8_t payload[];
+    uint8_t payload[625];
 };

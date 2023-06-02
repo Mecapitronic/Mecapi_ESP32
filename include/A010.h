@@ -65,7 +65,7 @@ class A010
 
    private:
     std::vector<uint8_t> serialBuffer;
-    uint8_t cursorTmp = 0;
+    uint16_t cursorTmp = 0; // 16 bits => frame limited to 65535 bytes
     uint16_t packetSize = 0;
 
     ConfigA010 a010Config = {0, 0};

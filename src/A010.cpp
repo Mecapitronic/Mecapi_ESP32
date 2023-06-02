@@ -53,15 +53,21 @@ boolean A010::ReadSerial()
 {
     while (SERIAL_A010.available() > 0)
     {
-        uint32_t tmpInt = SERIAL_A010.read();
-        SERIAL_DEBUG.print(tmpInt,HEX);
-        SERIAL_DEBUG.print(" ");
+        uint8_t tmpInt = SERIAL_A010.read();
 
-        if (cursorTmp == 0 && tmpInt == A010_FIRST_PACKET_BYTE)  // First byte of packet
+        if (cursorTmp == 0)  // First byte of packet
+        {
+            if (tmpInt == A010_FIRST_PACKET_BYTE)
         {
             serialBuffer.clear();
             serialBuffer.push_back(tmpInt);
             cursorTmp++;
+            }
+            else
+            {
+                serialBuffer.clear();
+                cursorTmp = 0;
+            }
         }
         else if (cursorTmp == 1)
         {
@@ -121,6 +127,8 @@ void A010::Analyze()
     a010Packet.frame_head.frame_id = serialBuffer[17] << 8 | serialBuffer[16];
     a010Packet.frame_head.isp_version = serialBuffer[18];
     a010Packet.frame_head.reserved3 = serialBuffer[19];
+
+    memcpy(&a010Packet.payload[0], &serialBuffer[20],sizeof(a010Packet.payload));
 
     a010Packet.frame_tail.checksum = serialBuffer[serialBuffer.size() - 2];
     a010Packet.frame_tail.frame_end_flag = serialBuffer[serialBuffer.size() - 1];

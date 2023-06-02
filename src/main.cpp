@@ -48,6 +48,8 @@ void Task1code(void *pvParameters)
 {
     a010_frame_t a010Packet;
     int send = 0;
+    uint16_t distance_mm, distance_mm_old = 0;
+
     while (1)
     {
         if (a010.ReadSerial())
@@ -55,6 +57,14 @@ void Task1code(void *pvParameters)
             a010.Analyze();
             a010Packet = a010.GetData();
             Debugger::log("", a010Packet);
+
+            distance_mm_old = distance_mm;
+            distance_mm = a010Packet.payload[312];
+            if (distance_mm_old != distance_mm) 
+            {
+                SERIAL_DEBUG.println(distance_mm);
+            }
+
             // we send one int
             xQueueSend(queue, &send, 0);
             Debugger::log("Sending ", send);
