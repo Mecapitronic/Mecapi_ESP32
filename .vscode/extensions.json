@@ -1,0 +1,22 @@
+{
+    // See http://go.microsoft.com/fwlink/?LinkId=827846
+    // for the documentation about the extensions.json format
+    "recommendations": [
+        "aaron-bond.better-comments",
+        "alefragnani.project-manager",
+        "github.vscode-pull-request-github",
+        "gruntfuggly.todo-tree",
+        "jeff-hykin.better-cpp-syntax",
+        "mhutchie.git-graph",
+        "ms-ceintl.vscode-language-pack-fr",
+        "ms-vscode.cpptools",
+        "ms-vscode.vscode-serial-monitor",
+        "platformio.platformio-ide",
+        "streetsidesoftware.code-spell-checker-french",
+        "vscode-icons-team.vscode-icons"
+    ],
+    "unwantedRecommendations": [
+        "ms-vscode.cmake-tools",
+        "ms-vscode.cpptools-extension-pack"
+    ]
+}
