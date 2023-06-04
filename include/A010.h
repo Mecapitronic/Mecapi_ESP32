@@ -29,7 +29,7 @@
 #define RX1 2
 #define TX1 4
 
-#define QUANTIZATION_VALUE 1 // depth data resolution in mm (1 to 9)
+#define QUANTIZATION_MM 4 // depth data resolution in mm (1 to 9)
 
 #include <Arduino.h>
 #include <vector>
@@ -44,7 +44,7 @@ struct ConfigA010
 
 class A010
 {
-   public:
+public:
     /**
      * A010 Constructor
      */
@@ -65,7 +65,7 @@ class A010
     void Analyze();
     a010_frame_t GetData();
 
-   private:
+private:
     std::vector<uint8_t> serialBuffer;
     uint16_t cursorTmp = 0; // 16 bits => frame limited to 65535 bytes
     uint16_t packetSize = 0;

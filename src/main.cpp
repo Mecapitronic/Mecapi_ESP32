@@ -59,8 +59,8 @@ void Task1code(void *pvParameters)
             Debugger::log("", a010Packet);
 
             distance_mm_old = distance_mm;
-            distance_mm = a010Packet.payload[312];
-            if (distance_mm_old != distance_mm) 
+            distance_mm = a010Packet.payload[312] * QUANTIZATION_MM;
+            if (distance_mm_old != distance_mm)
             {
                 SERIAL_DEBUG.println(distance_mm);
             }
