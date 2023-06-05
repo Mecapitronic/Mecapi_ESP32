@@ -1,0 +1,3 @@
+[submodule "SerialPacketSimulator"]
+	path = SerialPacketSimulator
+	url = https://github.com/Mecapitronic/SerialPacketSimulator.git
