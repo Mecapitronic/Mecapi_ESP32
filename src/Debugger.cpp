@@ -170,3 +170,11 @@ void Debugger::plotPoint(Point p, Level level)
     SERIAL_DEBUG.print(">y:");
     SERIAL_DEBUG.println((int)p.y);
 }
+
+void Debugger::plot3D(Point3D p, String varName)
+{
+    // 3D|A:B:C|E
+    // '3D|sphere1,widget0:S:sphere:RA:'+ str(sphere1rad)+':P:'+ str(sphere1x) +':'+ str(sphere1y) +':'+ str(sphere1z) + ':C:black:O:1'
+    String data = "3D|" + varName + ":";
+    SERIAL_DEBUG.println(data);
+}

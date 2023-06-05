@@ -15,8 +15,18 @@
  */
 struct Point
 {
-    float x;
-    float y;
+    int16_t x;
+    int16_t y;
+};
+
+/**
+ * @brief Represents a 3D Cartesian point, with x, y and z as coordinates
+ */
+struct Point3D
+{
+    int16_t x;
+    int16_t y;
+    int16_t z;
 };
 
 /**

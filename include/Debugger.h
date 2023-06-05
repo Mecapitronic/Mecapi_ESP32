@@ -27,7 +27,7 @@ enum class Level
 
 class Debugger
 {
-   public:
+public:
     /**
      * Print custom header on debugging serial
      */
@@ -74,7 +74,13 @@ class Debugger
      */
     static void plotPoint(Point p, Level level = INFO);
 
-   private:
+    /**
+     * send cloud point data on serial for teleplot to trace 3D shape
+     * Syntax : 3D|A:B:C|E
+     */
+    void plot3D(Point3D p, String varName);
+
+private:
     static const boolean enabled = true;
     static const Level debugLevel = INFO;
 };
