@@ -62,7 +62,7 @@ public:
      * Read data from serial and put in a buffer if it comes from the A010
      */
     boolean ReadSerial();
-    void Analyze();
+    void FillStructure();
     a010_frame_t GetData();
 
 private:

@@ -54,7 +54,7 @@ void Task1code(void *pvParameters)
     {
         if (a010.ReadSerial())
         {
-            a010.Analyze();
+            a010.FillStructure();
             a010Packet = a010.GetData();
             Debugger::log("", a010Packet);
 

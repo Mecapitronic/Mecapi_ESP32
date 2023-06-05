@@ -112,7 +112,7 @@ boolean A010::ReadSerial()
     return false;
 }
 
-void A010::Analyze()
+void A010::FillStructure()
 {
     a010Packet.frame_head.frame_begin_flag = serialBuffer[1] << 8 | serialBuffer[0];
     a010Packet.frame_head.frame_data_len = serialBuffer[3] << 8 | serialBuffer[2];
