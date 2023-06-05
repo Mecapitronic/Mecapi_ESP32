@@ -195,6 +195,8 @@ void Debugger::plot3D(Point3D p, String varName)
 {
     // 3D|A:B:C|E
     // '3D|sphere1,widget0:S:sphere:RA:'+ str(sphere1rad)+':P:'+ str(sphere1x) +':'+ str(sphere1y) +':'+ str(sphere1z) + ':C:black:O:1'
-    String data = "3D|" + varName + ":";
+    // msg = '3D|sphere' + sphere1num + ',widget0:S:sphere:RA:' + str(sphere1rad) + ':P:' + str(sphere1x) + ':' + str(sphere1y) + ':' + str(sphere1z) + ':C:black:O:1'
+
+    String data = varName + ":" + p.x + ":" + p.y + ":" + p.z + 'n';
     SERIAL_DEBUG.println(data);
 }

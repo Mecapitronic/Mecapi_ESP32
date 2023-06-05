@@ -1,14 +1,11 @@
 #include "main.h"
 
-// put function declarations here:
-int myFunction(int, int);
-
 void setup()
 {
     // put your setup code here, to run once:
     Debugger::init();
 
-    queue = xQueueCreate(queueSize, sizeof(int));
+    queue = xQueueCreate(queueSize, sizeof(uint16_t));
     if (queue == NULL)
     {
         Debugger::log("Error creating the queue", ERROR);
@@ -47,7 +44,6 @@ void loop()
 void Task1code(void *pvParameters)
 {
     a010_frame_t a010Packet;
-    int send = 0;
     uint16_t distance_mm, distance_mm_old = 0;
 
     while (1)
@@ -56,19 +52,16 @@ void Task1code(void *pvParameters)
         {
             a010.FillStructure();
             a010Packet = a010.GetData();
-            Debugger::log("", a010Packet);
 
-            distance_mm_old = distance_mm;
+            // distance_mm_old = distance_mm;
             distance_mm = a010Packet.payload[312] * QUANTIZATION_MM;
-            if (distance_mm_old != distance_mm)
-            {
-                SERIAL_DEBUG.println(distance_mm);
-            }
+            // if (distance_mm_old != distance_mm)
+            //{
+            // SERIAL_DEBUG.println(distance_mm);
+            // Debugger::plotPoint()
+            //}
 
-            // we send one int
-            xQueueSend(queue, &send, 0);
-            Debugger::log("Sending ", send);
-            send++;
+            xQueueSend(queue, &distance_mm, 0);
         }
         vTaskDelay(1);
     }
@@ -77,14 +70,18 @@ void Task1code(void *pvParameters)
 // Note the 1 Tick delay, this is need so the watchdog doesn't get confused
 void Task2code(void *pvParameters)
 {
-    int receive = 0;
+    a010_frame_t a010Packet;
+    uint16_t distance_mm = 0;
+    Point3D p = {0, 0, 0};
     while (1)
     {
         if (uxQueueMessagesWaiting(queue) > 0)
         {
-            if (xQueueReceive(queue, &receive, portTICK_PERIOD_MS * 0))
+            if (xQueueReceive(queue, &distance_mm, portTICK_PERIOD_MS * 0))
             {
-                Debugger::log("Receiving ", receive);
+                // SERIAL_DEBUG.println("3D|mySimpleSphere:1627551892437:S:sphere:P::2::RA:2:C:red");
+                p.z = distance_mm;
+                Debugger::plot3D(p, "0");
             }
         }
 

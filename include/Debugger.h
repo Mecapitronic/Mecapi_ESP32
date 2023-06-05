@@ -76,9 +76,8 @@ public:
 
     /**
      * send cloud point data on serial for teleplot to trace 3D shape
-     * Syntax : 3D|A:B:C|E
      */
-    void plot3D(Point3D p, String varName);
+    static void plot3D(Point3D p, String varName);
 
 private:
     static const boolean enabled = true;
