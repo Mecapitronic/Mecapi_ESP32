@@ -1,24 +1,3 @@
-import matplotlib.pyplot as plt
-import numpy as np
-
-from serial import Serial
-import socket
-
-teleplotAddr = ("teleplot.fr",47269)
-sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-
-with Serial('COM6', 921600) as ser:
-    while True:
-        line = ser.readline().decode("utf-8")
-        # print(line)
-
-        sock.sendto(line.encode(), teleplotAddr)
-
-
-
-----------------------------
-
-
 import numpy as np
 from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
