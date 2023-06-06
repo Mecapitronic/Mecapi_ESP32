@@ -36,9 +36,16 @@ String Debugger::checkSerial()
 {
     if (enabled && SERIAL_DEBUG.available() > 0)
     {
-        String command = SERIAL_DEBUG.readStringUntil('\n');
+        char tmpChar = SERIAL_A010.read();
+        readString += tmpChar;
+        if (tmpChar == '\n')
+        {
+            // String command = SERIAL_DEBUG.readStringUntil('\n');
+            String command = readString;
+            readString = "";
         SERIAL_DEBUG.println("Received : " + command);
         return command;
+        }
     }
     return "";
 }

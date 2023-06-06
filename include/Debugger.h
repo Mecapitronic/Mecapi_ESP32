@@ -82,5 +82,6 @@ public:
 private:
     static const boolean enabled = true;
     static const Level debugLevel = INFO;
+    static String readString = "";
 };
 #endif
