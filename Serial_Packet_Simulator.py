@@ -68,7 +68,7 @@ def main(serial_if: str, file: str):
         send_packet(bytes.fromhex(packet), serial_if)
 
         print(f"{packets.index(packet)}/{len(packets)}", end="\r")
-        time.sleep(0.1)
+        time.sleep(0.01)
 
     print("All data sent")
 
@@ -78,26 +78,26 @@ if __name__ == "__main__":
     argParser.add_argument(
         "serial_interface",
         type=str,
-        default=None,
+        default='COM4',
         nargs="?",
         help="serial interface where to send packets",
     )
     argParser.add_argument(
         "sensor_type",
         type=str,
-        default=None,
+        default='a010',
         nargs="?",
         help="type of sensor to simulate",
     )
     argParser.add_argument(
         "file_number",
         type=str,
-        default=0,
+        default='1',
         nargs="?",
         help="number of data file to send",
     )
     args = argParser.parse_args()
 
     serial_if = which_serial(serial_if=args.serial_interface)
-    file = "data_" + args.sensor_type + "_" + args.file_number + ".txt"
+    file = args.sensor_type + "\\data_" + args.sensor_type + "_" + str(args.file_number) + ".txt"
     main(serial_if, file)
