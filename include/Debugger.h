@@ -27,7 +27,7 @@ enum class Level
 
 class Debugger
 {
-public:
+   public:
     /**
      * Print custom header on debugging serial
      */
@@ -79,9 +79,9 @@ public:
      */
     static void plot3D(Point3D p, String varName);
 
-private:
+   private:
     static const boolean enabled = true;
     static const Level debugLevel = INFO;
-    static String readString = "";
+
 };
 #endif

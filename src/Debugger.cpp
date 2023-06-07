@@ -1,5 +1,5 @@
 #include "Debugger.h"
-
+String readString;
 void Debugger::init()
 {
     if (enabled)
@@ -9,6 +9,7 @@ void Debugger::init()
         if (SERIAL_DEBUG.available() <= 0)
         {
         }
+        readString = "";
 
         header();
         SERIAL_DEBUG.print("Preparing system...");
@@ -36,7 +37,7 @@ String Debugger::checkSerial()
 {
     if (enabled && SERIAL_DEBUG.available() > 0)
     {
-        char tmpChar = SERIAL_A010.read();
+        char tmpChar = SERIAL_DEBUG.read();
         readString += tmpChar;
         if (tmpChar == '\n')
         {
