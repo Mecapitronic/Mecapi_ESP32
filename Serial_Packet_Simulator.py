@@ -68,7 +68,7 @@ def main(serial_if: str, file: str):
         send_packet(bytes.fromhex(packet), serial_if)
 
         print(f"{packets.index(packet)}/{len(packets)}", end="\r")
-        time.sleep(0.01)
+        time.sleep(2)
 
     print("All data sent")
 
