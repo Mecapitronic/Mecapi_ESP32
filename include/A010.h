@@ -29,8 +29,8 @@
 #define RX1 2
 #define TX1 4
 
-#define BINNING_SIZE 4    // pixel binning : 1=1x1 (100x100), 2=2x2 (50x50), 4=4x4 (25x25)
-#define QUANTIZATION_MM 4 // depth data resolution in mm (1 to 9)
+#define BINNING_SIZE 4     // pixel binning : 1=1x1 (100x100), 2=2x2 (50x50), 4=4x4 (25x25)
+#define QUANTIZATION_MM 4  // depth data resolution in mm (1 to 9)
 
 #if BINNING_SIZE == 4
 #define PICTURE_SIZE 625
@@ -55,7 +55,7 @@ struct ConfigA010
 
 class A010
 {
-public:
+   public:
     /**
      * A010 Constructor
      */
@@ -75,10 +75,11 @@ public:
     boolean ReadSerial();
     void FillStructure();
     a010_frame_t GetData();
+    a010_point_cloud_t GetPointCloud();
 
-private:
+   private:
     std::vector<uint8_t> serialBuffer;
-    uint16_t cursorTmp = 0; // 16 bits => frame limited to 65535 bytes
+    uint16_t cursorTmp = 0;  // 16 bits => frame limited to 65535 bytes
     uint16_t packetSize = 0;
 
     ConfigA010 a010Config = {0, 0};

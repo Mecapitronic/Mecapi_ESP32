@@ -44,8 +44,8 @@ String Debugger::checkSerial()
             // String command = SERIAL_DEBUG.readStringUntil('\n');
             String command = readString;
             readString = "";
-        SERIAL_DEBUG.println("Received : " + command);
-        return command;
+            SERIAL_DEBUG.println("Received : " + command);
+            return command;
         }
     }
     return "";
@@ -203,8 +203,17 @@ void Debugger::plot3D(Point3D p, String varName)
 {
     // 3D|A:B:C|E
     // '3D|sphere1,widget0:S:sphere:RA:'+ str(sphere1rad)+':P:'+ str(sphere1x) +':'+ str(sphere1y) +':'+ str(sphere1z) + ':C:black:O:1'
-    // msg = '3D|sphere' + sphere1num + ',widget0:S:sphere:RA:' + str(sphere1rad) + ':P:' + str(sphere1x) + ':' + str(sphere1y) + ':' + str(sphere1z) + ':C:black:O:1'
+    // msg = '3D|sphere' + sphere1num + ',widget0:S:sphere:RA:' + str(sphere1rad) + ':P:' + str(sphere1x) + ':' + str(sphere1y) + ':' + str(sphere1z)
+    // + ':C:black:O:1' #2ecc71
+    // TODO : rester en cm sinon le point est perdu dans le brouillard de l'horizon 3D de teleplot...
+    // FIXME : la couleur n'est pas prise en compte
+    // FIXME : le repère 3D de teleplot est basé sur un plan XZ avec Y en "hauteur" (sans axe!)
+    String data = ">3D|" + varName + ",widget0:S:sphere:P:" + p.x + ":" + p.y + ":" + p.z / 10 + ":RA:1:C:black:O:1";
+    SERIAL_DEBUG.println(data);
+}
 
-    String data = varName + ":" + p.x + ":" + p.y + ":" + p.z + 'n';
+void Debugger::plot3Dpy(Point3D p)
+{
+    String data = "" + String(p.x) + ":" + String(p.y) + ":" + String(p.z);
     SERIAL_DEBUG.println(data);
 }

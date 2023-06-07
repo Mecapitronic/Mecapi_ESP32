@@ -78,10 +78,10 @@ class Debugger
      * send cloud point data on serial for teleplot to trace 3D shape
      */
     static void plot3D(Point3D p, String varName);
+    static void plot3Dpy(Point3D p);
 
    private:
     static const boolean enabled = true;
     static const Level debugLevel = INFO;
-
 };
 #endif

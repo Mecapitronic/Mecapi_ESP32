@@ -1,7 +1,7 @@
 #pragma once
 
 #include <stdint.h>
-#include "A010.h"
+// #include "A010.h"
 
 #define FRAME_BEGIN_FLAG (0xFF00)
 #define FRAME_END_FLAG (0xDD)
@@ -39,5 +39,12 @@ struct a010_frame_t
 {
     a010_frame_head_t frame_head;
     a010_frame_tail_t frame_tail;
-    uint8_t payload[PICTURE_SIZE];
+    uint8_t payload[625];  // TODO: PICTURE_SIZE en fonction de la valeur de BINNING => voir A010.h
+};
+
+struct a010_point_cloud_t
+{
+    int16_t x[625];
+    int16_t y[625];
+    int16_t z[625];
 };

@@ -44,7 +44,6 @@ void loop()
 void Task1code(void *pvParameters)
 {
     a010_frame_t a010Packet;
-    uint16_t distance_mm, distance_mm_old = 0;
 
     while (1)
     {
@@ -53,15 +52,9 @@ void Task1code(void *pvParameters)
             a010.FillStructure();
             a010Packet = a010.GetData();
 
-            // distance_mm_old = distance_mm;
-            distance_mm = a010Packet.payload[312] * QUANTIZATION_MM;
-            // if (distance_mm_old != distance_mm)
-            //{
-            // SERIAL_DEBUG.println(distance_mm);
-            // Debugger::plotPoint()
-            //}
+            // distance_mm = a010Packet.payload[312] * QUANTIZATION_MM;
 
-            xQueueSend(queue, &distance_mm, 0);
+            xQueueSend(queue, &a010Packet, 0);
         }
         vTaskDelay(1);
     }
@@ -77,11 +70,19 @@ void Task2code(void *pvParameters)
     {
         if (uxQueueMessagesWaiting(queue) > 0)
         {
-            if (xQueueReceive(queue, &distance_mm, portTICK_PERIOD_MS * 0))
+            if (xQueueReceive(queue, &a010Packet, portTICK_PERIOD_MS * 0))
             {
-                // SERIAL_DEBUG.println("3D|mySimpleSphere:1627551892437:S:sphere:P::2::RA:2:C:red");
-                p.z = distance_mm;
-                Debugger::plot3D(p, "0");
+                for (int x = 1; x <= 25; x++)
+                {
+                    for (int y = 1; y <= 25; y++)
+                    {
+                        p.x = x;
+                        p.y = y;
+                        p.z = a010Packet.payload[x + (y - 1) * 25] * QUANTIZATION_MM;
+                        // Debugger::plot3D(p, "p" + String(x) + "_" + String(y));
+                        Debugger::plot3Dpy(p);
+                    }
+                }
             }
         }
 

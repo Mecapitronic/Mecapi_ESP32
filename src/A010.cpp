@@ -14,19 +14,20 @@ A010::A010()
     // AT commands configuration
     // https://wiki.sipeed.com/hardware/en/maixsense/maixsense-a010/at_command_en.html
     // https://wiki.sipeed.com/hardware/en/metasense/metasense-a010/metasense-a010.html
-    SERIAL_A010.println("AT+BINN=" + String(BINNING_SIZE)); // pixel binning : 1=1x1 (100x100), 2=2x2 (50x50), 4=4x4 (25x25)
-    SERIAL_A010.println("AT+DISP=5");                          // 2=usb, 3=usb+lcd, 4=uart, 5=uart+lcd, 6=usb+uart, 7=usb+uart+lcd
-    SERIAL_A010.println("AT+UNIT=" + String(QUANTIZATION_MM)); // 1 to 9, Represents quantization in x mm. The smaller the value, the more details and the shorter the visual distance.
-    SERIAL_A010.println("AT+FPS=20");                          // FPS from 1 to 20 (30?)
-    SERIAL_A010.println("AT+ANTIMMI=-1");                      // Automatic anti-multi-machine interference is turned on and off (susceptible to interference, the effect
-                                                               // of turning off is better)
-    SERIAL_A010.println("AT+AE=0");                            // Ev:Exposure gap control (leftmost represents AE, others are fixed exposure time)
+    SERIAL_A010.println("AT+BINN=" + String(BINNING_SIZE));     // pixel binning : 1=1x1 (100x100), 2=2x2 (50x50), 4=4x4 (25x25)
+    SERIAL_A010.println("AT+DISP=5");                           // 2=usb, 3=usb+lcd, 4=uart, 5=uart+lcd, 6=usb+uart, 7=usb+uart+lcd
+    SERIAL_A010.println("AT+UNIT=" + String(QUANTIZATION_MM));  // 1 to 9, Represents quantization in x mm. The smaller the value, the more details
+                                                                // and the shorter the visual distance.
+    SERIAL_A010.println("AT+FPS=20");                           // FPS from 1 to 20 (30?)
+    SERIAL_A010.println("AT+ANTIMMI=-1");  // Automatic anti-multi-machine interference is turned on and off (susceptible to interference, the effect
+                                           // of turning off is better)
+    SERIAL_A010.println("AT+AE=0");        // Ev:Exposure gap control (leftmost represents AE, others are fixed exposure time)
 
     // TODO: receive command response to see if it's OK !
 
     // FIXME: fait planter le lcd et ne sauvegarde rien... SERIAL_A010.println("AT+SAVE"); // The current configuration of the TOF camera is cured,
     // and it needs to be reset afterwards
-    SERIAL_A010.println("AT+BAUD=3"); // 6=1M, 7=2M, 8=3M
+    SERIAL_A010.println("AT+BAUD=3");  // 6=1M, 7=2M, 8=3M
     SERIAL_A010.flush();
     SERIAL_A010.end();
     SERIAL_A010.begin(230400);
@@ -59,7 +60,7 @@ boolean A010::ReadSerial()
     {
         uint8_t tmpInt = SERIAL_A010.read();
 
-        if (cursorTmp == 0) // First byte of packet
+        if (cursorTmp == 0)  // First byte of packet
         {
             if (tmpInt == A010_FIRST_PACKET_BYTE)
             {
@@ -102,7 +103,7 @@ boolean A010::ReadSerial()
         {
             serialBuffer.push_back(tmpInt);
             cursorTmp++;
-            if (cursorTmp == packetSize + 4 + 2) // length count from Byte4 to the Byte before Checksum
+            if (cursorTmp == packetSize + 4 + 2)  // length count from Byte4 to the Byte before Checksum
             {
                 cursorTmp = 0;
                 return true;
@@ -139,3 +140,21 @@ void A010::FillStructure()
 }
 
 a010_frame_t A010::GetData() { return a010Packet; }
+
+a010_point_cloud_t GetPointCloudFromFrame(a010_frame_t frame)
+{
+    a010_point_cloud_t cloud;
+    uint8_t row, col = 1;
+    /*
+        for (col = 1; col <= frame.frame_head.resolution_cols; col++)
+        {
+            for (row = 1; row <= frame.frame_head.resolution_rows; row++)
+            {
+                cloud.point[].x = x;
+                cloud.point.y = y;
+                cloud.point.z = a010Packet.payload[x * y] * QUANTIZATION_MM;
+                cloud.cluster =
+            }
+        }*/
+    return cloud;
+}
