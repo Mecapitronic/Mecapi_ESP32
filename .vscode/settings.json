@@ -8,5 +8,8 @@
     "editor.formatOnSaveMode": "file",
     "editor.formatOnType": true,
     "editor.guides.bracketPairs": true,
-    "editor.guides.bracketPairsHorizontal": true
+    "editor.guides.bracketPairsHorizontal": true,
+    "cSpell.words": [
+        "MECAPITRONIC"
+    ]
 }
