@@ -14,7 +14,7 @@ A010::A010()
     // AT commands configuration
     // https://wiki.sipeed.com/hardware/en/maixsense/maixsense-a010/at_command_en.html
     // https://wiki.sipeed.com/hardware/en/metasense/metasense-a010/metasense-a010.html
-    SERIAL_A010.println("AT+BINN=4");                          // pixel merged : 1=1x1 (100x100), 2=2x2 (50x50), 4=4x4 (25x25)
+    SERIAL_A010.println("AT+BINN=" + String(BINNING_SIZE)); // pixel binning : 1=1x1 (100x100), 2=2x2 (50x50), 4=4x4 (25x25)
     SERIAL_A010.println("AT+DISP=5");                          // 2=usb, 3=usb+lcd, 4=uart, 5=uart+lcd, 6=usb+uart, 7=usb+uart+lcd
     SERIAL_A010.println("AT+UNIT=" + String(QUANTIZATION_MM)); // 1 to 9, Represents quantization in x mm. The smaller the value, the more details and the shorter the visual distance.
     SERIAL_A010.println("AT+FPS=20");                          // FPS from 1 to 20 (30?)

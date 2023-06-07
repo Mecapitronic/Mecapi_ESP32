@@ -29,7 +29,18 @@
 #define RX1 2
 #define TX1 4
 
+#define BINNING_SIZE 4    // pixel binning : 1=1x1 (100x100), 2=2x2 (50x50), 4=4x4 (25x25)
 #define QUANTIZATION_MM 4 // depth data resolution in mm (1 to 9)
+
+#if BINNING_SIZE == 4
+#define PICTURE_SIZE 625
+#elif BINNING_SIZE == 2
+#define PICTURE_SIZE 2500
+#elif BINNING_SIZE == 1
+#define PICTURE_SIZE 10000
+#else
+#error "Incorrect binning value !"
+#endif
 
 #include <Arduino.h>
 #include <vector>
