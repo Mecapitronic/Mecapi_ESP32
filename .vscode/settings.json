@@ -9,7 +9,12 @@
     "editor.formatOnType": true,
     "editor.guides.bracketPairs": true,
     "editor.guides.bracketPairsHorizontal": true,
+    "cSpell.language": "en,fr",
     "cSpell.words": [
-        "MECAPITRONIC"
-    ]
+        "MECAPITRONIC",
+        "Mecapitronic"
+    ],
+    "platformio-ide.disablePIOHomeStartup": true,
+    "platformio-ide.autoOpenPlatformIOIniFile": false,
+    "C_Cpp.clang_format_fallbackStyle": "{ BasedOnStyle: Google, IndentWidth: 4, ColumnLimit: 150, BreakBeforeBraces: Allman, AllowShortIfStatementsOnASingleLine: false}"
 }
