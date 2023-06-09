@@ -148,6 +148,7 @@ a010_point_cloud_t A010::GetPointCloudFromFrame(a010_frame_t frame)
     uint8_t row, col = 1;
     uint16_t i = 1;
     double dist, ang_h, ang_v;
+    double x, y, z;
     float res_h = 1.22173 / frame.frame_head.resolution_cols;
     float res_v = 1.0472 / frame.frame_head.resolution_rows;
     float zero_h = frame.frame_head.resolution_cols / 2;
@@ -162,9 +163,12 @@ a010_point_cloud_t A010::GetPointCloudFromFrame(a010_frame_t frame)
             ang_h = res_h * (col - zero_h);
             ang_v = res_v * (row - zero_v);
 
-            cloud.point[i].x = dist * asin(ang_h);
-            cloud.point[i].y = dist * acos(ang_h);
-            cloud.point[i].z = dist * asin(ang_v);
+            x = dist * asin(ang_h);
+            y = dist * acos(ang_h);
+            z = dist * asin(ang_v);
+            cloud.point[i].x = (uint16_t)x;
+            cloud.point[i].y = (uint16_t)y;
+            cloud.point[i].z = (uint16_t)z;
             cloud.cluster[i] = i * 100;
 
             String data =

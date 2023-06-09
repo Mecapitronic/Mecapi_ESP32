@@ -45,5 +45,5 @@ struct a010_frame_t
 struct a010_point_cloud_t
 {
     Point3D point[625];
-    uint8_t cluster[625];
+    uint16_t cluster[625];
 };
