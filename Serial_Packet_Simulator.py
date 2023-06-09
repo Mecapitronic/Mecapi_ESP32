@@ -11,7 +11,7 @@ import serial
 FILE = "data_ld06_3.txt"
 
 
-BAUDRATE = 230400
+BAUDRATE = 921600
 SERIAL_LNX = "/dev/ttyUSB"
 SERIAL_WIN = "COM"
 
@@ -68,7 +68,7 @@ def main(serial_if: str, file: str):
         send_packet(bytes.fromhex(packet), serial_if)
 
         print(f"{packets.index(packet)}/{len(packets)}", end="\r")
-        time.sleep(2)
+        time.sleep(0.01)
 
     print("All data sent")
 
@@ -78,7 +78,7 @@ if __name__ == "__main__":
     argParser.add_argument(
         "serial_interface",
         type=str,
-        default='COM4',
+        default='COM7',
         nargs="?",
         help="serial interface where to send packets",
     )
@@ -92,7 +92,7 @@ if __name__ == "__main__":
     argParser.add_argument(
         "file_number",
         type=str,
-        default='1',
+        default='6',
         nargs="?",
         help="number of data file to send",
     )
