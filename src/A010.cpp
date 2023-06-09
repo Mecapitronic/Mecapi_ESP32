@@ -141,20 +141,36 @@ void A010::FillStructure()
 
 a010_frame_t A010::GetData() { return a010Packet; }
 
-a010_point_cloud_t GetPointCloudFromFrame(a010_frame_t frame)
+// A010 FOV 70°(H) * 60°(V) => 1.22173 rad * 1.0472
+a010_point_cloud_t A010::GetPointCloudFromFrame(a010_frame_t frame)
 {
     a010_point_cloud_t cloud;
     uint8_t row, col = 1;
-    /*
-        for (col = 1; col <= frame.frame_head.resolution_cols; col++)
+    uint16_t i = 1;
+    double dist, ang_h, ang_v;
+    float res_h = 1.22173 / frame.frame_head.resolution_cols;
+    float res_v = 1.0472 / frame.frame_head.resolution_rows;
+    float zero_h = frame.frame_head.resolution_cols / 2;
+    float zero_v = frame.frame_head.resolution_rows / 2;
+
+    for (col = 1; col <= frame.frame_head.resolution_cols; col++)
+    {
+        for (row = 1; row <= frame.frame_head.resolution_rows; row++)
         {
-            for (row = 1; row <= frame.frame_head.resolution_rows; row++)
-            {
-                cloud.point[].x = x;
-                cloud.point.y = y;
-                cloud.point.z = a010Packet.payload[x * y] * QUANTIZATION_MM;
-                cloud.cluster =
-            }
-        }*/
+            i = col + ((row - 1) * frame.frame_head.resolution_rows);
+            dist = frame.payload[i] * QUANTIZATION_MM;
+            ang_h = res_h * (col - zero_h);
+            ang_v = res_v * (row - zero_v);
+
+            cloud.point[i].x = dist * asin(ang_h);
+            cloud.point[i].y = dist * acos(ang_h);
+            cloud.point[i].z = dist * asin(ang_v);
+            cloud.cluster[i] = i * 100;
+
+            String data =
+                "" + String(cloud.point[i].x) + " " + String(cloud.point[i].y) + " " + String(cloud.point[i].z) + " " + String(cloud.cluster[i]);
+            SERIAL_DEBUG.println(data);
+        }
+    }
     return cloud;
 }

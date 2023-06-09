@@ -72,6 +72,7 @@ void Task2code(void *pvParameters)
         {
             if (xQueueReceive(queue, &a010Packet, portTICK_PERIOD_MS * 0))
             {
+                /*
                 for (int x = 1; x <= 25; x++)
                 {
                     for (int y = 1; y <= 25; y++)
@@ -82,7 +83,8 @@ void Task2code(void *pvParameters)
                         // Debugger::plot3D(p, "p" + String(x) + "_" + String(y));
                         Debugger::plot3Dpy(p);
                     }
-                }
+                }*/
+                a010.GetPointCloudFromFrame(a010Packet);
             }
         }
 

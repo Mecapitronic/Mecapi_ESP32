@@ -75,7 +75,7 @@ class A010
     boolean ReadSerial();
     void FillStructure();
     a010_frame_t GetData();
-    a010_point_cloud_t GetPointCloud();
+    a010_point_cloud_t GetPointCloudFromFrame(a010_frame_t frame);
 
    private:
     std::vector<uint8_t> serialBuffer;
