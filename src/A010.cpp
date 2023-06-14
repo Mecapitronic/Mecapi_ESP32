@@ -5,7 +5,7 @@ A010::A010()
     Debugger::log("Init A010");
 
     // minDistance, maxDistance
-    Config(100, 1500);
+    Config(100, 1500, 2);
     SERIAL_A010.begin(115200);
 
     // wait A010 power up
@@ -38,7 +38,7 @@ A010::A010()
     serialBuffer.clear();
 }
 
-void A010::Config(int min = -1, int max = -1)
+void A010::Config(int min = -1, int max = -1, int discontinuity = -1)
 {
     if (min != -1)
     {
@@ -51,6 +51,12 @@ void A010::Config(int min = -1, int max = -1)
         Debugger::log("A010 Config 'Distance Max' from ", a010Config.maxDistance, "", INFO, false);
         Debugger::log(" to ", max, "", INFO);
         a010Config.maxDistance = max;
+    }
+    if (discontinuity != -1)
+    {
+        Debugger::log("A010 Config 'Discontinuity ' from ", a010Config.IDMaxDiscontinuity, "", INFO, false);
+        Debugger::log(" to ", discontinuity, "", INFO);
+        a010Config.IDMaxDiscontinuity = discontinuity;
     }
 }
 
@@ -140,6 +146,31 @@ void A010::FillStructure()
 }
 
 a010_frame_t A010::GetData() { return a010Packet; }
+
+boolean A010::CheckContinuity()
+{
+    // We compare the ID of this packet with the ID of the previous packet
+    int delta = a010LastPacketHeader.frame_id - a010Packet.frame_head.frame_id;
+
+    // previous packet overflowed
+    if (a010LastPacketHeader.frame_id <= a010Packet.frame_head.frame_id)
+    {
+        delta += 4096;
+    }
+
+    // save the last point to compare to the next packet's first point
+    a010LastPacketHeader = a010Packet.frame_head;
+
+    if (delta > a010Config.IDMaxDiscontinuity)
+    {
+        Debugger::log("Discontinuity : ", delta, "", WARN);
+        return false;
+    }
+    else
+    {
+        return true;
+    }
+}
 
 // A010 FOV 70°(H) * 60°(V) => 1.22173 rad * 1.0472
 a010_point_cloud_t A010::GetPointCloudFromFrame(a010_frame_t frame)

@@ -50,6 +50,8 @@ void Task1code(void *pvParameters)
         if (a010.ReadSerial())
         {
             a010.FillStructure();
+            a010.CheckContinuity();
+
             a010Packet = a010.GetData();
 
             // distance_mm = a010Packet.payload[312] * QUANTIZATION_MM;

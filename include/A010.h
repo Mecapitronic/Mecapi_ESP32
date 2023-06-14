@@ -43,7 +43,9 @@
 #endif
 
 #include <Arduino.h>
+
 #include <vector>
+
 #include "Debugger.h"
 #include "frame_struct.h"
 
@@ -51,6 +53,7 @@ struct ConfigA010
 {
     int minDistance;
     int maxDistance;
+    int IDMaxDiscontinuity;
 };
 
 class A010
@@ -66,8 +69,9 @@ class A010
      *
      * @param min (int) do not detect points closer than min distance (mm)
      * @param max (int) do not detect points further than max distance (mm)
+     * @param discontinuity (int) the max delta in frame we can lost
      */
-    void Config(int min, int max);
+    void Config(int min, int max, int discontinuity);
 
     /**
      * Read data from serial and put in a buffer if it comes from the A010
@@ -75,6 +79,7 @@ class A010
     boolean ReadSerial();
     void FillStructure();
     a010_frame_t GetData();
+    boolean CheckContinuity();
     a010_point_cloud_t GetPointCloudFromFrame(a010_frame_t frame);
 
    private:
@@ -82,8 +87,9 @@ class A010
     uint16_t cursorTmp = 0;  // 16 bits => frame limited to 65535 bytes
     uint16_t packetSize = 0;
 
-    ConfigA010 a010Config = {0, 0};
+    ConfigA010 a010Config = {0, 0, 0};
 
     a010_frame_t a010Packet;
+    a010_frame_head_t a010LastPacketHeader;
 };
 #endif
