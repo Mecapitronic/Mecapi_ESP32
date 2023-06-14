@@ -149,31 +149,45 @@ a010_point_cloud_t A010::GetPointCloudFromFrame(a010_frame_t frame)
     uint16_t i = 1;
     double dist, ang_h, ang_v;
     double x, y, z;
-    float res_h = 1.22173 / frame.frame_head.resolution_cols;
-    float res_v = 1.0472 / frame.frame_head.resolution_rows;
-    float zero_h = frame.frame_head.resolution_cols / 2;
-    float zero_v = frame.frame_head.resolution_rows / 2;
+    frame.frame_head.resolution_cols = 25;
+    frame.frame_head.resolution_rows = 25;
+    double res_h = 0.0488692;  // 1.22173 / (double)frame.frame_head.resolution_cols;  // 0.0488692
+    double res_v = 0.041888;   //    1.0472 / (double)frame.frame_head.resolution_rows;                  // 0.041888
+    double zero_h = 12.5;      //(double)frame.frame_head.resolution_cols / 2;                  // 12.5
+    double zero_v = 12.5;      // (double)frame.frame_head.resolution_rows / 2;  // 12.5
 
-    for (col = 1; col <= frame.frame_head.resolution_cols; col++)
+    for (row = 1; row <= frame.frame_head.resolution_rows; row++)
     {
-        for (row = 1; row <= frame.frame_head.resolution_rows; row++)
+        for (col = 1; col <= frame.frame_head.resolution_cols; col++)
         {
             i = col + ((row - 1) * frame.frame_head.resolution_rows);
-            dist = frame.payload[i] * QUANTIZATION_MM;
-            ang_h = res_h * (col - zero_h);
-            ang_v = res_v * (row - zero_v);
+            dist = frame.payload[i];  // FIXME: distance incorrecte : 660 au début puis 0 à la fin... vérifier la réception des données et le
+                                      // transfert dans la queue !
+            dist *= QUANTIZATION_MM;
+            ang_h = col;
+            ang_h -= zero_h;
+            ang_h *= res_h;
+            // ang_h = res_h * (col - zero_h);
+            ang_v = zero_v;
+            ang_v -= row;
+            ang_v *= res_v;
+            // ang_v = res_v * (zero_v - row);
 
-            x = dist * asin(ang_h);
-            y = dist * acos(ang_h);
-            z = dist * asin(ang_v);
-            cloud.point[i].x = (uint16_t)x;
-            cloud.point[i].y = (uint16_t)y;
-            cloud.point[i].z = (uint16_t)z;
-            cloud.cluster[i] = i * 100;
+            x = dist * sin(ang_h);
+            y = dist * cos(ang_h);
+            z = dist * sin(ang_v);
+            cloud.point[i].x = (int16_t)x;
+            cloud.point[i].y = (int16_t)y;
+            cloud.point[i].z = (int16_t)z;
+            cloud.cluster[i] = 0xff00;
+            // cloud.cluster[i] *= 20000;
 
             String data =
                 "" + String(cloud.point[i].x) + " " + String(cloud.point[i].y) + " " + String(cloud.point[i].z) + " " + String(cloud.cluster[i]);
+            SERIAL_DEBUG.println(String(dist));
             SERIAL_DEBUG.println(data);
+            if (i >= 625)
+                SERIAL_DEBUG.println("*********************************************************");
         }
     }
     return cloud;
