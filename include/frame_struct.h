@@ -39,11 +39,11 @@ struct a010_frame_t
 {
     a010_frame_head_t frame_head;
     a010_frame_tail_t frame_tail;
-    uint8_t payload[625];  // TODO: PICTURE_SIZE en fonction de la valeur de BINNING => voir A010.h
+    uint8_t payload[2500];  // TODO: PICTURE_SIZE en fonction de la valeur de BINNING => voir A010.h
 };
 
 struct a010_point_cloud_t
 {
-    Point3D point[625];
-    uint16_t cluster[625];
+    Point3D point[2500];
+    uint16_t cluster[2500];
 };

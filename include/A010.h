@@ -29,7 +29,7 @@
 #define RX1 2
 #define TX1 4
 
-#define BINNING_SIZE 4     // pixel binning : 1=1x1 (100x100), 2=2x2 (50x50), 4=4x4 (25x25)
+#define BINNING_SIZE 2     // pixel binning : 1=1x1 (100x100), 2=2x2 (50x50), 4=4x4 (25x25)
 #define QUANTIZATION_MM 5  // depth data resolution in mm (1 to 9)
 
 #if BINNING_SIZE == 4
@@ -47,13 +47,50 @@
 #include <vector>
 
 #include "Debugger.h"
-#include "frame_struct.h"
+// #include "frame_struct.h"
 
 struct ConfigA010
 {
     int minDistance;
     int maxDistance;
     int IDMaxDiscontinuity;
+};
+
+struct a010_frame_head_t
+{
+    uint16_t frame_begin_flag;
+    uint16_t frame_data_len;
+    uint8_t reserved1;    // fixed to 0xff
+    uint8_t output_mode;  // 0:depth only, 1:depth+ir
+    uint8_t senser_temp;
+    uint8_t driver_temp;
+    uint8_t exposure_time[4];
+    uint8_t error_code;
+    uint8_t reserved2;  // fixed to 0x00
+    uint8_t resolution_rows;
+    uint8_t resolution_cols;
+    uint16_t frame_id;  // 12-bit, 0~4095
+    uint8_t isp_version;
+    uint8_t reserved3;  // fixed to 0xff
+};
+
+struct a010_frame_tail_t
+{
+    uint8_t checksum;
+    uint8_t frame_end_flag;  // fixed to 0xdd
+};
+
+struct a010_frame_t
+{
+    a010_frame_head_t frame_head;
+    a010_frame_tail_t frame_tail;
+    uint8_t payload[PICTURE_SIZE];
+};
+
+struct a010_point_cloud_t
+{
+    Point3D point[PICTURE_SIZE];
+    uint16_t cluster[PICTURE_SIZE];
 };
 
 class A010
