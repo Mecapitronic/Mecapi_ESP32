@@ -2,6 +2,7 @@
 #define MAIN_H
 
 #include <Arduino.h>
+
 #include "A010.h"
 #include "Debugger.h"
 #include "Structure.h"
@@ -22,7 +23,7 @@ TaskHandle_t Task1;
 TaskHandle_t Task2;
 
 QueueHandle_t queue;
-uint16_t queueSize = 10000;
+uint16_t queueSize = 100;
 
 A010 a010;
 

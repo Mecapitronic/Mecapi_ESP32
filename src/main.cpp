@@ -5,7 +5,7 @@ void setup()
     // put your setup code here, to run once:
     Debugger::init();
 
-    queue = xQueueCreate(queueSize, sizeof(uint16_t));
+    queue = xQueueCreate(queueSize, sizeof(a010_frame_t));
     if (queue == NULL)
     {
         Debugger::log("Error creating the queue", ERROR);
