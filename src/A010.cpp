@@ -150,12 +150,12 @@ a010_frame_t A010::GetData() { return a010Packet; }
 boolean A010::CheckContinuity()
 {
     // We compare the ID of this packet with the ID of the previous packet
-    int delta = a010LastPacketHeader.frame_id - a010Packet.frame_head.frame_id;
-
+    int delta = a010Packet.frame_head.frame_id - a010LastPacketHeader.frame_id;
     // previous packet overflowed
     if (a010LastPacketHeader.frame_id <= a010Packet.frame_head.frame_id)
     {
-        delta += 4096;
+        // TODO get the overflow value
+        // delta += 4096;
     }
 
     // save the last point to compare to the next packet's first point
@@ -163,6 +163,8 @@ boolean A010::CheckContinuity()
 
     if (delta > a010Config.IDMaxDiscontinuity)
     {
+        Debugger::log("a010Packet.frame_head.frame_id : ", a010Packet.frame_head.frame_id, "", WARN);
+        Debugger::log("a010LastPacketHeader.frame_id : ", a010LastPacketHeader.frame_id, "", WARN);
         Debugger::log("Discontinuity : ", delta, "", WARN);
         return false;
     }
