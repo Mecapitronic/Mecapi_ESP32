@@ -81,6 +81,7 @@ class A010
     a010_frame_t GetData();
     boolean CheckContinuity();
     a010_point_cloud_t GetPointCloudFromFrame(a010_frame_t frame);
+    void logHeader();
 
    private:
     std::vector<uint8_t> serialBuffer;

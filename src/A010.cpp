@@ -103,7 +103,7 @@ boolean A010::ReadSerial()
             serialBuffer.push_back(tmpInt);
             cursorTmp++;
             packetSize = serialBuffer[3] << 8 | serialBuffer[2];
-            Debugger::log("packetSize", packetSize);
+            // Debugger::log("packetSize", packetSize);
         }
         else if (cursorTmp > 3)
         {
@@ -222,4 +222,21 @@ a010_point_cloud_t A010::GetPointCloudFromFrame(a010_frame_t frame)
         }
     }
     return cloud;
+}
+
+void A010::logHeader()
+{
+    Debugger::log("frame_data_len ", a010Packet.frame_head.frame_data_len);
+    Debugger::log("output_mode ", a010Packet.frame_head.output_mode);
+    Debugger::log("senser_temp ", a010Packet.frame_head.senser_temp);
+    Debugger::log("driver_temp ", a010Packet.frame_head.driver_temp);
+    Debugger::log("exposure_time[0] ", a010Packet.frame_head.exposure_time[0]);
+    Debugger::log("exposure_time[1] ", a010Packet.frame_head.exposure_time[1]);
+    Debugger::log("exposure_time[2] ", a010Packet.frame_head.exposure_time[2]);
+    Debugger::log("exposure_time[3] ", a010Packet.frame_head.exposure_time[3]);
+    Debugger::log("error_code ", a010Packet.frame_head.error_code);
+    Debugger::log("resolution_rows ", a010Packet.frame_head.resolution_rows);
+    Debugger::log("resolution_cols ", a010Packet.frame_head.resolution_cols);
+    Debugger::log("frame_id ", a010Packet.frame_head.frame_id);
+    Debugger::log("isp_version ", a010Packet.frame_head.isp_version);
 }
