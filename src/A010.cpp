@@ -182,10 +182,10 @@ a010_point_cloud_t A010::GetPointCloudFromFrame(a010_frame_t frame)
     double x, y, z;
     // frame.frame_head.resolution_cols = 25;
     // frame.frame_head.resolution_rows = 25;
-    double res_h = 0.0488692;  // 1.22173 / (double)frame.frame_head.resolution_cols;  // 0.0488692
-    double res_v = 0.041888;   //    1.0472 / (double)frame.frame_head.resolution_rows;                  // 0.041888
-    double zero_h = 12.5;      //(double)frame.frame_head.resolution_cols / 2;                  // 12.5
-    double zero_v = 12.5;      // (double)frame.frame_head.resolution_rows / 2;  // 12.5
+    double res_h = 1.22173 / (double)frame.frame_head.resolution_cols;  // 0.0488692
+    double res_v = 1.0472 / (double)frame.frame_head.resolution_rows;   // 0.041888
+    double zero_h = (double)frame.frame_head.resolution_cols / 2;       // 12.5
+    double zero_v = (double)frame.frame_head.resolution_rows / 2;       // 12.5
 
     for (row = 1; row <= frame.frame_head.resolution_rows; row++)
     {
@@ -211,8 +211,9 @@ a010_point_cloud_t A010::GetPointCloudFromFrame(a010_frame_t frame)
             cloud.point[i].z = (int16_t)z;
             cloud.cluster[i] = 0xff00;
             if (frame.frame_head.frame_id % 2)
-                cloud.cluster[i] = dist * 10;
-
+                cloud.cluster[i] = 0xff00;
+            else
+                cloud.cluster[i] = 0x00ff;
             String data =
                 "" + String(cloud.point[i].x) + " " + String(cloud.point[i].y) + " " + String(cloud.point[i].z) + " " + String(cloud.cluster[i]);
             // SERIAL_DEBUG.println(String(dist));
