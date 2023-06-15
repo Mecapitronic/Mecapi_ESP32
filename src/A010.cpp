@@ -195,33 +195,36 @@ a010_point_cloud_t A010::GetPointCloudFromFrame(a010_frame_t frame)
         {
             i = col + ((row - 1) * frame.frame_head.resolution_rows) - 1;  // from 0 to n-1
             dist = frame.payload[i];
-            dist *= QUANTIZATION_MM;
-            ang_h = col;
-            ang_h -= zero_h;
-            ang_h *= res_h;
-            // ang_h = res_h * (col - zero_h);
-            ang_v = zero_v;
-            ang_v -= row;
-            ang_v *= res_v;
-            // ang_v = res_v * (zero_v - row);
+            if (dist < 255)  // ignorer le fond
+            {
+                dist *= QUANTIZATION_MM;
+                ang_h = col;
+                ang_h -= zero_h;
+                ang_h *= res_h;
+                // ang_h = res_h * (col - zero_h);
+                ang_v = zero_v;
+                ang_v -= row;
+                ang_v *= res_v;
+                // ang_v = res_v * (zero_v - row);
 
-            x = dist * sin(ang_h);
-            y = dist * cos(ang_h);
-            z = dist * sin(ang_v);
-            cloud.point[i].x = (int16_t)x;
-            cloud.point[i].y = (int16_t)y;
-            cloud.point[i].z = (int16_t)z;
-            cloud.cluster[i] = 0xff00;
-            if (frame.frame_head.frame_id % 2)
+                x = dist * sin(ang_h);
+                y = dist * cos(ang_h);
+                z = dist * sin(ang_v);
+                cloud.point[i].x = (int16_t)x;
+                cloud.point[i].y = (int16_t)y;
+                cloud.point[i].z = (int16_t)z;
                 cloud.cluster[i] = 0xff00;
-            else
-                cloud.cluster[i] = 0x00ff;
-            String data =
-                "" + String(cloud.point[i].x) + " " + String(cloud.point[i].y) + " " + String(cloud.point[i].z) + " " + String(cloud.cluster[i]);
-            // SERIAL_DEBUG.println(String(dist));
-            SERIAL_DEBUG.println(data);
-            if (i >= 625)
-                SERIAL_DEBUG.println("*********************************************************");
+                if (frame.frame_head.frame_id % 2)
+                    cloud.cluster[i] = 0xff00;
+                else
+                    cloud.cluster[i] = 0x00ff;
+                String data =
+                    "" + String(cloud.point[i].x) + " " + String(cloud.point[i].y) + " " + String(cloud.point[i].z) + " " + String(cloud.cluster[i]);
+                // SERIAL_DEBUG.println(String(dist));
+                SERIAL_DEBUG.println(data);
+                if (i >= 625)
+                    SERIAL_DEBUG.println("*********************************************************");
+            }
         }
     }
     return cloud;
