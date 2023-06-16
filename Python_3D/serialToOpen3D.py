@@ -23,7 +23,7 @@ vis.add_geometry(pcd)
 
 opt = vis.get_render_option()
 opt.show_coordinate_frame = True
-#opt.background_color = np.asarray([0.5, 0.5, 0.5])
+opt.background_color = np.asarray([0.5, 0.5, 0.5])
 
 
 # run non-blocking visualization.
@@ -41,7 +41,7 @@ while keep_running:
                 x = int(line_splitted[0],10) / 1000 + 0.5
                 y = int(line_splitted[1],10) / 1000
                 z = int(line_splitted[2],10) / 1000 + 0.5
-                t1=np.array([x, y, z])
+                t1=np.array([x, z, y])
                 #t=np.fromstring(line, dtype=int, sep=' ')
                 t2=np.array([t1.tolist()])
                 pcd.points.extend(t2)
