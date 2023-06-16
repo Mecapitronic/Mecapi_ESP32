@@ -2,12 +2,14 @@ import open3d as o3d
 import numpy as np
 import serial
 
-ser = serial.Serial('COM6', 230400, timeout=0)
+#TODO : see examples: https://snyk.io/advisor/python/open3d/functions/open3d.geometry.PointCloud
+
+ser = serial.Serial('COM6', 921600, timeout=0)
 ser.flushInput()
 
 # create visualizer and window.
 vis = o3d.visualization.Visualizer()
-vis.create_window(height=480, width=640)
+vis.create_window(height=800, width=800)
 
 # initialize pointcloud instance.
 pcd = o3d.geometry.PointCloud()
@@ -33,18 +35,21 @@ while keep_running:
 
         try:
             if ser.in_waiting:
-                l = ser.readline()
-                line=l.decode("utf-8")
-                line_splitted = line.replace("\n","").replace("\r","").split(' ')
-                # Options (uncomment each to try them out):
-                # 1) extend with ndarrays.
-                x = int(line_splitted[0],10) / 1000 + 0.5
-                y = int(line_splitted[1],10) / 1000
-                z = int(line_splitted[2],10) / 1000 + 0.5
-                t1=np.array([x, z, y])
-                #t=np.fromstring(line, dtype=int, sep=' ')
-                t2=np.array([t1.tolist()])
-                pcd.points.extend(t2)
+                #TODO : enregistrer et afficher tous les points d'une trame d'un coup => au bout de qq secondes ça ne répond plus...
+                for i in range(50): 
+                    l = ser.readline()
+                    line=l.decode("utf-8")
+                    line_splitted = line.replace("\n","").replace("\r","").split(' ')
+                    # Options (uncomment each to try them out):
+                    # 1) extend with ndarrays.
+                    x = int(line_splitted[0],10) / 1000
+                    y = int(line_splitted[1],10) / 1000
+                    z = int(line_splitted[2],10) / 1000
+                    
+                    t1=np.asarray([x, z, y])
+                    #t=np.fromstring(line, dtype=int, sep=' ')
+                    t2=np.array([t1.tolist()])
+                    pcd.points.extend(o3d.utility.Vector3dVector(t2))
 
             # 2) extend with Vector3dVector instances.
             # pcd.points.extend(
