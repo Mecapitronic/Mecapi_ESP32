@@ -23,7 +23,7 @@ TaskHandle_t Task1;
 TaskHandle_t Task2;
 
 QueueHandle_t queue;
-uint16_t queueSize = 100;
+uint16_t queueSize = 500;
 
 A010 a010;
 

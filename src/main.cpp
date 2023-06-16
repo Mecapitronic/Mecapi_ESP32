@@ -5,10 +5,10 @@ void setup()
     // put your setup code here, to run once:
     Debugger::init();
 
-    queue = xQueueCreate(queueSize, sizeof(a010_frame_t));
-    if (queue == NULL)
+   // queue = xQueueCreate(queueSize, sizeof(a010_frame_t));
+   // if (queue == NULL)
     {
-        Debugger::log("Error creating the queue", ERROR);
+  //      Debugger::log("Error creating the queue", ERROR);
     }
 
     a010 = A010();
@@ -17,7 +17,7 @@ void setup()
     // create a task that will be executed in the Task1code() function, with priority 1 and executed on core 0
     xTaskCreatePinnedToCore(Task1code, /* Task function. */
                             "Task1",   /* name of task. */
-                            10000,     /* Stack size of task */
+                            100000,     /* Stack size of task */
                             NULL,      /* parameter of the task */
                             10,        /* priority of the task */
                             &Task1,    /* Task handle to keep track of created task */
@@ -50,13 +50,13 @@ void Task1code(void *pvParameters)
         if (a010.ReadSerial())
         {
             a010.FillStructure();
-            a010.CheckContinuity();
+           // a010.CheckContinuity();
 
             a010Packet = a010.GetData();
 
-            // distance_mm = a010Packet.payload[312] * QUANTIZATION_MM;
+            a010.GetPointCloudFromFrame(a010Packet);
 
-            xQueueSend(queue, &a010Packet, 0);
+           // xQueueSend(queue, &a010Packet, 0);
         }
         vTaskDelay(1);
     }
@@ -70,9 +70,9 @@ void Task2code(void *pvParameters)
     Point3D p = {0, 0, 0};
     while (1)
     {
-        if (uxQueueMessagesWaiting(queue) > 0)
+       // if (uxQueueMessagesWaiting(queue) > 0)
         {
-            if (xQueueReceive(queue, &a010Packet, portTICK_PERIOD_MS * 0))
+         //   if (xQueueReceive(queue, &a010Packet, portTICK_PERIOD_MS * 0))
             {
                 /*
                 for (int x = 1; x <= 25; x++)
@@ -86,7 +86,7 @@ void Task2code(void *pvParameters)
                         Debugger::plot3Dpy(p);
                     }
                 }*/
-                a010.GetPointCloudFromFrame(a010Packet);
+         //       a010.GetPointCloudFromFrame(a010Packet);
             }
         }
 

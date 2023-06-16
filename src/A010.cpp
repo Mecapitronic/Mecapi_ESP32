@@ -218,12 +218,10 @@ a010_point_cloud_t A010::GetPointCloudFromFrame(a010_frame_t frame)
                     cloud.cluster[i] = 0xff00;
                 else
                     cloud.cluster[i] = 0x00ff;
-                String data =
-                    "" + String(cloud.point[i].x) + " " + String(cloud.point[i].y) + " " + String(cloud.point[i].z) + " " + String(cloud.cluster[i]);
+                String data = "" + String(cloud.point[i].x) + " " + String(cloud.point[i].y) + " " + String(cloud.point[i].z);
+                //+" " + String(cloud.cluster[i]);
                 // SERIAL_DEBUG.println(String(dist));
                 SERIAL_DEBUG.println(data);
-                if (i >= 625)
-                    SERIAL_DEBUG.println("*********************************************************");
             }
         }
     }
