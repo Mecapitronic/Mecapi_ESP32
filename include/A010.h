@@ -9,15 +9,29 @@
 // Serial 2 : U2TX = GPIO17 ; U2RX = GPIO16
 #define SERIAL_A010 Serial2
 
-// 20+?+2 = 2(Start) + 2(Datalen) + 16(Other) + ?(Image frame) + 1(CRC) + 1(End)
-// #define A010_SERIAL_PACKET_SIZE 1024
-
-// Protocol : 2Byte header + 2Byte length + 1Byte command + 1Byte output_mode + 1Byte Sensor Temp + 1Byte Driver Temp
+// Header frame : 2Byte header + 2Byte length + 1Byte command + 1Byte output_mode + 1Byte Sensor Temp + 1Byte Driver Temp
 // 4Bytes exposure time + 1Byte error code + 1Byte reserved1 + 1Byte res rows + 1Byte res cols
 // 2Byte Frame ID + 1 Byte ISP version + 1 Byte reserved3
-// frame data : 100 x 100 bytes ?
-// 1Byte checksum + 1Byte tail
 // length count from Byte4 to the Byte before Checksum
+// Total Header : 20 bytes
+
+// Data Frame : 100 x 100 bytes ?
+
+// Footer frame : 1Byte checksum + 1Byte tail
+// Total Footer : 2 bytes
+
+// TOTAL FRAME : 20 + 625/2500/10000 + 2
+
+// Minimal Baud rate speed : (20 + PICTURE_SIZE + 2) * FRAME_PER_SECOND * 10
+//                BINN         BINN        BINN
+//                  4           2           1
+// FPS   5      32 350      126 100       501 100
+//
+// FPS  10      64 700      252 200     1 002 200
+//
+// FPS  15      97 050      378 300     1 503 300
+//
+// FPS  20     129 400      504 400     2 004 400
 
 #define A010_FIRST_PACKET_BYTE 0x00
 #define A010_SECOND_PACKET_BYTE 0xFF
@@ -29,8 +43,10 @@
 #define RX1 2
 #define TX1 4
 
-#define BINNING_SIZE 2     // pixel binning : 1=1x1 (100x100), 2=2x2 (50x50), 4=4x4 (25x25)
-#define QUANTIZATION_MM 5  // depth data resolution in mm (1 to 9)
+#define BINNING_SIZE 2      // pixel binning : 1=1x1 (100x100), 2=2x2 (50x50), 4=4x4 (25x25)
+#define QUANTIZATION_MM 5   // depth data resolution in mm (1 to 9)
+#define FRAME_PER_SECOND 6  // Frame per second, FPS from 1 to 20 (30?)
+#define BAUD_RATE_STATE 5   // 0=9.600 1=57.600 2=115.200 3=230.400  4=460.800 5=921.600 6=1.000.000 7=2.000.000 8=3.000.000
 
 #if BINNING_SIZE == 4
 #define PICTURE_SIZE 625
@@ -40,6 +56,33 @@
 #define PICTURE_SIZE 10000
 #else
 #error "Incorrect binning value !"
+#endif
+
+#if BAUD_RATE_STATE == 0
+#define BAUD_RATE_SPEED 9600
+#elif BAUD_RATE_STATE == 1
+#define BAUD_RATE_SPEED 57600
+#elif BAUD_RATE_STATE == 2
+#define BAUD_RATE_SPEED 115200
+#elif BAUD_RATE_STATE == 3
+#define BAUD_RATE_SPEED 230400
+#elif BAUD_RATE_STATE == 4
+#define BAUD_RATE_SPEED 460800
+#elif BAUD_RATE_STATE == 5
+#define BAUD_RATE_SPEED 921600
+#elif BAUD_RATE_STATE == 6
+#define BAUD_RATE_SPEED 1000000
+#elif BAUD_RATE_STATE == 7
+#define BAUD_RATE_SPEED 2000000
+#elif BAUD_RATE_STATE == 8
+#define BAUD_RATE_SPEED 3000000
+#else
+#error "Incorrect Baud Rate State value !"
+#endif
+
+#define BAUD_RATE_MIN ((20 + PICTURE_SIZE + 2) * FRAME_PER_SECOND * 10)
+#if BAUD_RATE_SPEED < BAUD_RATE_MIN
+#error "/!\ Baud rate selected is not enough or BINN / FPS are too high /!\"
 #endif
 
 #include <Arduino.h>

@@ -17,7 +17,7 @@ void setup()
     // create a task that will be executed in the Task1code() function, with priority 1 and executed on core 0
     xTaskCreatePinnedToCore(Task1code, /* Task function. */
                             "Task1",   /* name of task. */
-                            100000,     /* Stack size of task */
+                            100000,    /* Stack size of task */
                             NULL,      /* parameter of the task */
                             10,        /* priority of the task */
                             &Task1,    /* Task handle to keep track of created task */

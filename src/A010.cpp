@@ -18,7 +18,7 @@ A010::A010()
     SERIAL_A010.println("AT+DISP=5");                           // 2=usb, 3=usb+lcd, 4=uart, 5=uart+lcd, 6=usb+uart, 7=usb+uart+lcd
     SERIAL_A010.println("AT+UNIT=" + String(QUANTIZATION_MM));  // 1 to 9, Represents quantization in x mm. The smaller the value, the more details
                                                                 // and the shorter the visual distance.
-    SERIAL_A010.println("AT+FPS=20");                           // FPS from 1 to 20 (30?)
+    SERIAL_A010.println("AT+FPS=" + String(FRAME_PER_SECOND));               // FPS from 1 to 20 (30?)
     SERIAL_A010.println("AT+ANTIMMI=-1");  // Automatic anti-multi-machine interference is turned on and off (susceptible to interference, the effect
                                            // of turning off is better)
     SERIAL_A010.println("AT+AE=0");        // Ev:Exposure gap control (leftmost represents AE, others are fixed exposure time)
@@ -27,10 +27,10 @@ A010::A010()
 
     // FIXME: fait planter le lcd et ne sauvegarde rien... SERIAL_A010.println("AT+SAVE"); // The current configuration of the TOF camera is cured,
     // and it needs to be reset afterwards
-    SERIAL_A010.println("AT+BAUD=3");  // 6=1M, 7=2M, 8=3M
+    SERIAL_A010.println("AT+BAUD=" + String(BAUD_RATE_STATE));  // 6=1M, 7=2M, 8=3M
     SERIAL_A010.flush();
     SERIAL_A010.end();
-    SERIAL_A010.begin(230400);
+    SERIAL_A010.begin(BAUD_RATE_SPEED);
 
     // Debugger::log("Init A010 COPY");
     // SERIAL_A010_COPY.begin(115200, SERIAL_8N1, RX1, TX1);
