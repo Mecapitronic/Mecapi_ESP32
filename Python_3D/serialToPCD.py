@@ -1,6 +1,6 @@
 import serial
 
-ser = serial.Serial('COM10', 115200)
+ser = serial.Serial('COM6', 921600)
 ser.flushInput()
 ser.write(("Starting\n").encode())
 
