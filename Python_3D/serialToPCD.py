@@ -1,10 +1,13 @@
 import serial
+import subprocess, os, platform
 
-ser = serial.Serial('COM6', 921600)
+ser = serial.Serial('COM10', 921600)
 ser.flushInput()
 ser.write(("Starting\n").encode())
 
-with open("test3D.pcd","wt") as f:
+filename = "C:\\Users\\Public\\test3D.pcd"
+
+with open(filename,"wt") as f:
     f.write("# .PCD v.7 - Point Cloud Data file format\n")
     f.write("VERSION .7\n")
     f.write("FIELDS x y z rgb\n")
@@ -42,3 +45,5 @@ except:
 
 ser.close()
 f.close()
+
+os.startfile(filename, 'open')
