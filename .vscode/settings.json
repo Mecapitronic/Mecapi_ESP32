@@ -11,13 +11,16 @@
     "editor.guides.bracketPairsHorizontal": true,
     "cSpell.language": "en,fr",
     "cSpell.words": [
-        "MECAPITRONIC",
-        "Mecapitronic"
+        "dbscan",
+        "EUCLIDIAN",
+        "Mecapitronic",
+        "MECAPITRONIC"
     ],
     "platformio-ide.disablePIOHomeStartup": true,
     "platformio-ide.autoOpenPlatformIOIniFile": false,
     "C_Cpp.clang_format_fallbackStyle": "{ BasedOnStyle: Google, IndentWidth: 4, ColumnLimit: 150, BreakBeforeBraces: Allman, AllowShortIfStatementsOnASingleLine: false}",
     "[python]": {
         "editor.defaultFormatter": "ms-python.python"
-    }
+    },
+    "workbench.iconTheme": "vscode-icons",
 }
