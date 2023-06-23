@@ -27,6 +27,14 @@ opt = vis.get_render_option()
 opt.show_coordinate_frame = True
 opt.background_color = np.asarray([0.5, 0.5, 0.5])
 
+# Creating a mesh of the XYZ axes Cartesian coordinates frame.
+# This mesh will show the directions in which the X, Y & Z-axes point,
+# and can be overlaid on the 3D mesh to visualize its orientation in
+# the Euclidean space.
+# X-axis : Red arrow
+# Y-axis : Green arrow
+# Z-axis : Blue arrow
+
 
 # run non-blocking visualization.
 # To exit, press 'q' or click the 'x' of the window.
@@ -36,7 +44,7 @@ while keep_running:
         try:
             if ser.in_waiting:
                 #TODO : enregistrer et afficher tous les points d'une trame d'un coup => au bout de qq secondes ça ne répond plus...
-                for i in range(50): 
+                for i in range(625): 
                     l = ser.readline()
                     line=l.decode("utf-8")
                     line_splitted = line.replace("\n","").replace("\r","").split(' ')
