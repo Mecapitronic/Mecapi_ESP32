@@ -77,4 +77,5 @@
     },
     "files.trimFinalNewlines": true,
     "files.insertFinalNewline": true,
+    "terminal.integrated.scrollback": 10000,
 }

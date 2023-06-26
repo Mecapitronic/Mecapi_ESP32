@@ -13,7 +13,7 @@ A010::A010()
 
     // pre-computing of coefficient to convert depth data to cartesian coordinate point
     ComputeCartesianCoefficient(PICTURE_RES, PICTURE_RES, FOV_HOR, FOV_VER, 0, 0);
-    // logCartesianCoefficient();
+    logCartesianCoefficient();
 
     // AT commands configuration
     // https://wiki.sipeed.com/hardware/en/maixsense/maixsense-a010/at_command_en.html
@@ -296,8 +296,9 @@ void A010::logCartesianCoefficient()
     {
         int row = i % PICTURE_RES;
         int col = i / PICTURE_RES;
-        String data = "" + String(coefX[row]) + " " + String(coefY[row]) + " " + String(coefZ[col]);
-        // SERIAL_DEBUG.println(data);
+        String color = "65520";
+        String data = String(coefX[row]) + " " + String(coefY[row]) + " " + String(coefZ[col]) + " " + color;
+        SERIAL_DEBUG.println(data);
     }
     SERIAL_DEBUG.println("---");
 }
