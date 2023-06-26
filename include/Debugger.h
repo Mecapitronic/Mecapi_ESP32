@@ -11,11 +11,15 @@
 #define ERROR Level::LEVEL_ERROR
 
 #include <Arduino.h>
+
 #include "Structure.h"
-#include "frame_struct.h"
 
 #define SERIAL_PC Serial
 #define SERIAL_DEBUG SERIAL_PC
+
+// ESP32 Serial Bauds rates
+// static const unsigned long default_rates[] = {300, 600, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 74880,
+// 115200, 230400, 256000, 460800, 921600, 1843200, 3686400};
 
 enum class Level
 {
@@ -55,7 +59,6 @@ class Debugger
 
     static void log(String prefix, Point data, String suffix = "", Level level = VERBOSE, boolean lineFeed = true);
     static void log(String prefix, PolarPoint data, String suffix = "", Level level = VERBOSE, boolean lineFeed = true);
-    static void log(String prefix, a010_frame_t data, String suffix = "", Level level = VERBOSE, boolean lineFeed = true);
 
     // bool needs to be the last because it overrides all functions
     static void log(String prefix, bool data, String suffix = "", Level level = VERBOSE, boolean lineFeed = true);

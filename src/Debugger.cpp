@@ -122,15 +122,6 @@ void Debugger::log(String prefix, PolarPoint data, String suffix, Level level, b
         SERIAL_DEBUG.println();
 }
 
-void Debugger::log(String prefix, a010_frame_t data, String suffix, Level level, boolean lineFeed)
-{
-    if (level < debugLevel)
-        return;
-    log("frame_data_len", data.frame_head.frame_data_len, "", level, true);
-    if (lineFeed)
-        SERIAL_DEBUG.println();
-}
-
 // bool needs to be the last because it overrides all functions
 void Debugger::log(String prefix, bool data, String suffix, Level level, boolean lineFeed)
 {
