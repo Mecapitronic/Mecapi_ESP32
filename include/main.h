@@ -4,6 +4,7 @@
 #include <Arduino.h>
 
 #include "A010.h"
+#include "DBSCAN.h"
 #include "Debugger.h"
 #include "Structure.h"
 

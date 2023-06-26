@@ -1,3 +1,6 @@
 [submodule "SerialPacketSimulator"]
 	path = SerialPacketSimulator
 	url = https://github.com/Mecapitronic/SerialPacketSimulator.git
+[submodule "lib/DBSCAN-for-ESP32"]
+	path = lib/DBSCAN-for-ESP32
+	url = https://github.com/Mecapitronic/DBSCAN-for-ESP32.git

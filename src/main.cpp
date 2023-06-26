@@ -5,10 +5,10 @@ void setup()
     // put your setup code here, to run once:
     Debugger::init();
 
-   // queue = xQueueCreate(queueSize, sizeof(a010_frame_t));
-   // if (queue == NULL)
+    // queue = xQueueCreate(queueSize, sizeof(a010_frame_t));
+    // if (queue == NULL)
     {
-  //      Debugger::log("Error creating the queue", ERROR);
+        //      Debugger::log("Error creating the queue", ERROR);
     }
 
     a010 = A010();
@@ -45,18 +45,61 @@ void Task1code(void *pvParameters)
 {
     a010_frame_t a010Packet;
 
+    uint16_t i, result;
+    std::vector<ClusterPoint3D> cloud;
+    std::vector<std::vector<uint16_t>> clusters;
+
     while (1)
     {
         if (a010.ReadSerial())
         {
-            // a010.FillStructure();
-           // a010.CheckContinuity();
+            // a010.CheckContinuity();
 
-            a010Packet = a010.GetData();
+            // std::vector<std::vector<float>> w;
+            float w[PICTURE_SIZE][3]{0};
 
-            a010.GetPointCloudFromFrame(a010Packet);
+            // SERIAL_DEBUG.println("vector capacity: " + String(w.capacity()));  // vector capacity: 0
+            // SERIAL_DEBUG.println("vector max size: " + String(w.max_size()));  // vector max size: 357913941
 
-           // xQueueSend(queue, &a010Packet, 0);
+            // w.reserve(2500);
+
+            for (i = 0; i < PICTURE_SIZE; i++)  // FIXME: n'affiche plus rien !
+            {
+                // std::vector<float> v;
+                // v.push_back(cloud[i].x);
+                // v.push_back(cloud[i].y);
+                // v.push_back(cloud[i].z);
+                // w.push_back(v);
+                w[i][0] = a010.cloudFrame[i].x;
+                w[i][1] = a010.cloudFrame[i].y;
+                w[i][2] = a010.cloudFrame[i].z;
+                String data = "" + String(a010.cloudFrame[i].x) + " " + String(a010.cloudFrame[i].y) + " " + String(a010.cloudFrame[i].z) + " " +
+                              String("65520");
+                SERIAL_DEBUG.println(data);
+            }
+            SERIAL_DEBUG.println("-----------");
+
+            // SERIAL_DEBUG.println("vector capacity: " + String(w.capacity()));  // vector capacity: 512
+            // SERIAL_DEBUG.println("vector max size: " + String(w.max_size()));
+            // SERIAL_DEBUG.println("vector size: " + String(w.size()));  // vector size: 300
+            //  SERIAL_DEBUG.println("vector shrink to fit : " + w.shrink_to_fit());
+            //  SERIAL_DEBUG.println("vector size: " + w.size());
+
+            // dbscan(epsilon, minPts, distance, mink)
+            // dbscan DB(30, 10, EUCLIDIAN);
+            SERIAL_DEBUG.println("dbscan setup");
+            // clusters = DB.init(w);
+            // DB.init(w);
+            SERIAL_DEBUG.println("dbscan init");
+            // SERIAL_DEBUG.println(clusters.size() - 1);
+            // DB.displayStats();
+
+            //+" " + String(cloud.cluster[i]);
+            // SERIAL_DEBUG.println(String(dist));
+
+            // TODO: afficher les clusters en changeant la couleur dans fichier PCD
+
+            // xQueueSend(queue, &a010Packet, 0);
         }
         vTaskDelay(1);
     }
@@ -70,9 +113,9 @@ void Task2code(void *pvParameters)
     Point3D p = {0, 0, 0};
     while (1)
     {
-       // if (uxQueueMessagesWaiting(queue) > 0)
+        // if (uxQueueMessagesWaiting(queue) > 0)
         {
-         //   if (xQueueReceive(queue, &a010Packet, portTICK_PERIOD_MS * 0))
+            //   if (xQueueReceive(queue, &a010Packet, portTICK_PERIOD_MS * 0))
             {
                 /*
                 for (int x = 1; x <= 25; x++)
@@ -86,7 +129,7 @@ void Task2code(void *pvParameters)
                         Debugger::plot3Dpy(p);
                     }
                 }*/
-         //       a010.GetPointCloudFromFrame(a010Packet);
+                //       a010.GetPointCloudFromFrame(a010Packet);
             }
         }
 
