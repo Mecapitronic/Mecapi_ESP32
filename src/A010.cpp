@@ -66,83 +66,172 @@ boolean A010::ReadSerial()
     {
         uint8_t tmpInt = SERIAL_A010.read();
 
-        if (cursorTmp == 0)  // First byte of packet
+        if (cursorTmp >= 20)
+        {
+            // serialBuffer.push_back(tmpInt);
+            // cursorTmp++;
+            if (cursorTmp >= 20 && cursorTmp <= packetSize + 4)
+            {
+                a010Packet.payload[indexTmp] = tmpInt;
+                float tmpF = tmpInt;
+                uint16_t hor = indexTmp % PICTURE_RES;  // plan horizontal => curseur
+                uint16_t ver = indexTmp / PICTURE_RES;  // plan vertical => numéro de ligne
+
+                cloudFrame[indexTmp].x = tmpF * coefX[hor];
+                cloudFrame[indexTmp].y = tmpF * coefY[hor];
+                cloudFrame[indexTmp].z = tmpF * coefZ[ver];
+                cloudFrame[indexTmp].cluster = 0;
+
+                cursorTmp++;
+                indexTmp++;
+            }
+            else if (cursorTmp == packetSize + 4 + 1)
+            {
+                a010Packet.frame_tail.checksum = tmpInt;
+                cursorTmp++;
+            }
+            else if (cursorTmp == packetSize + 4 + 2)  // length count from Byte4 to the Byte before Checksum
+            {
+                a010Packet.frame_tail.frame_end_flag = tmpInt;
+                cursorTmp++;
+                cursorTmp = 0;
+                packetSize = 0;
+                return true;
+            }
+        }
+        else if (cursorTmp == 0)  // First byte of packet
         {
             if (tmpInt == A010_FIRST_PACKET_BYTE)
             {
-                serialBuffer.clear();
-                serialBuffer.push_back(tmpInt);
+                // serialBuffer.clear();
+                // serialBuffer.push_back(tmpInt);
+                a010Packet.frame_head.frame_begin_flag = tmpInt;
                 cursorTmp++;
             }
             else
             {
-                serialBuffer.clear();
+                // serialBuffer.clear();
+                //cloudFrame.clear();
                 cursorTmp = 0;
+                indexTmp = 0;
+                packetSize = 0;
             }
         }
         else if (cursorTmp == 1)
         {
             if (tmpInt == A010_SECOND_PACKET_BYTE)
             {
-                serialBuffer.push_back(tmpInt);
+                // serialBuffer.push_back(tmpInt);
+                a010Packet.frame_head.frame_begin_flag |= tmpInt << 8;
                 cursorTmp++;
             }
             else
             {
-                serialBuffer.clear();
+                // serialBuffer.clear();
+                //cloudFrame.clear();
                 cursorTmp = 0;
+                packetSize = 0;
             }
         }
         else if (cursorTmp == 2)
         {
-            serialBuffer.push_back(tmpInt);
+            // serialBuffer.push_back(tmpInt);
+            packetSize = tmpInt;
+            a010Packet.frame_head.frame_data_len = tmpInt;
             cursorTmp++;
         }
         else if (cursorTmp == 3)
         {
-            serialBuffer.push_back(tmpInt);
-            cursorTmp++;
-            packetSize = serialBuffer[3] << 8 | serialBuffer[2];
+            // serialBuffer.push_back(tmpInt);
+            // packetSize = serialBuffer[3] << 8 | serialBuffer[2];
+            packetSize |= tmpInt << 8;
+            a010Packet.frame_head.frame_data_len |= tmpInt << 8;
             // Debugger::log("packetSize", packetSize);
-        }
-        else if (cursorTmp > 3)
-        {
-            serialBuffer.push_back(tmpInt);
             cursorTmp++;
-            if (cursorTmp == packetSize + 4 + 2)  // length count from Byte4 to the Byte before Checksum
+        }
+        else if (cursorTmp == 4)
+        {
+            a010Packet.frame_head.reserved1 = tmpInt;
+            cursorTmp++;
+        }
+        else if (cursorTmp == 5)
+        {
+            a010Packet.frame_head.output_mode = tmpInt;
+            cursorTmp++;
+        }
+        else if (cursorTmp == 6)
+        {
+            a010Packet.frame_head.senser_temp = tmpInt;
+            cursorTmp++;
+        }
+        else if (cursorTmp == 7)
+        {
+            a010Packet.frame_head.driver_temp = tmpInt;
+            cursorTmp++;
+        }
+        else if (cursorTmp == 8)
+        {
+            a010Packet.frame_head.exposure_time[0] = tmpInt;
+            cursorTmp++;
+        }
+        else if (cursorTmp == 9)
+        {
+            a010Packet.frame_head.exposure_time[1] = tmpInt;
+            cursorTmp++;
+        }
+        else if (cursorTmp == 10)
+        {
+            a010Packet.frame_head.exposure_time[2] = tmpInt;
+            cursorTmp++;
+        }
+        else if (cursorTmp == 11)
+        {
+            a010Packet.frame_head.exposure_time[3] = tmpInt;
+            cursorTmp++;
+        }
+        else if (cursorTmp == 12)
+        {
+            a010Packet.frame_head.error_code = tmpInt;
+            cursorTmp++;
+        }
+        else if (cursorTmp == 13)
             {
-                cursorTmp = 0;
-                return true;
+            a010Packet.frame_head.reserved2 = tmpInt;
+            cursorTmp++;
             }
+        else if (cursorTmp == 14)
+        {
+            a010Packet.frame_head.resolution_rows = tmpInt;
+            cursorTmp++;
+        }
+        else if (cursorTmp == 15)
+        {
+            a010Packet.frame_head.resolution_cols = tmpInt;
+            cursorTmp++;
+    }
+        else if (cursorTmp == 16)
+        {
+            a010Packet.frame_head.frame_id = tmpInt;
+            cursorTmp++;
+}
+        else if (cursorTmp == 17)
+{
+            a010Packet.frame_head.frame_id |= tmpInt << 8;
+            cursorTmp++;
+        }
+        else if (cursorTmp == 18)
+        {
+            a010Packet.frame_head.isp_version = tmpInt;
+            cursorTmp++;
+        }
+        else if (cursorTmp == 19)
+        {
+            a010Packet.frame_head.reserved3 = tmpInt;
+            cursorTmp++;
+            indexTmp = 0;
         }
     }
     return false;
-}
-
-void A010::FillStructure()
-{
-    a010Packet.frame_head.frame_begin_flag = serialBuffer[1] << 8 | serialBuffer[0];
-    a010Packet.frame_head.frame_data_len = serialBuffer[3] << 8 | serialBuffer[2];
-    a010Packet.frame_head.reserved1 = serialBuffer[4];
-    a010Packet.frame_head.output_mode = serialBuffer[5];
-    a010Packet.frame_head.senser_temp = serialBuffer[6];
-    a010Packet.frame_head.driver_temp = serialBuffer[7];
-    a010Packet.frame_head.exposure_time[0] = serialBuffer[8];
-    a010Packet.frame_head.exposure_time[1] = serialBuffer[9];
-    a010Packet.frame_head.exposure_time[2] = serialBuffer[10];
-    a010Packet.frame_head.exposure_time[3] = serialBuffer[11];
-    a010Packet.frame_head.error_code = serialBuffer[12];
-    a010Packet.frame_head.reserved2 = serialBuffer[13];
-    a010Packet.frame_head.resolution_rows = serialBuffer[14];
-    a010Packet.frame_head.resolution_cols = serialBuffer[15];
-    a010Packet.frame_head.frame_id = serialBuffer[17] << 8 | serialBuffer[16];
-    a010Packet.frame_head.isp_version = serialBuffer[18];
-    a010Packet.frame_head.reserved3 = serialBuffer[19];
-
-    memcpy(&a010Packet.payload[0], &serialBuffer[20], sizeof(a010Packet.payload));
-
-    a010Packet.frame_tail.checksum = serialBuffer[serialBuffer.size() - 2];
-    a010Packet.frame_tail.frame_end_flag = serialBuffer[serialBuffer.size() - 1];
 }
 
 a010_frame_t A010::GetData() { return a010Packet; }

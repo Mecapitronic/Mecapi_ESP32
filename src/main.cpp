@@ -49,7 +49,7 @@ void Task1code(void *pvParameters)
     {
         if (a010.ReadSerial())
         {
-            a010.FillStructure();
+            // a010.FillStructure();
            // a010.CheckContinuity();
 
             a010Packet = a010.GetData();

@@ -134,9 +134,11 @@ class A010
     a010_point_cloud_t GetPointCloudFromFrame(a010_frame_t frame);
     void logHeader();
 
+    ClusterPoint3D cloudFrame[PICTURE_SIZE];
    private:
     std::vector<uint8_t> serialBuffer;
     uint16_t cursorTmp = 0;  // 16 bits => frame limited to 65535 bytes
+    uint16_t indexTmp = 0;
     uint16_t packetSize = 0;
 
     ConfigA010 a010Config = {0, 0, 0};
