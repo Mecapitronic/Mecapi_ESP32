@@ -11,6 +11,10 @@ A010::A010()
     // wait A010 power up
     delay(1000);
 
+    // pre-computing of coefficient to convert depth data to cartesian coordinate point
+    ComputeCartesianCoefficient(PICTURE_RES, PICTURE_RES, FOV_HOR, FOV_VER, 0, 0);
+    // logCartesianCoefficient();
+
     // AT commands configuration
     // https://wiki.sipeed.com/hardware/en/maixsense/maixsense-a010/at_command_en.html
     // https://wiki.sipeed.com/hardware/en/metasense/metasense-a010/metasense-a010.html
@@ -34,8 +38,6 @@ A010::A010()
 
     // Debugger::log("Init A010 COPY");
     // SERIAL_A010_COPY.begin(115200, SERIAL_8N1, RX1, TX1);
-
-    serialBuffer.clear();
 }
 
 void A010::Config(int min = -1, int max = -1, int discontinuity = -1)
@@ -68,8 +70,6 @@ boolean A010::ReadSerial()
 
         if (cursorTmp >= 20)
         {
-            // serialBuffer.push_back(tmpInt);
-            // cursorTmp++;
             if (cursorTmp >= 20 && cursorTmp <= packetSize + 4)
             {
                 a010Packet.payload[indexTmp] = tmpInt;
@@ -103,15 +103,11 @@ boolean A010::ReadSerial()
         {
             if (tmpInt == A010_FIRST_PACKET_BYTE)
             {
-                // serialBuffer.clear();
-                // serialBuffer.push_back(tmpInt);
                 a010Packet.frame_head.frame_begin_flag = tmpInt;
                 cursorTmp++;
             }
             else
             {
-                // serialBuffer.clear();
-                //cloudFrame.clear();
                 cursorTmp = 0;
                 indexTmp = 0;
                 packetSize = 0;
@@ -121,29 +117,23 @@ boolean A010::ReadSerial()
         {
             if (tmpInt == A010_SECOND_PACKET_BYTE)
             {
-                // serialBuffer.push_back(tmpInt);
                 a010Packet.frame_head.frame_begin_flag |= tmpInt << 8;
                 cursorTmp++;
             }
             else
             {
-                // serialBuffer.clear();
-                //cloudFrame.clear();
                 cursorTmp = 0;
                 packetSize = 0;
             }
         }
         else if (cursorTmp == 2)
         {
-            // serialBuffer.push_back(tmpInt);
             packetSize = tmpInt;
             a010Packet.frame_head.frame_data_len = tmpInt;
             cursorTmp++;
         }
         else if (cursorTmp == 3)
         {
-            // serialBuffer.push_back(tmpInt);
-            // packetSize = serialBuffer[3] << 8 | serialBuffer[2];
             packetSize |= tmpInt << 8;
             a010Packet.frame_head.frame_data_len |= tmpInt << 8;
             // Debugger::log("packetSize", packetSize);
@@ -195,10 +185,10 @@ boolean A010::ReadSerial()
             cursorTmp++;
         }
         else if (cursorTmp == 13)
-            {
+        {
             a010Packet.frame_head.reserved2 = tmpInt;
             cursorTmp++;
-            }
+        }
         else if (cursorTmp == 14)
         {
             a010Packet.frame_head.resolution_rows = tmpInt;
@@ -208,14 +198,14 @@ boolean A010::ReadSerial()
         {
             a010Packet.frame_head.resolution_cols = tmpInt;
             cursorTmp++;
-    }
+        }
         else if (cursorTmp == 16)
         {
             a010Packet.frame_head.frame_id = tmpInt;
             cursorTmp++;
-}
+        }
         else if (cursorTmp == 17)
-{
+        {
             a010Packet.frame_head.frame_id |= tmpInt << 8;
             cursorTmp++;
         }
@@ -233,8 +223,6 @@ boolean A010::ReadSerial()
     }
     return false;
 }
-
-a010_frame_t A010::GetData() { return a010Packet; }
 
 boolean A010::CheckContinuity()
 {
@@ -263,58 +251,55 @@ boolean A010::CheckContinuity()
     }
 }
 
-// A010 FOV 70°(H) * 60°(V) => 1.22173 rad * 1.0472
-a010_point_cloud_t A010::GetPointCloudFromFrame(a010_frame_t frame)
+/*
+Point3D A010::DepthToPoint3D(uint8_t id, uint16_t depth)
 {
-    a010_point_cloud_t cloud;
-    uint8_t row, col = 1;
-    uint16_t i = 1;
-    double dist, ang_h, ang_v;
-    double x, y, z;
-    // frame.frame_head.resolution_cols = 25;
-    // frame.frame_head.resolution_rows = 25;
-    double res_h = 1.22173 / (double)frame.frame_head.resolution_cols;  // 0.0488692
-    double res_v = 1.0472 / (double)frame.frame_head.resolution_rows;   // 0.041888
-    double zero_h = (double)frame.frame_head.resolution_cols / 2;       // 12.5
-    double zero_v = (double)frame.frame_head.resolution_rows / 2;       // 12.5
+    Point3D p;
 
-    for (row = 1; row <= frame.frame_head.resolution_rows; row++)
+    p.x = distance * coefX[id];
+    p.y = distance * coefY[id];
+    p.z = distance * coefZ[id];
+
+    return p;
+}*/
+
+// camera parameter : horizontal and vertical resolution, horizontal and vertical field of view in degree,  horizontal and vertical offset angle setup
+void A010::ComputeCartesianCoefficient(uint16_t horRes, uint16_t verRes, float horFOVdeg, float verFOVdeg, float horOFFSETdeg, float verOFFSETdeg)
+{
+    uint16_t i = 0;
+    float angle;
+    // radians !
+    float horAngRes = (horFOVdeg * DEG_TO_RAD) / (float)horRes;
+    float verAngRes = (verFOVdeg * DEG_TO_RAD) / (float)verRes;
+    float horAngZero = ((horFOVdeg / 2) + horOFFSETdeg) * DEG_TO_RAD;
+    float verAngZero = ((verFOVdeg / 2) + verOFFSETdeg) * DEG_TO_RAD;
+
+    // compute Horizontal => X and Y
+    for (i = 0; i < horRes; i++)
     {
-        for (col = 1; col <= frame.frame_head.resolution_cols; col++)
-        {
-            i = col + ((row - 1) * frame.frame_head.resolution_rows) - 1;  // from 0 to n-1
-            dist = frame.payload[i];
-            if (dist < 255)  // ignorer le fond
-            {
-                dist *= QUANTIZATION_MM;
-                ang_h = col;
-                ang_h -= zero_h;
-                ang_h *= res_h;
-                // ang_h = res_h * (col - zero_h);
-                ang_v = zero_v;
-                ang_v -= row;
-                ang_v *= res_v;
-                // ang_v = res_v * (zero_v - row);
-
-                x = dist * sin(ang_h);
-                y = dist * cos(ang_h);
-                z = dist * sin(ang_v);
-                cloud.point[i].x = (int16_t)x;
-                cloud.point[i].y = (int16_t)y;
-                cloud.point[i].z = (int16_t)z;
-                cloud.cluster[i] = 0xff00;
-                if (frame.frame_head.frame_id % 2)
-                    cloud.cluster[i] = 0xff00;
-                else
-                    cloud.cluster[i] = 0x00ff;
-                String data = "" + String(cloud.point[i].x) + " " + String(cloud.point[i].y) + " " + String(cloud.point[i].z);
-                //+" " + String(cloud.cluster[i]);
-                // SERIAL_DEBUG.println(String(dist));
-                SERIAL_DEBUG.println(data);
-            }
-        }
+        angle = (horAngRes * i) - horAngZero;
+        coefX[i] = QUANTIZATION_MM * sin(angle);
+        coefY[i] = QUANTIZATION_MM * cos(angle);
     }
-    return cloud;
+    // compute Vertical => Z
+    for (i = 0; i < verRes; i++)
+    {
+        angle = verAngZero - (verAngRes * i);
+        coefZ[i] = QUANTIZATION_MM * sin(angle);
+    }
+}
+
+void A010::logCartesianCoefficient()
+{
+    SERIAL_DEBUG.println("***");
+    for (int16_t i = 0; i < PICTURE_SIZE; i++)
+    {
+        int row = i % PICTURE_RES;
+        int col = i / PICTURE_RES;
+        String data = "" + String(coefX[row]) + " " + String(coefY[row]) + " " + String(coefZ[col]);
+        // SERIAL_DEBUG.println(data);
+    }
+    SERIAL_DEBUG.println("---");
 }
 
 void A010::logHeader()

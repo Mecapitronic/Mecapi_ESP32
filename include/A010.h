@@ -97,8 +97,11 @@
 
 #include <vector>
 
+// #include "..\DBSCAN-for-ESP32\DBSCAN.h"
 #include "Debugger.h"
 #include "frame_struct.h"
+
+using std::vector;
 
 struct ConfigA010
 {
@@ -128,15 +131,15 @@ class A010
      * Read data from serial and put in a buffer if it comes from the A010
      */
     boolean ReadSerial();
-    void FillStructure();
-    a010_frame_t GetData();
     boolean CheckContinuity();
-    a010_point_cloud_t GetPointCloudFromFrame(a010_frame_t frame);
+
+    void ComputeCartesianCoefficient(uint16_t horRes, uint16_t verRes, float horFOVdeg, float verFOVdeg, float horOFFSETdeg, float verOFFSETdeg);
+    void logCartesianCoefficient();
     void logHeader();
 
     ClusterPoint3D cloudFrame[PICTURE_SIZE];
+
    private:
-    std::vector<uint8_t> serialBuffer;
     uint16_t cursorTmp = 0;  // 16 bits => frame limited to 65535 bytes
     uint16_t indexTmp = 0;
     uint16_t packetSize = 0;
@@ -145,5 +148,9 @@ class A010
 
     a010_frame_t a010Packet;
     a010_frame_head_t a010LastPacketHeader;
+
+    float coefX[PICTURE_RES];
+    float coefY[PICTURE_RES];
+    float coefZ[PICTURE_RES];
 };
 #endif

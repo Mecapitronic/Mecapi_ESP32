@@ -30,6 +30,17 @@ struct Point3D
 };
 
 /**
+ * @brief Represents a 3D Cartesian point, with x, y and z as coordinates and it's cluster
+ */
+struct ClusterPoint3D
+{
+    int16_t x;
+    int16_t y;
+    int16_t z;
+    uint8_t cluster;
+};
+
+/**
  * @brief Represents a Polar point, with angle and distance as coordinates
  * Has confidence and cartesian coordinates too
  *
