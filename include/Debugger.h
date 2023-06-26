@@ -11,7 +11,6 @@
 #define ERROR Level::LEVEL_ERROR
 
 #include <Arduino.h>
-
 #include "Structure.h"
 
 #define SERIAL_PC Serial

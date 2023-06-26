@@ -94,7 +94,6 @@
 #endif
 
 #include <Arduino.h>
-
 #include <vector>
 
 // #include "..\DBSCAN-for-ESP32\DBSCAN.h"

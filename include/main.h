@@ -2,7 +2,6 @@
 #define MAIN_H
 
 #include <Arduino.h>
-
 #include "A010.h"
 #include "DBSCAN.h"
 #include "Debugger.h"
