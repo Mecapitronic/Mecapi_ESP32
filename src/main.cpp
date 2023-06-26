@@ -11,7 +11,13 @@ void setup()
         //      Debugger::log("Error creating the queue", ERROR);
     }
 
+    SERIAL_DEBUG.println("A010 setup");
     a010 = A010();
+    delay(500);
+
+    SERIAL_DEBUG.println("Dbscan setup");
+    dbscan = Dbscan();
+    dbscan.Config(30, 10, EUCLIDIAN);
     delay(500);
 
     // create a task that will be executed in the Task1code() function, with priority 1 and executed on core 0
@@ -51,11 +57,11 @@ void Task1code(void *pvParameters)
 
     while (1)
     {
+        // we enter once we have the complete frame
         if (a010.ReadSerial())
         {
             // a010.CheckContinuity();
 
-            // std::vector<std::vector<float>> w;
             float w[PICTURE_SIZE][3]{0};
 
             // SERIAL_DEBUG.println("vector capacity: " + String(w.capacity()));  // vector capacity: 0
@@ -65,11 +71,6 @@ void Task1code(void *pvParameters)
 
             for (i = 0; i < PICTURE_SIZE; i++)  // FIXME: n'affiche plus rien !
             {
-                // std::vector<float> v;
-                // v.push_back(cloud[i].x);
-                // v.push_back(cloud[i].y);
-                // v.push_back(cloud[i].z);
-                // w.push_back(v);
                 w[i][0] = a010.cloudFrame[i].x;
                 w[i][1] = a010.cloudFrame[i].y;
                 w[i][2] = a010.cloudFrame[i].z;
@@ -79,18 +80,9 @@ void Task1code(void *pvParameters)
             }
             SERIAL_DEBUG.println("-----------");
 
-            // SERIAL_DEBUG.println("vector capacity: " + String(w.capacity()));  // vector capacity: 512
-            // SERIAL_DEBUG.println("vector max size: " + String(w.max_size()));
-            // SERIAL_DEBUG.println("vector size: " + String(w.size()));  // vector size: 300
-            //  SERIAL_DEBUG.println("vector shrink to fit : " + w.shrink_to_fit());
-            //  SERIAL_DEBUG.println("vector size: " + w.size());
-
-            // dbscan(epsilon, minPts, distance, mink)
-            // dbscan DB(30, 10, EUCLIDIAN);
-            SERIAL_DEBUG.println("dbscan setup");
-            // clusters = DB.init(w);
+            // clusters = dbscan.init(w);
             // DB.init(w);
-            SERIAL_DEBUG.println("dbscan init");
+            SERIAL_DEBUG.println("Dbscan init");
             // SERIAL_DEBUG.println(clusters.size() - 1);
             // DB.displayStats();
 
