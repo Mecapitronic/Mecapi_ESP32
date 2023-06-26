@@ -26,5 +26,6 @@ QueueHandle_t queue;
 uint16_t queueSize = 500;
 
 A010 a010;
+Dbscan dbScan;
 
 #endif
