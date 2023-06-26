@@ -1,7 +1,7 @@
 import serial
 import subprocess, os, platform
 
-ser = serial.Serial('COM10', 921600)
+ser = serial.Serial('COM6', 921600)
 ser.flushInput()
 ser.write(("Starting\n").encode())
 
@@ -12,7 +12,7 @@ with open(filename,"wt") as f:
     f.write("VERSION .7\n")
     f.write("FIELDS x y z rgb\n")
     f.write("SIZE 8 8 8 8\n")
-    f.write("TYPE F F F F\n")
+    f.write("TYPE I I I I\n")
     f.write("COUNT 1 1 1 1\n")
     f.write("WIDTH 25\n")
     f.write("HEIGHT 25\n")
@@ -21,6 +21,7 @@ with open(filename,"wt") as f:
     f.write("DATA ascii\n")
     f.close()
 
+#FIXME: en copiant les données dans un autre fichier PCD du dossier Point_Cloud ça fonctionne !
 
 start = "***"
 end = "---"
@@ -28,7 +29,7 @@ data = ""
 str = ""
 
 try:
-    with open("test3D.pcd","at") as f:
+    with open(filename,"at") as f:
         #data = ser.readline().decode("utf-8")
         while start not in str:
             data = ser.read_until(b'\n').decode("utf-8")
