@@ -18,7 +18,7 @@ A010::A010()
     SERIAL_A010.println("AT+DISP=5");                           // 2=usb, 3=usb+lcd, 4=uart, 5=uart+lcd, 6=usb+uart, 7=usb+uart+lcd
     SERIAL_A010.println("AT+UNIT=" + String(QUANTIZATION_MM));  // 1 to 9, Represents quantization in x mm. The smaller the value, the more details
                                                                 // and the shorter the visual distance.
-    SERIAL_A010.println("AT+FPS=" + String(FRAME_PER_SECOND));               // FPS from 1 to 20 (30?)
+    SERIAL_A010.println("AT+FPS=" + String(FRAME_PER_SECOND));  // FPS from 1 to 20 (30?)
     SERIAL_A010.println("AT+ANTIMMI=-1");  // Automatic anti-multi-machine interference is turned on and off (susceptible to interference, the effect
                                            // of turning off is better)
     SERIAL_A010.println("AT+AE=0");        // Ev:Exposure gap control (leftmost represents AE, others are fixed exposure time)

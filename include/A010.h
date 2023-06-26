@@ -43,17 +43,25 @@
 #define RX1 2
 #define TX1 4
 
-#define BINNING_SIZE 2      // pixel binning : 1=1x1 (100x100), 2=2x2 (50x50), 4=4x4 (25x25)
+/***************** Configuration : REBOOT CAMERA AFTER !! *****************/
+#define BINNING_SIZE 4      // pixel binning : 1=1x1 (100x100), 2=2x2 (50x50), 4=4x4 (25x25)
 #define QUANTIZATION_MM 5   // depth data resolution in mm (1 to 9)
 #define FRAME_PER_SECOND 6  // Frame per second, FPS from 1 to 20 (30?)
 #define BAUD_RATE_STATE 5   // 0=9.600 1=57.600 2=115.200 3=230.400  4=460.800 5=921.600 6=1.000.000 7=2.000.000 8=3.000.000
+/************************************************/
+
+#define FOV_HOR 70
+#define FOV_VER 60
 
 #if BINNING_SIZE == 4
 #define PICTURE_SIZE 625
+#define PICTURE_RES 25
 #elif BINNING_SIZE == 2
 #define PICTURE_SIZE 2500
+#define PICTURE_RES 50
 #elif BINNING_SIZE == 1
 #define PICTURE_SIZE 10000
+#define PICTURE_RES 100
 #else
 #error "Incorrect binning value !"
 #endif
@@ -82,7 +90,7 @@
 
 #define BAUD_RATE_MIN ((20 + PICTURE_SIZE + 2) * FRAME_PER_SECOND * 10)
 #if BAUD_RATE_SPEED < BAUD_RATE_MIN
-#error "/!\ Baud rate selected is not enough or BINN / FPS are too high /!\"
+#error "!!! Baud rate selected is not enough or BINN - FPS are too high !!!"
 #endif
 
 #include <Arduino.h>
