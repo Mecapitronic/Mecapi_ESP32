@@ -3,7 +3,6 @@
 A010::A010()
 {
     Debugger::log("Init A010");
-
     // minDistance, maxDistance
     Config(100, 1500, 2);
     SERIAL_A010.begin(115200);
@@ -13,7 +12,7 @@ A010::A010()
 
     // pre-computing of coefficient to convert depth data to cartesian coordinate point
     ComputeCartesianCoefficient(PICTURE_RES, PICTURE_RES, FOV_HOR, FOV_VER, 0, 0);
-    logCartesianCoefficient();
+    // logCartesianCoefficient();
 
     // AT commands configuration
     // https://wiki.sipeed.com/hardware/en/maixsense/maixsense-a010/at_command_en.html
@@ -34,6 +33,7 @@ A010::A010()
     SERIAL_A010.println("AT+BAUD=" + String(BAUD_RATE_STATE));  // 6=1M, 7=2M, 8=3M
     SERIAL_A010.flush();
     SERIAL_A010.end();
+    cursorTmp = 0;
     SERIAL_A010.begin(BAUD_RATE_SPEED);
 
     // Debugger::log("Init A010 COPY");
@@ -56,7 +56,7 @@ void A010::Config(int min = -1, int max = -1, int discontinuity = -1)
     }
     if (discontinuity != -1)
     {
-        Debugger::log("A010 Config 'Discontinuity ' from ", a010Config.IDMaxDiscontinuity, "", INFO, false);
+        Debugger::log("A010 Config 'Discontinuity' from ", a010Config.IDMaxDiscontinuity, "", INFO, false);
         Debugger::log(" to ", discontinuity, "", INFO);
         a010Config.IDMaxDiscontinuity = discontinuity;
     }
@@ -80,7 +80,6 @@ boolean A010::ReadSerial()
                 cloudFrame[indexTmp].x = tmpF * coefX[hor];
                 cloudFrame[indexTmp].y = tmpF * coefY[hor];
                 cloudFrame[indexTmp].z = tmpF * coefZ[ver];
-                cloudFrame[indexTmp].cluster = 0;
 
                 cursorTmp++;
                 indexTmp++;
@@ -93,9 +92,7 @@ boolean A010::ReadSerial()
             else if (cursorTmp == packetSize + 4 + 2)  // length count from Byte4 to the Byte before Checksum
             {
                 a010Packet.frame_tail.frame_end_flag = tmpInt;
-                cursorTmp++;
                 cursorTmp = 0;
-                packetSize = 0;
                 return true;
             }
         }
@@ -109,8 +106,6 @@ boolean A010::ReadSerial()
             else
             {
                 cursorTmp = 0;
-                indexTmp = 0;
-                packetSize = 0;
             }
         }
         else if (cursorTmp == 1)
@@ -123,7 +118,6 @@ boolean A010::ReadSerial()
             else
             {
                 cursorTmp = 0;
-                packetSize = 0;
             }
         }
         else if (cursorTmp == 2)

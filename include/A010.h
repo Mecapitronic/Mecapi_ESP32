@@ -97,8 +97,7 @@
 #include <vector>
 #include "Debugger.h"
 #include "frame_struct.h"
-
-using std::vector;
+using namespace std;
 
 struct ConfigA010
 {
@@ -134,7 +133,7 @@ class A010
     void logCartesianCoefficient();
     void logHeader();
 
-    ClusterPoint3D cloudFrame[PICTURE_SIZE];
+    Point3D cloudFrame[PICTURE_SIZE];
 
    private:
     uint16_t cursorTmp = 0;  // 16 bits => frame limited to 65535 bytes
