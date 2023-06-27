@@ -16,10 +16,10 @@ void setup()
     delay(500);
 
     SERIAL_DEBUG.println("Dbscan setup");
-    dbscan = Dbscan();
     dbscan.Config(30, 10, EUCLIDIAN);
     delay(500);
 
+    SERIAL_DEBUG.println("Create Task1code");
     // create a task that will be executed in the Task1code() function, with priority 1 and executed on core 0
     xTaskCreatePinnedToCore(Task1code, /* Task function. */
                             "Task1",   /* name of task. */
@@ -29,6 +29,7 @@ void setup()
                             &Task1,    /* Task handle to keep track of created task */
                             0);        /* pin task to core 0 */
 
+    SERIAL_DEBUG.println("Create Task2code");
     // create a task that will be executed in the Task2code() function, with priority 1 and executed on core 1
     xTaskCreatePinnedToCore(Task2code, /* Task function. */
                             "Task2",   /* name of task. */
@@ -49,49 +50,52 @@ void loop()
 // Note the 1 Tick delay, this is need so the watchdog doesn't get confused
 void Task1code(void *pvParameters)
 {
+    SERIAL_DEBUG.println("Start Task1code");
     a010_frame_t a010Packet;
 
     uint16_t i, result;
-    std::vector<ClusterPoint3D> cloud;
+    std::vector<Point3D> cloud;
     std::vector<std::vector<uint16_t>> clusters;
 
     while (1)
     {
-        // we enter once we have the complete frame
-        if (a010.ReadSerial())
+        try
         {
-            // a010.CheckContinuity();
-
-            float w[PICTURE_SIZE][3]{0};
-
-            // SERIAL_DEBUG.println("vector capacity: " + String(w.capacity()));  // vector capacity: 0
-            // SERIAL_DEBUG.println("vector max size: " + String(w.max_size()));  // vector max size: 357913941
-
-            // w.reserve(2500);
-
-            for (i = 0; i < PICTURE_SIZE; i++)  // FIXME: n'affiche plus rien !
+            // we enter once we have the complete frame
+            if (a010.ReadSerial())
             {
-                w[i][0] = a010.cloudFrame[i].x;
-                w[i][1] = a010.cloudFrame[i].y;
-                w[i][2] = a010.cloudFrame[i].z;
-                String data = "" + String(a010.cloudFrame[i].x) + " " + String(a010.cloudFrame[i].y) + " " + String(a010.cloudFrame[i].z) + " " +
-                              String("65520");
-                SERIAL_DEBUG.println(data);
+                // a010.CheckContinuity();
+
+                // float w[PICTURE_SIZE][3]{0};
+
+                SERIAL_DEBUG.println("***");
+
+                for (i = 0; i < PICTURE_SIZE; i++)  // FIXME: n'affiche plus rien !
+                {
+                    // w[i][0] = a010.cloudFrame[i].x;
+                    // w[i][1] = a010.cloudFrame[i].y;
+                    // w[i][2] = a010.cloudFrame[i].z;
+                    String data = "" + String(a010.cloudFrame[i].x) + " " + String(a010.cloudFrame[i].y) + " " + String(a010.cloudFrame[i].z) + " " +
+                                  String("65520");
+                    SERIAL_DEBUG.println(data);
+                }
+                SERIAL_DEBUG.println("---");
+
+                // clusters = dbscan.Process((Dbscan::Point3D *)&(a010.cloudFrame), PICTURE_SIZE);
+                // SERIAL_DEBUG.println("Dbscan Process");
+                // dbscan.displayStats();
+
+                //+" " + String(cloud.cluster[i]);
+                // SERIAL_DEBUG.println(String(dist));
+
+                // TODO: afficher les clusters en changeant la couleur dans fichier PCD
+
+                // xQueueSend(queue, &a010Packet, 0);
             }
-            SERIAL_DEBUG.println("-----------");
-
-            // clusters = dbscan.init(w);
-            // DB.init(w);
-            SERIAL_DEBUG.println("Dbscan init");
-            // SERIAL_DEBUG.println(clusters.size() - 1);
-            // DB.displayStats();
-
-            //+" " + String(cloud.cluster[i]);
-            // SERIAL_DEBUG.println(String(dist));
-
-            // TODO: afficher les clusters en changeant la couleur dans fichier PCD
-
-            // xQueueSend(queue, &a010Packet, 0);
+        }
+        catch (std::exception const &e)
+        {
+            Debugger::log("error : ", e.what());
         }
         vTaskDelay(1);
     }
@@ -100,6 +104,7 @@ void Task1code(void *pvParameters)
 // Note the 1 Tick delay, this is need so the watchdog doesn't get confused
 void Task2code(void *pvParameters)
 {
+    SERIAL_DEBUG.println("Start Task2code");
     a010_frame_t a010Packet;
     uint16_t distance_mm = 0;
     Point3D p = {0, 0, 0};
