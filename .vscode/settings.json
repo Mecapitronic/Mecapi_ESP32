@@ -14,7 +14,9 @@
         "dbscan",
         "EUCLIDIAN",
         "Mecapitronic",
-        "MECAPITRONIC"
+        "MECAPITRONIC",
+        "neighbourhoods",
+        "neighbours"
     ],
     "platformio-ide.disablePIOHomeStartup": true,
     "platformio-ide.autoOpenPlatformIOIniFile": false,
