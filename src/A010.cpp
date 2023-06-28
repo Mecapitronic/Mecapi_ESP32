@@ -38,6 +38,7 @@ void A010::Initialisation()
 
     InitTmpVariables();
 
+    SERIAL_A010.setRxBufferSize(SERIAL_SIZE_RX);
     SERIAL_A010.begin(BAUD_RATE_SPEED);
 
     // Debugger::log("Init A010 COPY");
