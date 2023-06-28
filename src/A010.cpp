@@ -1,6 +1,8 @@
 #include "A010.h"
 
-A010::A010()
+A010::A010() {}
+
+void A010::Initialisation()
 {
     Debugger::log("Init A010");
     // minDistance, maxDistance
@@ -33,11 +35,20 @@ A010::A010()
     SERIAL_A010.println("AT+BAUD=" + String(BAUD_RATE_STATE));  // 6=1M, 7=2M, 8=3M
     SERIAL_A010.flush();
     SERIAL_A010.end();
-    cursorTmp = 0;
+
+    InitTmpVariables();
+
     SERIAL_A010.begin(BAUD_RATE_SPEED);
 
     // Debugger::log("Init A010 COPY");
     // SERIAL_A010_COPY.begin(115200, SERIAL_8N1, RX1, TX1);
+}
+
+void A010::InitTmpVariables()
+{
+    cursorTmp = 0;
+    indexTmp = 0;
+    packetSize = 0;
 }
 
 void A010::Config(int min = -1, int max = -1, int discontinuity = -1)
@@ -92,7 +103,7 @@ boolean A010::ReadSerial()
             else if (cursorTmp == packetSize + 4 + 2)  // length count from Byte4 to the Byte before Checksum
             {
                 a010Packet.frame_tail.frame_end_flag = tmpInt;
-                cursorTmp = 0;
+                InitTmpVariables();
                 return true;
             }
         }
@@ -213,6 +224,12 @@ boolean A010::ReadSerial()
             a010Packet.frame_head.reserved3 = tmpInt;
             cursorTmp++;
             indexTmp = 0;
+            // logHeader();
+        }
+        else
+        {
+            // we should never come here !
+            InitTmpVariables();
         }
     }
     return false;

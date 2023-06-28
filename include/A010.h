@@ -114,6 +114,9 @@ class A010
      */
     A010(void);
 
+    void Initialisation();
+    void InitTmpVariables();
+
     /**
      * @brief Configure A010Config local variable with the given values in parameters
      *

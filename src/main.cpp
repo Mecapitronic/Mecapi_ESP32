@@ -12,7 +12,7 @@ void setup()
     }
 
     SERIAL_DEBUG.println("A010 setup");
-    a010 = A010();
+    a010.Initialisation();
     delay(500);
 
     SERIAL_DEBUG.println("Dbscan setup");
