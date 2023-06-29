@@ -16,7 +16,8 @@
         "Mecapitronic",
         "MECAPITRONIC",
         "neighbourhoods",
-        "neighbours"
+        "neighbours",
+        "teleplot"
     ],
     "platformio-ide.disablePIOHomeStartup": true,
     "platformio-ide.autoOpenPlatformIOIniFile": false,
@@ -79,5 +80,5 @@
     },
     "files.trimFinalNewlines": true,
     "files.insertFinalNewline": true,
-    "terminal.integrated.scrollback": 10000,
+    "terminal.integrated.scrollback": 100000,
 }
