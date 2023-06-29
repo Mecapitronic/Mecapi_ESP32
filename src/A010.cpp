@@ -73,39 +73,71 @@ void A010::Config(int min = -1, int max = -1, int discontinuity = -1)
         a010Config.IDMaxDiscontinuity = discontinuity;
     }
 }
+bool waitEndOfPacket = true;
 
 boolean A010::ReadSerial()
 {
     while (SERIAL_A010.available() > 0)
     {
         uint8_t tmpInt = SERIAL_A010.read();
-
-        if (cursorTmp >= 20)
+        if (waitEndOfPacket)
         {
-            if (cursorTmp >= 20 && cursorTmp <= packetSize + 4)
+            if (tmpInt == A010_END_PACKET_BYTE)
             {
-                a010Packet.payload[indexTmp] = tmpInt;
+                waitEndOfPacket = false;
+            }
+            InitTmpVariables();
+            return false;
+        }
+
+        if (cursorTmp >= 20 && packetSize > 0)
+        {
+            if (cursorTmp < packetSize + 4)
+            {
                 float tmpF = tmpInt;
                 uint16_t hor = indexTmp % PICTURE_RES;  // plan horizontal => curseur
                 uint16_t ver = indexTmp / PICTURE_RES;  // plan vertical => numéro de ligne
 
+                if (indexTmp >= 0 && indexTmp < PICTURE_SIZE)
+                {
+                    a010Packet.payload[indexTmp] = tmpInt;
+                    if (hor >= 0 && hor < PICTURE_RES && ver >= 0 && ver < PICTURE_RES)
+                    {
                 cloudFrame[indexTmp].x = tmpF * coefX[hor];
                 cloudFrame[indexTmp].y = tmpF * coefY[hor];
                 cloudFrame[indexTmp].z = tmpF * coefZ[ver];
-
+                    }
+                }
                 cursorTmp++;
                 indexTmp++;
             }
-            else if (cursorTmp == packetSize + 4 + 1)
+            else if (cursorTmp == packetSize + 4)
             {
                 a010Packet.frame_tail.checksum = tmpInt;
                 cursorTmp++;
             }
-            else if (cursorTmp == packetSize + 4 + 2)  // length count from Byte4 to the Byte before Checksum
+            else if (cursorTmp == packetSize + 4 + 1)  // length count from Byte4 to the Byte before Checksum
             {
+                if (tmpInt == A010_END_PACKET_BYTE)
+                {
                 a010Packet.frame_tail.frame_end_flag = tmpInt;
                 InitTmpVariables();
                 return true;
+                }
+                else
+                {
+                    waitEndOfPacket = true;
+                    // Not the end of the frame
+                    InitTmpVariables();
+                }
+            }
+            else
+            {
+                // we should never come here !
+                InitTmpVariables();
+                Debugger::log("cursorTmp > packetSize + 4 + 2", WARN);
+                Debugger::log("cursorTmp : ", cursorTmp, "", WARN);
+                Debugger::log("packetSize : ", packetSize, "", WARN);
             }
         }
         else if (cursorTmp == 0)  // First byte of packet
@@ -117,7 +149,8 @@ boolean A010::ReadSerial()
             }
             else
             {
-                cursorTmp = 0;
+                // Not the start of the frame
+                InitTmpVariables();
             }
         }
         else if (cursorTmp == 1)
@@ -129,7 +162,8 @@ boolean A010::ReadSerial()
             }
             else
             {
-                cursorTmp = 0;
+                // Not the start of the frame
+                InitTmpVariables();
             }
         }
         else if (cursorTmp == 2)
@@ -231,6 +265,9 @@ boolean A010::ReadSerial()
         {
             // we should never come here !
             InitTmpVariables();
+            Debugger::log("cursorTmp < 0", WARN);
+            Debugger::log("cursorTmp : ", cursorTmp, "", WARN);
+            Debugger::log("packetSize : ", packetSize, "", WARN);
         }
     }
     return false;

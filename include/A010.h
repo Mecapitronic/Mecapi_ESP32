@@ -9,9 +9,11 @@
 // Serial 2 : U2TX = GPIO17 ; U2RX = GPIO16
 #define SERIAL_A010 Serial2
 
-// Header frame : 2Byte header + 2Byte length + 1Byte command + 1Byte output_mode + 1Byte Sensor Temp + 1Byte Driver Temp
-// 4Bytes exposure time + 1Byte error code + 1Byte reserved1 + 1Byte res rows + 1Byte res cols
+// Header frame : 2Byte header + 2Byte length +
+// 1Byte command + 1Byte output_mode + 1Byte Sensor Temp + 1Byte Driver Temp +
+// 4Bytes exposure time + 1Byte error code + 1Byte reserved1 + 1Byte res rows + 1Byte res cols +
 // 2Byte Frame ID + 1 Byte ISP version + 1 Byte reserved3
+
 // length count from Byte4 to the Byte before Checksum
 // Total Header : 20 bytes
 
