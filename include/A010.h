@@ -147,6 +147,7 @@ class A010
     uint16_t cursorTmp = 0;  // 16 bits => frame limited to 65535 bytes
     uint16_t indexTmp = 0;
     uint16_t packetSize = 0;
+    uint8_t checksum = 0;
 
     ConfigA010 a010Config = {0, 0, 0};
 

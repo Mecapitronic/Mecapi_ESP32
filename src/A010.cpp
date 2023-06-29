@@ -50,6 +50,7 @@ void A010::InitTmpVariables()
     cursorTmp = 0;
     indexTmp = 0;
     packetSize = 0;
+    checksum = 0;
 }
 
 void A010::Config(int min = -1, int max = -1, int discontinuity = -1)
@@ -80,6 +81,8 @@ boolean A010::ReadSerial()
     while (SERIAL_A010.available() > 0)
     {
         uint8_t tmpInt = SERIAL_A010.read();
+        checksum += tmpInt;  // checksum calculation
+
         if (waitEndOfPacket)
         {
             if (tmpInt == A010_END_PACKET_BYTE)
@@ -103,9 +106,9 @@ boolean A010::ReadSerial()
                     a010Packet.payload[indexTmp] = tmpInt;
                     if (hor >= 0 && hor < PICTURE_RES && ver >= 0 && ver < PICTURE_RES)
                     {
-                cloudFrame[indexTmp].x = tmpF * coefX[hor];
-                cloudFrame[indexTmp].y = tmpF * coefY[hor];
-                cloudFrame[indexTmp].z = tmpF * coefZ[ver];
+                        cloudFrame[indexTmp].x = tmpF * coefX[hor];
+                        cloudFrame[indexTmp].y = tmpF * coefY[hor];
+                        cloudFrame[indexTmp].z = tmpF * coefZ[ver];
                     }
                 }
                 cursorTmp++;
@@ -115,14 +118,30 @@ boolean A010::ReadSerial()
             {
                 a010Packet.frame_tail.checksum = tmpInt;
                 cursorTmp++;
+                checksum -= tmpInt;
+                if (checksum == a010Packet.frame_tail.checksum)
+                {
+                    // Serial.println("Checksum OK !");
+                }
+                else
+                {
+                    Serial.println();
+                    Serial.print("Checksum ");
+                    Serial.print(a010Packet.frame_tail.checksum);
+                    Serial.print(" - Calculated ");
+                    Serial.print(checksum);
+                    Serial.println();
+                    waitEndOfPacket = true;
+                    InitTmpVariables();
+                }
             }
             else if (cursorTmp == packetSize + 4 + 1)  // length count from Byte4 to the Byte before Checksum
             {
                 if (tmpInt == A010_END_PACKET_BYTE)
                 {
-                a010Packet.frame_tail.frame_end_flag = tmpInt;
-                InitTmpVariables();
-                return true;
+                    a010Packet.frame_tail.frame_end_flag = tmpInt;
+                    InitTmpVariables();
+                    return true;
                 }
                 else
                 {
