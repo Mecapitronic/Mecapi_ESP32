@@ -46,7 +46,7 @@
 #define TX1 4
 
 // Increase the buffer serial to avoid loss packet, 256 by default, should not be under 128
-#define SERIAL_SIZE_RX 1024
+#define SERIAL_SIZE_RX 4096
 
 /***************** Configuration : REBOOT CAMERA AFTER !! *****************/
 #define BINNING_SIZE 4      // pixel binning : 1=1x1 (100x100), 2=2x2 (50x50), 4=4x4 (25x25)

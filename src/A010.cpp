@@ -125,12 +125,14 @@ boolean A010::ReadSerial()
                 }
                 else
                 {
-                    Serial.println();
-                    Serial.print("Checksum ");
-                    Serial.print(a010Packet.frame_tail.checksum);
-                    Serial.print(" - Calculated ");
-                    Serial.print(checksum);
-                    Serial.println();
+                    // Serial.println();
+                    // Serial.print("Checksum ");
+                    // Serial.print(a010Packet.frame_tail.checksum);
+                    // Serial.print(" - Calculated ");
+                    // Serial.print(checksum);
+                    // Serial.println();
+                    // Serial.printf("'%X\n", checksum);
+                    // Serial.println(SERIAL_A010.available());
                     waitEndOfPacket = true;
                     InitTmpVariables();
                 }
@@ -195,7 +197,7 @@ boolean A010::ReadSerial()
         {
             packetSize |= tmpInt << 8;
             a010Packet.frame_head.frame_data_len |= tmpInt << 8;
-            // Debugger::log("packetSize", packetSize);
+            // Serial.printf("|%i|", packetSize);
             cursorTmp++;
         }
         else if (cursorTmp == 4)

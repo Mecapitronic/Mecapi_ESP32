@@ -80,10 +80,10 @@ void Task1code(void *pvParameters)
                     SERIAL_DEBUG.println(data);
                 }
                 SERIAL_DEBUG.println("---");
+                // SERIAL_DEBUG.println();
 
-                clusters = dbscan.Process((Dbscan::Point3D *)&(a010.cloudFrame), PICTURE_SIZE);
-                SERIAL_DEBUG.println("Dbscan Process");
-                dbscan.displayStats();
+                // SERIAL_DEBUG.println("Dbscan Process");
+                //  clusters = dbscan.Process((Dbscan::Point3D *)&(a010.cloudFrame), PICTURE_SIZE);
 
                 //+" " + String(cloud.cluster[i]);
                 // SERIAL_DEBUG.println(String(dist));
