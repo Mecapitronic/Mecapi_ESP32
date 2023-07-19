@@ -16,14 +16,14 @@ void setup()
     delay(500);
 
     SERIAL_DEBUG.println("Dbscan setup");
-    dbscan.Config(30, 10, EUCLIDIAN);
+    dbscan.Config(60.0f, 3, TCHEBYCHEV);
     delay(500);
 
     SERIAL_DEBUG.println("Create Task1code");
     // create a task that will be executed in the Task1code() function, with priority 1 and executed on core 0
     xTaskCreatePinnedToCore(Task1code, /* Task function. */
                             "Task1",   /* name of task. */
-                            100000,    /* Stack size of task */
+                            20000,     /* Stack size of task */
                             NULL,      /* parameter of the task */
                             10,        /* priority of the task */
                             &Task1,    /* Task handle to keep track of created task */
@@ -33,7 +33,7 @@ void setup()
     // create a task that will be executed in the Task2code() function, with priority 1 and executed on core 1
     xTaskCreatePinnedToCore(Task2code, /* Task function. */
                             "Task2",   /* name of task. */
-                            10000,     /* Stack size of task */
+                            20000,     /* Stack size of task */
                             NULL,      /* parameter of the task */
                             5,         /* priority of the task */
                             &Task2,    /* Task handle to keep track of created task */
@@ -51,11 +51,8 @@ void loop()
 void Task1code(void *pvParameters)
 {
     SERIAL_DEBUG.println("Start Task1code");
-    a010_frame_t a010Packet;
 
-    uint16_t i, result;
-    std::vector<Point3D> cloud;
-    std::vector<std::vector<uint16_t>> clusters;
+    vector<vector<uint16_t>> _clusters;
 
     while (1)
     {
@@ -66,29 +63,26 @@ void Task1code(void *pvParameters)
             {
                 // a010.CheckContinuity();
 
-                // float w[PICTURE_SIZE][3]{0};
-
                 SERIAL_DEBUG.println("***");
 
-                for (i = 0; i < PICTURE_SIZE; i++)  // FIXME: n'affiche plus rien !
+                for (uint16_t i = 0; i < PICTURE_SIZE; i++)  // FIXME: n'affiche plus rien !
                 {
-                    // w[i][0] = a010.cloudFrame[i].x;
-                    // w[i][1] = a010.cloudFrame[i].y;
-                    // w[i][2] = a010.cloudFrame[i].z;
-                    String data = "" + String(a010.cloudFrame[i].x) + " " + String(a010.cloudFrame[i].y) + " " + String(a010.cloudFrame[i].z) + " " +
-                                  String("65520");
-                    SERIAL_DEBUG.println(data);
+                    // String data = "" + String(a010.cloudFrame[i].x) + " " + String(a010.cloudFrame[i].y) + " " + String(a010.cloudFrame[i].z) + " " + String("65520");
+                    // SERIAL_DEBUG.println(data);
                 }
                 SERIAL_DEBUG.println("---");
                 // SERIAL_DEBUG.println();
 
-                // SERIAL_DEBUG.println("Dbscan Process");
-                //  clusters = dbscan.Process((Dbscan::Point3D *)&(a010.cloudFrame), PICTURE_SIZE);
-
-                //+" " + String(cloud.cluster[i]);
-                // SERIAL_DEBUG.println(String(dist));
-
-                // TODO: afficher les clusters en changeant la couleur dans fichier PCD
+                // Erasing all previous _clusters
+                for (size_t i = 0; i < _clusters.size(); i++)
+                {
+                    _clusters[i].clear();
+                }
+                _clusters.clear();
+                SERIAL_DEBUG.println("Dbscan Process");
+                //_clusters = dbscan.Process((Dbscan::Point3D *)&(a010.cloudFrame));
+                _clusters = dbscan.Process((Point4D *)&(a010.cloudFrame));
+                dbscan.displayStats();
 
                 // xQueueSend(queue, &a010Packet, 0);
             }
@@ -105,28 +99,13 @@ void Task1code(void *pvParameters)
 void Task2code(void *pvParameters)
 {
     SERIAL_DEBUG.println("Start Task2code");
-    a010_frame_t a010Packet;
-    uint16_t distance_mm = 0;
-    Point3D p = {0, 0, 0};
+
     while (1)
     {
-        // if (uxQueueMessagesWaiting(queue) > 0)
+        if (uxQueueMessagesWaiting(queue) > 0)
         {
             //   if (xQueueReceive(queue, &a010Packet, portTICK_PERIOD_MS * 0))
             {
-                /*
-                for (int x = 1; x <= 25; x++)
-                {
-                    for (int y = 1; y <= 25; y++)
-                    {
-                        p.x = x;
-                        p.y = y;
-                        p.z = a010Packet.payload[x + (y - 1) * 25] * QUANTIZATION_MM;
-                        // Debugger::plot3D(p, "p" + String(x) + "_" + String(y));
-                        Debugger::plot3Dpy(p);
-                    }
-                }*/
-                //       a010.GetPointCloudFromFrame(a010Packet);
             }
         }
 

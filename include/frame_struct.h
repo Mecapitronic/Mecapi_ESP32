@@ -1,7 +1,6 @@
 #pragma once
 
 #include <stdint.h>
-// #include "A010.h"
 
 #define FRAME_BEGIN_FLAG (0xFF00)
 #define FRAME_END_FLAG (0xDD)
