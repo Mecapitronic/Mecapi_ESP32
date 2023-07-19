@@ -5,14 +5,14 @@
     "editor.defaultFormatter": "ms-vscode.cpptools",
     "editor.formatOnPaste": true,
     "editor.formatOnSave": true,
-    "editor.formatOnSaveMode": "file",
+    "editor.formatOnSaveMode": "modifications",
     "editor.formatOnType": true,
     "editor.guides.bracketPairs": true,
     "editor.guides.bracketPairsHorizontal": true,
+    "editor.rulers": [180],
     "cSpell.language": "en,fr",
     "cSpell.words": [
         "dbscan",
-        "EUCLIDIAN",
         "Mecapitronic",
         "MECAPITRONIC",
         "neighbourhoods",
@@ -21,12 +21,13 @@
     ],
     "platformio-ide.disablePIOHomeStartup": true,
     "platformio-ide.autoOpenPlatformIOIniFile": false,
-    "C_Cpp.clang_format_fallbackStyle": "{ BasedOnStyle: Google, IndentWidth: 4, ColumnLimit: 150, BreakBeforeBraces: Allman, AllowShortIfStatementsOnASingleLine: false, IncludeBlocks: Merge }",
+    "C_Cpp.clang_format_fallbackStyle": "{ BasedOnStyle: Google, IndentWidth: 4, ColumnLimit: 180, BreakBeforeBraces: Allman, AllowShortIfStatementsOnASingleLine: false, IncludeBlocks: Merge }",
     "[python]": {
         "editor.defaultFormatter": "ms-python.python"
     },
     "workbench.iconTheme": "vscode-icons",
     "files.associations": {
+        "*.tmpl": "html",
         "array": "cpp",
         "atomic": "cpp",
         "*.tcc": "cpp",
@@ -76,9 +77,11 @@
         "cinttypes": "cpp",
         "typeinfo": "cpp",
         "charconv": "cpp",
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "queue": "cpp"
     },
     "files.trimFinalNewlines": true,
     "files.insertFinalNewline": true,
     "terminal.integrated.scrollback": 100000,
+    "git.autofetch": true,
 }
