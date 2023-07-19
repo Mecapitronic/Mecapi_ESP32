@@ -97,18 +97,19 @@ boolean A010::ReadSerial()
         {
             if (cursorTmp < packetSize + 4)
             {
-                float tmpF = tmpInt;
-                uint16_t hor = indexTmp % PICTURE_RES;  // plan horizontal => curseur
-                uint16_t ver = indexTmp / PICTURE_RES;  // plan vertical => numéro de ligne
-
                 if (indexTmp >= 0 && indexTmp < PICTURE_SIZE)
                 {
+                    uint16_t col = indexTmp % PICTURE_RES;  // plan horizontal => curseur
+                    uint16_t row = indexTmp / PICTURE_RES;  // plan vertical => numéro de ligne
                     a010Packet.payload[indexTmp] = tmpInt;
-                    if (hor >= 0 && hor < PICTURE_RES && ver >= 0 && ver < PICTURE_RES)
+
+                    if (col >= 0 && col < PICTURE_RES && row >= 0 && row < PICTURE_RES)
                     {
-                        cloudFrame[indexTmp].x = tmpF * coefX[hor];
-                        cloudFrame[indexTmp].y = tmpF * coefY[hor];
-                        cloudFrame[indexTmp].z = tmpF * coefZ[ver];
+                        float tmpF = tmpInt;
+                        cloudFrame[indexTmp].x = tmpF * coefX[col];
+                        cloudFrame[indexTmp].y = tmpF * coefY[col];
+                        cloudFrame[indexTmp].z = tmpF * coefZ[row];
+                        cloudFrame[indexTmp].d = tmpInt;
                     }
                 }
                 cursorTmp++;

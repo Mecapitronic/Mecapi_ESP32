@@ -30,14 +30,14 @@ struct Point3D
 };
 
 /**
- * @brief Represents a 3D Cartesian point, with x, y and z as coordinates and it's cluster
+ * @brief Represents a 4D point, with x, y and z as Cartesian coordinates, and d as 4th dimension
  */
-struct ClusterPoint3D
+struct Point4D
 {
     int16_t x;
     int16_t y;
     int16_t z;
-    uint8_t cluster;
+    uint8_t d;
 };
 
 /**
