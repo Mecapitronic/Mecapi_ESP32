@@ -120,7 +120,8 @@ void Task2code(void *pvParameters)
                 {
                     cmd.remove(0, 6);
                     // int i = atoi(cmd.c_str());
-                    Debugger::log("cmdAT: ", cmd);
+                    SERIAL_DEBUG.print("cmdAT: ");
+                    SERIAL_DEBUG.println(cmd);
                     SERIAL_A010.write(cmd.c_str());
                 }
                 catch (std::exception const &e)

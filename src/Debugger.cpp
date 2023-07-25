@@ -1,5 +1,8 @@
 #include "Debugger.h"
-String readString;
+
+char readBuffer[READ_SERIAL_BUFFER_SIZE];
+uint16_t indexBuffer;
+
 void Debugger::init()
 {
     if (enabled)
@@ -9,7 +12,8 @@ void Debugger::init()
         if (SERIAL_DEBUG.available() <= 0)
         {
         }
-        readString = "";
+        strcpy(readBuffer, "");
+        indexBuffer = 0;
 
         header();
         SERIAL_DEBUG.print("Preparing system...");
@@ -33,22 +37,30 @@ void Debugger::header()
 
 Level Debugger::level() { return debugLevel; }
 
-String Debugger::checkSerial()
+char* Debugger::checkSerial()
 {
     if (enabled && SERIAL_DEBUG.available() > 0)
     {
         char tmpChar = SERIAL_DEBUG.read();
-        readString += tmpChar;
-        if (tmpChar == '\n')
+        if (indexBuffer < READ_SERIAL_BUFFER_SIZE)
         {
-            // String command = SERIAL_DEBUG.readStringUntil('\n');
-            String command = readString;
-            readString = "";
-            SERIAL_DEBUG.println("Received : " + command);
-            return command;
+            readBuffer[indexBuffer++] = tmpChar;
+            if (tmpChar == '\n')
+            {
+                SERIAL_DEBUG.print("Received : ");
+                SERIAL_DEBUG.write(readBuffer, indexBuffer);
+                indexBuffer = 0;
+                return readBuffer;
+            }
+        }
+        else
+        {
+            SERIAL_DEBUG.print("Read Buffer Overflow : ");
+            SERIAL_DEBUG.println(indexBuffer);
+            indexBuffer = 0;
         }
     }
-    return "";
+    return nullptr;
 }
 
 void Debugger::log(String data, Level level, boolean lineFeed)

@@ -5,3 +5,6 @@
 	path = lib/DBSCAN-for-ESP32
 	url = https://github.com/Mecapitronic/DBSCAN-for-ESP32.git
 	branch = main
+[submodule "lib/ESP32_Helper"]
+	path = lib/ESP32_Helper
+	url = https://github.com/Mecapitronic/ESP32_Helper.git
