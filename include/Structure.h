@@ -10,6 +10,14 @@
 
 #include <Arduino.h>
 
+enum class Level
+{
+    LEVEL_VERBOSE = 0,
+    LEVEL_INFO = 1,
+    LEVEL_WARN = 2,
+    LEVEL_ERROR = 3
+};
+
 /**
  * @brief Represents a Cartesian point, with x and y as coordinates
  */
