@@ -3,23 +3,36 @@
 char readBuffer[READ_SERIAL_BUFFER_SIZE];
 uint16_t indexBuffer;
 
+QueueHandle_t queueSteps;
+const uint16_t queueStepsSize = 100;
+uint16_t debugStep;
+
 void Debugger::init()
 {
     if (enabled)
     {
-        SERIAL_DEBUG.begin(921600);
-
-        if (SERIAL_DEBUG.available() <= 0)
+        SERIAL_DEBUG.begin(SERIAL_DEBUG_SPEED);
+        if (SERIAL_DEBUG.available() > 0)
         {
+            SERIAL_DEBUG.flush();
         }
+
         strcpy(readBuffer, "");
         indexBuffer = 0;
 
         header();
         SERIAL_DEBUG.print("Preparing system...");
+        queueSteps = xQueueCreate(queueStepsSize, sizeof(uint16_t));
+        if (queueSteps == NULL)
+        {
+            log("Error creating the queueSteps", ERROR);
+        }
+        debugStep = 0;
         delay(200);
         SERIAL_DEBUG.println("done.");
     }
+    else
+        SERIAL_DEBUG.print("Debugger Disable");
 }
 
 void Debugger::header()
@@ -220,3 +233,30 @@ void Debugger::plot3Dpy(Point3D p)
     String data = "" + String(p.x) + ":" + String(p.y) + ":" + String(p.z);
     SERIAL_DEBUG.println(data);
 }
+
+bool Debugger::waitForAvaiableSteps()
+{
+    if (debugStep == 0)
+        SERIAL_DEBUG.println("waitForAvaiableSteps");
+
+    while (debugStep == 0)
+    {
+        if (uxQueueMessagesWaiting(queueSteps) > 0)
+        {
+            uint16_t steps = 0;
+            if (xQueueReceive(queueSteps, &steps, portTICK_PERIOD_MS * 0))
+            {
+                addSteps(steps);
+                SERIAL_DEBUG.print("xQueueReceive queueSteps : ");
+                SERIAL_DEBUG.println(steps);
+            }
+        }
+        vTaskDelay(1);
+    }
+    subSteps();
+    return true;
+}
+
+void Debugger::addSteps(uint16_t steps) { debugStep += steps; }
+
+void Debugger::subSteps(uint16_t steps) { debugStep -= steps; }
