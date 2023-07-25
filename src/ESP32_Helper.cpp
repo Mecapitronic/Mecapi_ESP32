@@ -1,18 +1,15 @@
 #include "ESP32_Helper.h"
 
-char readBuffer[READ_SERIAL_BUFFER_SIZE];
-uint16_t indexBuffer;
+namespace ESP32_Helper
+{
 
 void ESP32_Helper()
 {
-    SERIAL_DEBUG.begin(SERIAL_DEBUG_SPEED);
+    SERIAL_DEBUG.begin(Serial_Debug_Speed);
     if (SERIAL_DEBUG.available() > 0)
     {
         SERIAL_DEBUG.flush();
     }
-
-    strcpy(readBuffer, "");
-    indexBuffer = 0;
 
     SERIAL_DEBUG.println();
     SERIAL_DEBUG.println(".--------------.");
@@ -23,15 +20,18 @@ void ESP32_Helper()
     SERIAL_DEBUG.print(" at ");
     SERIAL_DEBUG.println(__TIME__);
     SERIAL_DEBUG.println();
-    delay(200);
 }
 
 char* checkSerial()
 {
+    // static declaration to initialise only once at startup
+    static uint16_t indexBuffer = 0;
+    static char readBuffer[Serial_Read_Buffer];
+
     if (SERIAL_DEBUG.available() > 0)
     {
         char tmpChar = SERIAL_DEBUG.read();
-        if (indexBuffer < READ_SERIAL_BUFFER_SIZE)
+        if (indexBuffer < Serial_Read_Buffer)
         {
             readBuffer[indexBuffer++] = tmpChar;
             if (tmpChar == '\n')
@@ -51,3 +51,4 @@ char* checkSerial()
     }
     return nullptr;
 }
+}  // namespace ESP32_Helper

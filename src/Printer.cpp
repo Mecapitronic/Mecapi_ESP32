@@ -1,30 +1,28 @@
 #include "Printer.h"
 
-//Level Printer::level() { return debugLevel; }
-
-void Printer::log(String data, Level level, boolean lineFeed)
+namespace Printer
 {
-    if (level < debugLevel)
+Level PrintLevel(Level level)
+{
+    if (level != Level::LEVEL_NONE)
+    {
+        printLevel = level;
+    }
+    return printLevel;
+}
+
+void print(String data, Level level, boolean lineFeed)
+{
+    if (level < printLevel)
         return;
     SERIAL_DEBUG.print(data);
     if (lineFeed)
         SERIAL_DEBUG.println();
 }
 
-void Printer::log(String prefix, int data, String suffix, Level level, boolean lineFeed)
+void print(String prefix, int data, String suffix, Level level, boolean lineFeed)
 {
-    if (level < debugLevel)
-        return;
-    SERIAL_DEBUG.print(prefix);
-    SERIAL_DEBUG.print(data);
-    SERIAL_DEBUG.print(suffix);
-    if (lineFeed)
-        SERIAL_DEBUG.println();
-}
-
-void Printer::log(String prefix, char data, String suffix, Level level, boolean lineFeed)
-{
-    if (level < debugLevel)
+    if (level < printLevel)
         return;
     SERIAL_DEBUG.print(prefix);
     SERIAL_DEBUG.print(data);
@@ -33,9 +31,9 @@ void Printer::log(String prefix, char data, String suffix, Level level, boolean 
         SERIAL_DEBUG.println();
 }
 
-void Printer::log(String prefix, float data, String suffix, Level level, boolean lineFeed)
+void print(String prefix, char data, String suffix, Level level, boolean lineFeed)
 {
-    if (level < debugLevel)
+    if (level < printLevel)
         return;
     SERIAL_DEBUG.print(prefix);
     SERIAL_DEBUG.print(data);
@@ -44,9 +42,20 @@ void Printer::log(String prefix, float data, String suffix, Level level, boolean
         SERIAL_DEBUG.println();
 }
 
-void Printer::log(String prefix, Point data, String suffix, Level level, boolean lineFeed)
+void print(String prefix, float data, String suffix, Level level, boolean lineFeed)
 {
-    if (level < debugLevel)
+    if (level < printLevel)
+        return;
+    SERIAL_DEBUG.print(prefix);
+    SERIAL_DEBUG.print(data);
+    SERIAL_DEBUG.print(suffix);
+    if (lineFeed)
+        SERIAL_DEBUG.println();
+}
+
+void print(String prefix, Point data, String suffix, Level level, boolean lineFeed)
+{
+    if (level < printLevel)
         return;
     SERIAL_DEBUG.print(prefix);
     SERIAL_DEBUG.print("x: ");
@@ -58,9 +67,9 @@ void Printer::log(String prefix, Point data, String suffix, Level level, boolean
         SERIAL_DEBUG.println();
 }
 
-void Printer::log(String prefix, PolarPoint data, String suffix, Level level, boolean lineFeed)
+void print(String prefix, PolarPoint data, String suffix, Level level, boolean lineFeed)
 {
-    if (level < debugLevel)
+    if (level < printLevel)
         return;
     SERIAL_DEBUG.print("A: ");
     SERIAL_DEBUG.print((int)(data.angle / 100));
@@ -74,9 +83,9 @@ void Printer::log(String prefix, PolarPoint data, String suffix, Level level, bo
 }
 
 // bool needs to be the last because it overrides all functions
-void Printer::log(String prefix, bool data, String suffix, Level level, boolean lineFeed)
+void print(String prefix, bool data, String suffix, Level level, boolean lineFeed)
 {
-    if (level < debugLevel)
+    if (level < printLevel)
         return;
     SERIAL_DEBUG.print(prefix);
     SERIAL_DEBUG.print(data);
@@ -85,9 +94,9 @@ void Printer::log(String prefix, bool data, String suffix, Level level, boolean 
         SERIAL_DEBUG.println();
 }
 
-void Printer::logArray(String prefix, int array[], size_t size, char separator, String suffix, Level level)
+void printArray(String prefix, int array[], size_t size, char separator, String suffix, Level level)
 {
-    if (level < debugLevel)
+    if (level < printLevel)
         return;
     if (size > 0)
     {
@@ -102,9 +111,9 @@ void Printer::logArray(String prefix, int array[], size_t size, char separator, 
     }
 }
 
-void Printer::logArrayN(String prefix, int element, String interFix, int array[], size_t size, char separator, String suffix, Level level)
+void printArrayN(String prefix, int element, String interFix, int array[], size_t size, char separator, String suffix, Level level)
 {
-    if (level < debugLevel)
+    if (level < printLevel)
         return;
     if (size > 0)
     {
@@ -123,17 +132,17 @@ void Printer::logArrayN(String prefix, int element, String interFix, int array[]
         SERIAL_DEBUG.println("Invalid array printed !");
 }
 
-void Printer::plotPoint(Point p, String varName, Level level)
+void plotPoint(Point p, String varName, Level level)
 {
-    if (level < debugLevel)
+    if (level < printLevel)
         return;
     String data = ">" + varName + ":" + (int)p.x + ":" + (int)p.y + "|xy";
     SERIAL_DEBUG.println(data);
 }
 
-void Printer::plotPoint(Point p, Level level)
+void plotPoint(Point p, Level level)
 {
-    if (level < debugLevel)
+    if (level < printLevel)
         return;
     SERIAL_DEBUG.print(">x:");
     SERIAL_DEBUG.println((int)p.x);
@@ -141,7 +150,7 @@ void Printer::plotPoint(Point p, Level level)
     SERIAL_DEBUG.println((int)p.y);
 }
 
-void Printer::plot3D(Point3D p, String varName)
+void plot3D(Point3D p, String varName)
 {
     // 3D|A:B:C|E
     // '3D|sphere1,widget0:S:sphere:RA:'+ str(sphere1rad)+':P:'+ str(sphere1x) +':'+ str(sphere1y) +':'+ str(sphere1z) + ':C:black:O:1'
@@ -154,8 +163,9 @@ void Printer::plot3D(Point3D p, String varName)
     SERIAL_DEBUG.println(data);
 }
 
-void Printer::plot3Dpy(Point3D p)
+void plot3Dpy(Point3D p)
 {
     String data = "" + String(p.x) + ":" + String(p.y) + ":" + String(p.z);
     SERIAL_DEBUG.println(data);
 }
+}  // namespace Printer

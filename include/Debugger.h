@@ -1,5 +1,8 @@
 /**
- * Helper functions to debug via serial
+ * @file Debugger.h
+ * @author Mecapitronic (mecapitronic@gmail.com)
+ * @brief Software debugger
+ * @date 2023-07-25
  */
 
 #ifndef DEBUGGER_H

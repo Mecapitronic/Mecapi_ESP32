@@ -2,7 +2,7 @@
  * @file Structure.h
  * @author Mecapitronic (mecapitronic@gmail.com)
  * @brief All data structures used across program
- *
+ * @date 2023-07-25
  */
 
 #ifndef STRUCTURE_H
@@ -12,10 +12,11 @@
 
 enum class Level
 {
-    LEVEL_VERBOSE = 0,
-    LEVEL_INFO = 1,
-    LEVEL_WARN = 2,
-    LEVEL_ERROR = 3
+    LEVEL_NONE,
+    LEVEL_VERBOSE,
+    LEVEL_INFO,
+    LEVEL_WARN,
+    LEVEL_ERROR
 };
 
 /**
@@ -50,7 +51,7 @@ struct Point4D
 
 /**
  * @brief Represents a Polar point, with angle and distance as coordinates
- * Has confidence and cartesian coordinates too
+ * Has confidence and Cartesian coordinates too
  *
  */
 struct PolarPoint
