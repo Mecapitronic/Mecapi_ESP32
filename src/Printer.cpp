@@ -23,46 +23,70 @@ Enable PrintEnable(Enable enable)
 
 bool IsPrintable(Level level) { return PrintEnable() == ENABLE_TRUE && PrintLevel() < level; }
 
-void print(String data, Level level, boolean lineFeed)
+void print(String data, Level level)
 {
     if (!IsPrintable(level))
         return;
     SERIAL_DEBUG.print(data);
-    if (lineFeed)
-        SERIAL_DEBUG.println();
 }
 
-void print(String prefix, int data, String suffix, Level level, boolean lineFeed)
+void println(String data, Level level)
+{
+    if (!IsPrintable(level))
+        return;
+    SERIAL_DEBUG.print(data);
+    SERIAL_DEBUG.println();
+}
+
+void print(String prefix, int data, String suffix, Level level)
 {
     if (!IsPrintable(level))
         return;
     SERIAL_DEBUG.print(prefix);
     SERIAL_DEBUG.print(data);
     SERIAL_DEBUG.print(suffix);
-    if (lineFeed)
-        SERIAL_DEBUG.println();
 }
 
-void print(String prefix, char data, String suffix, Level level, boolean lineFeed)
+void println(String prefix, int data, String suffix, Level level)
+{
+    if (!IsPrintable(level))
+        return;
+    print(prefix, data, suffix, level);
+    SERIAL_DEBUG.println();
+}
+
+void print(String prefix, char data, String suffix, Level level)
 {
     if (!IsPrintable(level))
         return;
     SERIAL_DEBUG.print(prefix);
     SERIAL_DEBUG.print(data);
     SERIAL_DEBUG.print(suffix);
-    if (lineFeed)
-        SERIAL_DEBUG.println();
 }
 
-void print(String prefix, float data, String suffix, Level level, boolean lineFeed)
+void println(String prefix, char data, String suffix, Level level)
+{
+    if (!IsPrintable(level))
+        return;
+    print(prefix, data, suffix, level);
+    SERIAL_DEBUG.println();
+}
+
+void print(String prefix, float data, String suffix, Level level)
 {
     if (!IsPrintable(level))
         return;
     SERIAL_DEBUG.print(prefix);
     SERIAL_DEBUG.print(data);
     SERIAL_DEBUG.print(suffix);
-    if (lineFeed)
-        SERIAL_DEBUG.println();
+}
+
+void println(String prefix, float data, String suffix, Level level)
+{
+    if (!IsPrintable(level))
+        return;
+    print(prefix, data, suffix, level);
+    SERIAL_DEBUG.println();
 }
 
 void print(String prefix, Point data, String suffix, Level level, boolean lineFeed)
@@ -100,7 +124,10 @@ void print(String prefix, bool data, String suffix, Level level, boolean lineFee
     if (!IsPrintable(level))
         return;
     SERIAL_DEBUG.print(prefix);
-    SERIAL_DEBUG.print(data);
+    if (data)
+        SERIAL_DEBUG.print("true");
+    else
+        SERIAL_DEBUG.print("false");
     SERIAL_DEBUG.print(suffix);
     if (lineFeed)
         SERIAL_DEBUG.println();

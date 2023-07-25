@@ -18,10 +18,14 @@ Level PrintLevel(Level level = LEVEL_NONE);
 Enable PrintEnable(Enable enable = Enable::ENABLE_NONE);
 bool IsPrintable();
 
-void print(String data, Level level = LEVEL_VERBOSE, boolean lineFeed = true);
-void print(String prefix, int data, String suffix = "", Level level = LEVEL_VERBOSE, boolean lineFeed = true);
-void print(String prefix, char data, String suffix = "", Level level = LEVEL_VERBOSE, boolean lineFeed = true);
-void print(String prefix, float data, String suffix = "", Level level = LEVEL_VERBOSE, boolean lineFeed = true);
+void print(String data, Level level = LEVEL_VERBOSE);
+void println(String data, Level level = LEVEL_VERBOSE);
+void print(String prefix, int data, String suffix = "", Level level = LEVEL_VERBOSE);
+void println(String prefix, int data, String suffix = "", Level level = LEVEL_VERBOSE);
+void print(String prefix, char data, String suffix = "", Level level = LEVEL_VERBOSE);
+void println(String prefix, char data, String suffix = "", Level level = LEVEL_VERBOSE);
+void print(String prefix, float data, String suffix = "", Level level = LEVEL_VERBOSE);
+void println(String prefix, float data, String suffix = "", Level level = LEVEL_VERBOSE);
 
 void print(String prefix, Point data, String suffix = "", Level level = LEVEL_VERBOSE, boolean lineFeed = true);
 void print(String prefix, PolarPoint data, String suffix = "", Level level = LEVEL_VERBOSE, boolean lineFeed = true);
