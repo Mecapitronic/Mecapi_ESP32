@@ -13,7 +13,8 @@
         "ms-vscode.vscode-serial-monitor",
         "platformio.platformio-ide",
         "streetsidesoftware.code-spell-checker-french",
-        "vscode-icons-team.vscode-icons"
+        "vscode-icons-team.vscode-icons",
+        "cschlosser.doxdocgen"
     ],
     "unwantedRecommendations": [
         "ms-vscode.cmake-tools",
