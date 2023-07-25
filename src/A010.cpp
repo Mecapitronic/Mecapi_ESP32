@@ -4,7 +4,7 @@ A010::A010() {}
 
 void A010::Initialisation()
 {
-    Debugger::log("Init A010");
+    println("Init A010");
     // minDistance, maxDistance
     Config(100, 1500, 2);
     SERIAL_A010.begin(115200);
@@ -41,8 +41,8 @@ void A010::Initialisation()
     SERIAL_A010.setRxBufferSize(SERIAL_SIZE_RX);
     SERIAL_A010.begin(BAUD_RATE_SPEED);
 
-    // Debugger::log("Init A010 COPY");
-    // SERIAL_A010_COPY.begin(115200, SERIAL_8N1, RX1, TX1);
+    // println("Init A010 COPY");
+    //  SERIAL_A010_COPY.begin(115200, SERIAL_8N1, RX1, TX1);
 }
 
 void A010::InitTmpVariables()
@@ -57,20 +57,20 @@ void A010::Config(int min = -1, int max = -1, int discontinuity = -1)
 {
     if (min != -1)
     {
-        Debugger::log("A010 Config 'Distance Min' from ", a010Config.minDistance, "", INFO, false);
-        Debugger::log(" to ", min, "", INFO);
+        print("A010 Config 'Distance Min' from ", a010Config.minDistance, "", LEVEL_INFO);
+        println(" to ", min, "", LEVEL_INFO);
         a010Config.minDistance = min;
     }
     if (max != -1)
     {
-        Debugger::log("A010 Config 'Distance Max' from ", a010Config.maxDistance, "", INFO, false);
-        Debugger::log(" to ", max, "", INFO);
+        print("A010 Config 'Distance Max' from ", a010Config.maxDistance, "", LEVEL_INFO);
+        println(" to ", max, "", LEVEL_INFO);
         a010Config.maxDistance = max;
     }
     if (discontinuity != -1)
     {
-        Debugger::log("A010 Config 'Discontinuity' from ", a010Config.IDMaxDiscontinuity, "", INFO, false);
-        Debugger::log(" to ", discontinuity, "", INFO);
+        print("A010 Config 'Discontinuity' from ", a010Config.IDMaxDiscontinuity, "", LEVEL_INFO);
+        println(" to ", discontinuity, "", LEVEL_INFO);
         a010Config.IDMaxDiscontinuity = discontinuity;
     }
 }
@@ -157,9 +157,9 @@ boolean A010::ReadSerial()
             {
                 // we should never come here !
                 InitTmpVariables();
-                Debugger::log("cursorTmp > packetSize + 4 + 2", WARN);
-                Debugger::log("cursorTmp : ", cursorTmp, "", WARN);
-                Debugger::log("packetSize : ", packetSize, "", WARN);
+                print("cursorTmp > packetSize + 4 + 2", LEVEL_WARN);
+                print("cursorTmp : ", cursorTmp, "", LEVEL_WARN);
+                println("packetSize : ", packetSize, "", LEVEL_WARN);
             }
         }
         else if (cursorTmp == 0)  // First byte of packet
@@ -287,9 +287,9 @@ boolean A010::ReadSerial()
         {
             // we should never come here !
             InitTmpVariables();
-            Debugger::log("cursorTmp < 0", WARN);
-            Debugger::log("cursorTmp : ", cursorTmp, "", WARN);
-            Debugger::log("packetSize : ", packetSize, "", WARN);
+            print("cursorTmp < 0", LEVEL_WARN);
+            print("cursorTmp : ", cursorTmp, "", LEVEL_WARN);
+            println("packetSize : ", packetSize, "", LEVEL_WARN);
         }
     }
     return false;
@@ -311,9 +311,9 @@ boolean A010::CheckContinuity()
 
     if (delta > a010Config.IDMaxDiscontinuity)
     {
-        Debugger::log("a010Packet.frame_head.frame_id : ", a010Packet.frame_head.frame_id, "", WARN);
-        Debugger::log("a010LastPacketHeader.frame_id : ", a010LastPacketHeader.frame_id, "", WARN);
-        Debugger::log("Discontinuity : ", delta, "", WARN);
+        println("a010Packet.frame_head.frame_id : ", a010Packet.frame_head.frame_id, "", LEVEL_WARN);
+        println("a010LastPacketHeader.frame_id : ", a010LastPacketHeader.frame_id, "", LEVEL_WARN);
+        println("Discontinuity : ", delta, "", LEVEL_WARN);
         return false;
     }
     else
@@ -376,17 +376,17 @@ void A010::logCartesianCoefficient()
 
 void A010::logHeader()
 {
-    Debugger::log("frame_data_len ", a010Packet.frame_head.frame_data_len);
-    Debugger::log("output_mode ", a010Packet.frame_head.output_mode);
-    Debugger::log("senser_temp ", a010Packet.frame_head.senser_temp);
-    Debugger::log("driver_temp ", a010Packet.frame_head.driver_temp);
-    Debugger::log("exposure_time[0] ", a010Packet.frame_head.exposure_time[0]);
-    Debugger::log("exposure_time[1] ", a010Packet.frame_head.exposure_time[1]);
-    Debugger::log("exposure_time[2] ", a010Packet.frame_head.exposure_time[2]);
-    Debugger::log("exposure_time[3] ", a010Packet.frame_head.exposure_time[3]);
-    Debugger::log("error_code ", a010Packet.frame_head.error_code);
-    Debugger::log("resolution_rows ", a010Packet.frame_head.resolution_rows);
-    Debugger::log("resolution_cols ", a010Packet.frame_head.resolution_cols);
-    Debugger::log("frame_id ", a010Packet.frame_head.frame_id);
-    Debugger::log("isp_version ", a010Packet.frame_head.isp_version);
+    println("frame_data_len ", a010Packet.frame_head.frame_data_len);
+    println("output_mode ", a010Packet.frame_head.output_mode);
+    println("senser_temp ", a010Packet.frame_head.senser_temp);
+    println("driver_temp ", a010Packet.frame_head.driver_temp);
+    println("exposure_time[0] ", a010Packet.frame_head.exposure_time[0]);
+    println("exposure_time[1] ", a010Packet.frame_head.exposure_time[1]);
+    println("exposure_time[2] ", a010Packet.frame_head.exposure_time[2]);
+    println("exposure_time[3] ", a010Packet.frame_head.exposure_time[3]);
+    println("error_code ", a010Packet.frame_head.error_code);
+    println("resolution_rows ", a010Packet.frame_head.resolution_rows);
+    println("resolution_cols ", a010Packet.frame_head.resolution_cols);
+    println("frame_id ", a010Packet.frame_head.frame_id);
+    println("isp_version ", a010Packet.frame_head.isp_version);
 }
