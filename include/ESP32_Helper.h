@@ -16,7 +16,6 @@
 
 namespace ESP32_Helper
 {
-const int Serial_Debug_Speed = 921600;
 const int Serial_Read_Buffer = 64;
 
 // ESP32 Serial Bauds rates
@@ -26,7 +25,7 @@ const int Serial_Read_Buffer = 64;
 /**
  * Initialize serial for PC communication
  */
-void ESP32_Helper();
+void ESP32_Helper(int baud_speed = 921600);
 
 /**
  * Check for commands send on debugging serial plugged to a computer

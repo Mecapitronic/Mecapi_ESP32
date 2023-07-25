@@ -3,9 +3,9 @@
 namespace ESP32_Helper
 {
 
-void ESP32_Helper()
+void ESP32_Helper(int baud_speed)
 {
-    SERIAL_DEBUG.begin(Serial_Debug_Speed);
+    SERIAL_DEBUG.begin(baud_speed);
     if (SERIAL_DEBUG.available() > 0)
     {
         SERIAL_DEBUG.flush();
@@ -20,6 +20,9 @@ void ESP32_Helper()
     SERIAL_DEBUG.print(" at ");
     SERIAL_DEBUG.println(__TIME__);
     SERIAL_DEBUG.println();
+
+    Printer::PrintLevel(Level::LEVEL_VERBOSE);
+    Printer::PrintEnable(Enable::ENABLE_TRUE);
 }
 
 char* checkSerial()
