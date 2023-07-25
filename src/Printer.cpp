@@ -4,6 +4,8 @@ namespace Printer
 {
 Level PrintLevel(Level level)
 {
+    static Level printLevel = LEVEL_NONE;
+
     if (level != Level::LEVEL_NONE)
     {
         printLevel = level;
@@ -11,9 +13,19 @@ Level PrintLevel(Level level)
     return printLevel;
 }
 
+Enable PrintEnable(Enable enable)
+{
+    static Enable printEnable = ENABLE_NONE;
+    if (enable != ENABLE_NONE)
+        printEnable = enable;
+    return printEnable;
+}
+
+bool IsPrintable(Level level) { return PrintEnable() == ENABLE_TRUE && PrintLevel() < level; }
+
 void print(String data, Level level, boolean lineFeed)
 {
-    if (level < printLevel)
+    if (!IsPrintable(level))
         return;
     SERIAL_DEBUG.print(data);
     if (lineFeed)
@@ -22,7 +34,7 @@ void print(String data, Level level, boolean lineFeed)
 
 void print(String prefix, int data, String suffix, Level level, boolean lineFeed)
 {
-    if (level < printLevel)
+    if (!IsPrintable(level))
         return;
     SERIAL_DEBUG.print(prefix);
     SERIAL_DEBUG.print(data);
@@ -33,7 +45,7 @@ void print(String prefix, int data, String suffix, Level level, boolean lineFeed
 
 void print(String prefix, char data, String suffix, Level level, boolean lineFeed)
 {
-    if (level < printLevel)
+    if (!IsPrintable(level))
         return;
     SERIAL_DEBUG.print(prefix);
     SERIAL_DEBUG.print(data);
@@ -44,7 +56,7 @@ void print(String prefix, char data, String suffix, Level level, boolean lineFee
 
 void print(String prefix, float data, String suffix, Level level, boolean lineFeed)
 {
-    if (level < printLevel)
+    if (!IsPrintable(level))
         return;
     SERIAL_DEBUG.print(prefix);
     SERIAL_DEBUG.print(data);
@@ -55,7 +67,7 @@ void print(String prefix, float data, String suffix, Level level, boolean lineFe
 
 void print(String prefix, Point data, String suffix, Level level, boolean lineFeed)
 {
-    if (level < printLevel)
+    if (!IsPrintable(level))
         return;
     SERIAL_DEBUG.print(prefix);
     SERIAL_DEBUG.print("x: ");
@@ -69,7 +81,7 @@ void print(String prefix, Point data, String suffix, Level level, boolean lineFe
 
 void print(String prefix, PolarPoint data, String suffix, Level level, boolean lineFeed)
 {
-    if (level < printLevel)
+    if (!IsPrintable(level))
         return;
     SERIAL_DEBUG.print("A: ");
     SERIAL_DEBUG.print((int)(data.angle / 100));
@@ -85,7 +97,7 @@ void print(String prefix, PolarPoint data, String suffix, Level level, boolean l
 // bool needs to be the last because it overrides all functions
 void print(String prefix, bool data, String suffix, Level level, boolean lineFeed)
 {
-    if (level < printLevel)
+    if (!IsPrintable(level))
         return;
     SERIAL_DEBUG.print(prefix);
     SERIAL_DEBUG.print(data);
@@ -96,7 +108,7 @@ void print(String prefix, bool data, String suffix, Level level, boolean lineFee
 
 void printArray(String prefix, int array[], size_t size, char separator, String suffix, Level level)
 {
-    if (level < printLevel)
+    if (!IsPrintable(level))
         return;
     if (size > 0)
     {
@@ -113,7 +125,7 @@ void printArray(String prefix, int array[], size_t size, char separator, String 
 
 void printArrayN(String prefix, int element, String interFix, int array[], size_t size, char separator, String suffix, Level level)
 {
-    if (level < printLevel)
+    if (!IsPrintable(level))
         return;
     if (size > 0)
     {
@@ -134,7 +146,7 @@ void printArrayN(String prefix, int element, String interFix, int array[], size_
 
 void plotPoint(Point p, String varName, Level level)
 {
-    if (level < printLevel)
+    if (!IsPrintable(level))
         return;
     String data = ">" + varName + ":" + (int)p.x + ":" + (int)p.y + "|xy";
     SERIAL_DEBUG.println(data);
@@ -142,7 +154,7 @@ void plotPoint(Point p, String varName, Level level)
 
 void plotPoint(Point p, Level level)
 {
-    if (level < printLevel)
+    if (!IsPrintable(level))
         return;
     SERIAL_DEBUG.print(">x:");
     SERIAL_DEBUG.println((int)p.x);

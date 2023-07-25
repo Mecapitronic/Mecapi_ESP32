@@ -10,13 +10,20 @@
 
 #include <Arduino.h>
 
-enum class Level
+enum Level
 {
     LEVEL_NONE,
     LEVEL_VERBOSE,
     LEVEL_INFO,
     LEVEL_WARN,
     LEVEL_ERROR
+};
+
+enum Enable
+{
+    ENABLE_FALSE,
+    ENABLE_TRUE,
+    ENABLE_NONE
 };
 
 /**
