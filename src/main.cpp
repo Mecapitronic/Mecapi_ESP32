@@ -3,12 +3,12 @@
 void setup()
 {
     // put your setup code here, to run once:
-    Debugger::init();
+    ESP32_Helper::ESP32_Helper(921600);
 
-    // queue = xQueueCreate(queueSize, sizeof(a010_frame_t));
-    // if (queue == NULL)
+    queue = xQueueCreate(queueSize, sizeof(uint8_t));
+    if (queue == NULL)
     {
-        //      Debugger::log("Error creating the queue", ERROR);
+        println("Error creating the queue !");
     }
 
     SERIAL_DEBUG.println("A010 setup");
@@ -65,12 +65,12 @@ void Task1code(void *pvParameters)
 
                 SERIAL_DEBUG.println("***");
 
-                for (uint16_t i = 0; i < PICTURE_SIZE; i++)  // FIXME: n'affiche plus rien !
-                {
-                    // String data = "" + String(a010.cloudFrame[i].x) + " " + String(a010.cloudFrame[i].y) + " " + String(a010.cloudFrame[i].z) + " " + String("65520");
-                    // SERIAL_DEBUG.println(data);
-                }
-                SERIAL_DEBUG.println("---");
+                // for (uint16_t i = 0; i < PICTURE_SIZE; i++)  // FIXME: n'affiche plus rien !
+                //{
+                //  String data = "" + String(a010.cloudFrame[i].x) + " " + String(a010.cloudFrame[i].y) + " " + String(a010.cloudFrame[i].z) + " " + String("65520");
+                //  SERIAL_DEBUG.println(data);
+                //}
+                // SERIAL_DEBUG.println("---");
                 // SERIAL_DEBUG.println();
 
                 // Erasing all previous _clusters
@@ -81,15 +81,16 @@ void Task1code(void *pvParameters)
                 _clusters.clear();
                 SERIAL_DEBUG.println("Dbscan Process");
                 //_clusters = dbscan.Process((Dbscan::Point3D *)&(a010.cloudFrame));
-                _clusters = dbscan.Process((Point4D *)&(a010.cloudFrame));
-                dbscan.displayStats();
+                //_clusters = dbscan.Process((Point4D *)&(a010.cloudFrame));
+                // dbscan.displayStats();
 
                 // xQueueSend(queue, &a010Packet, 0);
             }
         }
         catch (std::exception const &e)
         {
-            Debugger::log("error : ", e.what());
+            SERIAL_DEBUG.print("error : ");
+            SERIAL_DEBUG.println(e.what());
         }
         vTaskDelay(1);
     }
@@ -99,13 +100,15 @@ void Task1code(void *pvParameters)
 void Task2code(void *pvParameters)
 {
     SERIAL_DEBUG.println("Start Task2code");
-
+    uint8_t test = 0;
     while (1)
     {
         if (uxQueueMessagesWaiting(queue) > 0)
         {
-            //   if (xQueueReceive(queue, &a010Packet, portTICK_PERIOD_MS * 0))
+            if (xQueueReceive(queue, &test, portTICK_PERIOD_MS * 0))
             {
+                SERIAL_DEBUG.print("xQueueReceive : ");
+                SERIAL_DEBUG.println(test);
             }
         }
 
@@ -126,7 +129,8 @@ void Task2code(void *pvParameters)
                 }
                 catch (std::exception const &e)
                 {
-                    Debugger::log("error : ", e.what());
+                    SERIAL_DEBUG.print("error : ");
+                    SERIAL_DEBUG.println(e.what());
                 }
             }
         }

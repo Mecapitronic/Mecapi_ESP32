@@ -2,11 +2,11 @@
 #define MAIN_H
 
 #include <Arduino.h>
+#include "ESP32_Helper.h"
 #include "A010.h"
 #include "DBSCAN.h"
-#include "Debugger.h"
-#include "Structure.h"
 
+using namespace Printer;
 /**
  * Get lidar data from serial
  * Get robot position from serial
