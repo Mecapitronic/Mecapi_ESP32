@@ -103,6 +103,40 @@ void print(String prefix, Point data, String suffix, Level level, boolean lineFe
         SERIAL_DEBUG.println();
 }
 
+void print(String prefix, Point3D data, String suffix, Level level, boolean lineFeed)
+{
+    if (!IsPrintable(level))
+        return;
+    SERIAL_DEBUG.print(prefix);
+    SERIAL_DEBUG.print("x: ");
+    SERIAL_DEBUG.print(data.x);
+    SERIAL_DEBUG.print(" y: ");
+    SERIAL_DEBUG.print(data.y);
+    SERIAL_DEBUG.print(" z: ");
+    SERIAL_DEBUG.print(data.z);
+    SERIAL_DEBUG.print(suffix);
+    if (lineFeed)
+        SERIAL_DEBUG.println();
+}
+
+void print(String prefix, Point4D data, String suffix, Level level, boolean lineFeed)
+{
+    if (!IsPrintable(level))
+        return;
+    SERIAL_DEBUG.print(prefix);
+    SERIAL_DEBUG.print("x: ");
+    SERIAL_DEBUG.print(data.x);
+    SERIAL_DEBUG.print(" y: ");
+    SERIAL_DEBUG.print(data.y);
+    SERIAL_DEBUG.print(" z: ");
+    SERIAL_DEBUG.print(data.z);
+    SERIAL_DEBUG.print(" d: ");
+    SERIAL_DEBUG.print(data.d);
+    SERIAL_DEBUG.print(suffix);
+    if (lineFeed)
+        SERIAL_DEBUG.println();
+}
+
 void print(String prefix, PolarPoint data, String suffix, Level level, boolean lineFeed)
 {
     if (!IsPrintable(level))
