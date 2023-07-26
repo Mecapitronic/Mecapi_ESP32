@@ -204,9 +204,9 @@ struct PolarPoint
      *
      * @param _angle
      * @param _distance
-     * @param _confidence optional
+     * @param _confidence
      */
-    PolarPoint(float _angle, int16_t _distance, uint16_t _confidence = 0)
+    PolarPoint(float _angle, int16_t _distance, uint16_t _confidence)
     {
         angle = _angle;
         distance = _distance;
@@ -221,6 +221,22 @@ struct PolarPoint
      * @param _y
      */
     PolarPoint(float _x, float _y)
+    {
+        angle = 0;
+        distance = 0;
+        confidence = 0;
+        x = _x;
+        y = _y;
+    }
+    /**
+     * @brief Construct a new Polar Point object
+     * @param _angle
+     * @param _distance
+     * @param _confidence
+     * @param _x
+     * @param _y
+     */
+    PolarPoint(float _angle, int16_t _distance, uint16_t _confidence, float _x, float _y)
     {
         angle = 0;
         distance = 0;
