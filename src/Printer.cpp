@@ -23,6 +23,13 @@ Enable PrintEnable(Enable enable)
 
 bool IsPrintable(Level level) { return PrintEnable() == ENABLE_TRUE && PrintLevel() < level; }
 
+void println(Level level)
+{
+    if (!IsPrintable(level))
+        return;
+    SERIAL_DEBUG.println();
+}
+
 void print(String data, Level level)
 {
     if (!IsPrintable(level))

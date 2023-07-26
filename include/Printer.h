@@ -18,6 +18,8 @@ Level PrintLevel(Level level = LEVEL_NONE);
 Enable PrintEnable(Enable enable = Enable::ENABLE_NONE);
 bool IsPrintable();
 
+void println(Level level = LEVEL_VERBOSE);
+
 void print(String data, Level level = LEVEL_VERBOSE);
 void println(String data, Level level = LEVEL_VERBOSE);
 void print(String prefix, int data, String suffix = "", Level level = LEVEL_VERBOSE);
