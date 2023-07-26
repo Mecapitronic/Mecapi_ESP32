@@ -35,8 +35,7 @@ void print(String prefix, PolarPoint data, String suffix = "", Level level = LEV
 // bool needs to be the last because it overrides all functions
 void print(String prefix, bool data, String suffix = "", Level level = LEVEL_VERBOSE, boolean lineFeed = true);
 
-void printArray(String prefix, int array[], size_t size, char separator = ',', String suffix = ")", Level level = LEVEL_VERBOSE);
-void printArrayN(String prefix, int element, String interFix, int array[], size_t size, char separator = ',', String suffix = ")", Level level = LEVEL_VERBOSE);
+void printArray(String prefix, int array[], size_t size, char separator = ',', String suffix = "", Level level = LEVEL_VERBOSE);
 
 /**
  * send point data on serial for teleplot to trace x and y in a graph

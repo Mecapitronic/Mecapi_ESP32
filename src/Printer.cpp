@@ -130,8 +130,8 @@ void print(String prefix, Point4D data, String suffix, Level level, boolean line
     SERIAL_DEBUG.print(data.y);
     SERIAL_DEBUG.print(" z: ");
     SERIAL_DEBUG.print(data.z);
-    SERIAL_DEBUG.print(" d: ");
-    SERIAL_DEBUG.print(data.d);
+    SERIAL_DEBUG.print(" w: ");
+    SERIAL_DEBUG.print(data.w);
     SERIAL_DEBUG.print(suffix);
     if (lineFeed)
         SERIAL_DEBUG.println();
@@ -171,38 +171,17 @@ void printArray(String prefix, int array[], size_t size, char separator, String 
 {
     if (!IsPrintable(level))
         return;
+    SERIAL_DEBUG.print(prefix);
     if (size > 0)
     {
-        SERIAL_DEBUG.print(prefix);
         for (size_t i = 0; i < size - 1; i++)
         {
             SERIAL_DEBUG.print(array[i]);
             SERIAL_DEBUG.print(separator);
         }
         SERIAL_DEBUG.print(array[size - 1]);
-        SERIAL_DEBUG.println(suffix);
     }
-}
-
-void printArrayN(String prefix, int element, String interFix, int array[], size_t size, char separator, String suffix, Level level)
-{
-    if (!IsPrintable(level))
-        return;
-    if (size > 0)
-    {
-        SERIAL_DEBUG.print(prefix);
-        SERIAL_DEBUG.print(element);
-        SERIAL_DEBUG.print(interFix);
-        for (size_t i = 0; i < size - 1; i++)
-        {
-            SERIAL_DEBUG.print(array[i]);
-            SERIAL_DEBUG.print(separator);
-        }
-        SERIAL_DEBUG.print(array[size - 1]);
-        SERIAL_DEBUG.println(suffix);
-    }
-    else
-        SERIAL_DEBUG.println("Invalid array printed !");
+    SERIAL_DEBUG.println(suffix);
 }
 
 void plotPoint(Point p, String varName, Level level)
