@@ -47,6 +47,15 @@ struct Point
         x = _x;
         y = _y;
     }
+    /**
+     * @brief Construct a new Point object
+     *
+     */
+    Point()
+    {
+        x = 0;
+        y = 0;
+    }
 };
 
 /**
@@ -68,6 +77,15 @@ struct PointF
     {
         x = _x;
         y = _y;
+    }
+    /**
+     * @brief Construct a new Point F object
+     *
+     */
+    PointF()
+    {
+        x = 0;
+        y = 0;
     }
 };
 
@@ -95,6 +113,15 @@ struct Point3D
         y = _y;
         z = _z;
     }
+    /**
+     * @brief Construct a new Point3D object
+     */
+    Point3D()
+    {
+        x = 0;
+        y = 0;
+        z = 0;
+    }
 };
 
 /**
@@ -120,6 +147,15 @@ struct PointF3D
         x = _x;
         y = _y;
         z = _z;
+    }
+    /**
+     * @brief Construct a new Point3D object
+     */
+    PointF3D()
+    {
+        x = 0;
+        y = 0;
+        z = 0;
     }
 };
 
@@ -150,6 +186,15 @@ struct Point4D
         y = _y;
         z = _z;
         w = _w;
+    } /**
+       * @brief Construct a new Point4D object
+       */
+    Point4D()
+    {
+        x = 0;
+        y = 0;
+        z = 0;
+        w = 0;
     }
 };
 
@@ -180,6 +225,16 @@ struct PointF4D
         y = _y;
         z = _z;
         w = _w;
+    }
+    /**
+     * @brief Construct a new Point4D object
+     */
+    PointF4D()
+    {
+        x = 0;
+        y = 0;
+        z = 0;
+        w = 0;
     }
 };
 
@@ -240,11 +295,22 @@ struct PolarPoint
      */
     PolarPoint(float _angle, int16_t _distance, uint16_t _confidence, float _x, float _y)
     {
+        angle = _angle;
+        distance = _distance;
+        confidence = _confidence;
+        x = _x;
+        y = _y;
+    }
+    /**
+     * @brief Construct a new Polar Point object
+     */
+    PolarPoint()
+    {
         angle = 0;
         distance = 0;
         confidence = 0;
-        x = _x;
-        y = _y;
+        x = 0;
+        y = 0;
     }
 };
 
