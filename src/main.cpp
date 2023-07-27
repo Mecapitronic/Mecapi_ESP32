@@ -109,8 +109,7 @@ void Task2code(void *pvParameters)
             {
                 if (xQueueReceive(myQueue, &test, portTICK_PERIOD_MS * 0))
                 {
-                    print("xQueueReceive : ");
-                    println(test);
+                    println("xQueueReceive : ", test, "");
                 }
             }
 
