@@ -1,11 +1,11 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-#include <Arduino.h>
-#include "Debugger.h"
+#include "ESP32_Helper.h"
 #include "LD06.h"
 #include "Robot.h"
-#include "Structure.h"
+
+using namespace Printer;
 
 /**
  * Get lidar data from serial

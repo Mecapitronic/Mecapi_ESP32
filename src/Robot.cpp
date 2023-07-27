@@ -2,42 +2,42 @@
 
 Robot::Robot()
 {
-    Debugger::log("Init Robot", INFO);
+    Printer::println("Init Robot", LEVEL_INFO);
 
     robotPosition = {1000, 1000, 0.0};
-    Debugger::log("Robot Position : ", robotPosition, "", INFO);
+    print("Robot Position : ", robotPosition, "", LEVEL_INFO);
     cursorTmp = 0;
     for (size_t i = 0; i < ROBOT_SERIAL_PACKET_SIZE; i++)
     {
         serialBuffer[i] = 0;
     }
-    dsPicSerial(Start);
+    dsPicSerial(ENABLE_TRUE);
 }
 
-void Robot::dsPicSerial(State state)
+void Robot::dsPicSerial(Enable enable)
 {
-    dsPicSerialStatus = state;
+    dsPicSerialStatus = enable;
     SERIAL_ROBOT.end();
     switch (dsPicSerialStatus)
     {
-    case Stop:
-        /* code */
-        Debugger::log("dsPic Serial Stop", INFO);
-        break;
-    case Start:
-        Debugger::log("dsPic Serial Start", INFO);
-        SERIAL_ROBOT.begin(250000, SERIAL_8N1, RX1, TX1);
-        break;
-    case Debug:
-        Debugger::log("dsPic Serial Debug");
-        SERIAL_ROBOT.begin(230400, SERIAL_8N1, RX1, TX1);
-        break;
+        case ENABLE_NONE:
+            /* code */
+            println("dsPic Serial Stop", LEVEL_INFO);
+            break;
+        case ENABLE_TRUE:
+            println("dsPic Serial Start", LEVEL_INFO);
+            SERIAL_ROBOT.begin(250000, SERIAL_8N1, RX1, TX1);
+            break;
+        case ENABLE_FALSE:
+            println("dsPic Serial Debug", LEVEL_INFO);
+            SERIAL_ROBOT.begin(230400, SERIAL_8N1, RX1, TX1);
+            break;
 
-    default:
-        break;
+        default:
+            break;
     }
 }
-State Robot::dsPicSerial() { return dsPicSerialStatus; }
+Enable Robot::dsPicSerial() { return dsPicSerialStatus; }
 
 RobotPosition Robot::GetPosition() { return robotPosition; }
 
@@ -85,7 +85,7 @@ void Robot::Analyze()
 
 void Robot::WriteSerialdsPic(int n, Point p)
 {
-    if (dsPicSerialStatus == Start)
+    if (dsPicSerialStatus == ENABLE_TRUE)
     {
         // Starting char : '!'
         SERIAL_ROBOT.write(0x21);

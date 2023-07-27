@@ -17,11 +17,13 @@
 // positive in trigonometric way
 #define LIDAR_ROBOT_ANGLE_OFFSET 0
 
-#include <Arduino.h>
-#include "Debugger.h"
+#define kMaxPoints 25
+
+#include "ESP32_Helper.h"
 #include "Robot.h"
 #include "Tracker.h"
 
+using namespace Printer;
 // LIDAR
 
 struct ConfigLidar
@@ -39,10 +41,20 @@ struct PacketLidar
     int dataLength;
     int radarSpeed;
     int startAngle;
-    PointLidar dataPoint[LIDAR_DATA_PACKET_SIZE];
+    PolarPoint dataPoint[LIDAR_DATA_PACKET_SIZE];
     int endAngle;
     int timestamp;
     byte crcCheck;
+};
+
+/**
+ * Represent an obstacle, the topping cylinder on adversary robots
+ * The maximum points needed to represent a 70mm wide cylinder is 20 (kMaxPoints)
+ */
+struct Obstacle
+{
+    PolarPoint data[kMaxPoints];
+    uint8_t size = 0;
 };
 
 class Lidar
@@ -95,7 +107,7 @@ public:
      * convert detected position from polar coordinates to cartesian coordinates
      * according to robot position on the field
      */
-    Point PolarToCartesian(PointLidar polar_point, Robot robot);
+    Point PolarToCartesian(PolarPoint polar_point, Robot robot);
 
     /**
      * returns whether or not the given point is outside the table
@@ -108,7 +120,7 @@ public:
      * Custom segmentation algorithm to detect cylinders in 2D plan
      * Send data to object tracker that send it to the PIC
      */
-    void AggregatePoint(PointLidar lidar_point, Tracker *tracker, Robot robot);
+    void AggregatePoint(PolarPoint lidar_point, Tracker *tracker, Robot robot);
 
     void ObstacleDetected(Tracker *tracker, uint8_t size);
 
@@ -116,7 +128,7 @@ public:
      * the limit of passing to new obstacle
      * compare the difference with the previous point to the defined threshold
      */
-    bool NewObstacleThreshold(PointLidar polar_point);
+    bool NewObstacleThreshold(PolarPoint polar_point);
 
     /**
      * Compute the center of local var lidar_obstacle

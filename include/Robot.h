@@ -19,8 +19,9 @@
 // 21 e8 03 dc 05 28 23 0A
 #define ROBOT_DATA_PACKET_SIZE 8
 
-#include "Debugger.h"
-#include "Structure.h"
+#include "ESP32_Helper.h"
+
+using namespace Printer;
 
 class Robot
 {
@@ -33,8 +34,8 @@ public:
     /**
      * Enable or disable communication to dsPIC : used for debug as it re-route serial to PC
      */
-    void dsPicSerial(State state);
-    State dsPicSerial();
+    void dsPicSerial(Enable enable);
+    Enable dsPicSerial();
     /**
      * Read data coming from Robot PIC giving the actual position of the robot
      * put data in local buffer
@@ -66,7 +67,7 @@ private:
     RobotPosition robotPosition = {0, 0, 0.0}; // x, y, angle
     uint32_t serialBuffer[ROBOT_SERIAL_PACKET_SIZE] = {0};
     uint8_t cursorTmp = 0;
-    State dsPicSerialStatus = Start;
+    Enable dsPicSerialStatus = ENABLE_TRUE;
 };
 
 #endif

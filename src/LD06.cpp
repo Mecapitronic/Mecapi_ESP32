@@ -2,7 +2,7 @@
 
 Lidar::Lidar()
 {
-    Debugger::log("Init Lidar");
+    println("Init Lidar");
 
     // minDistance, maxDistance, minQuality, distanceThreshold, angleThreshold;
     Config(100, 1500, 200, 200, 0.8 * 5);
@@ -13,32 +13,32 @@ void Lidar::Config(int min = -1, int max = -1, int quality = -1, int distance = 
 {
     if (min != -1)
     {
-        Debugger::log("Lidar Config 'Distance Min' from ", lidarConfig.minDistance, "", INFO, false);
-        Debugger::log(" to ", min, "", INFO);
+        print("Lidar Config 'Distance Min' from ", lidarConfig.minDistance, "", LEVEL_INFO);
+        println(" to ", min, "", LEVEL_INFO);
         lidarConfig.minDistance = min;
     }
     if (max != -1)
     {
-        Debugger::log("Lidar Config 'Distance Max' from ", lidarConfig.maxDistance, "", INFO, false);
-        Debugger::log(" to ", max, "", INFO);
+        print("Lidar Config 'Distance Max' from ", lidarConfig.maxDistance, "", LEVEL_INFO);
+        println(" to ", max, "", LEVEL_INFO);
         lidarConfig.maxDistance = max;
     }
     if (quality != -1)
     {
-        Debugger::log("Lidar Config 'Quality' from ", lidarConfig.minQuality, "", INFO, false);
-        Debugger::log(" to ", quality, "", INFO);
+        print("Lidar Config 'Quality' from ", lidarConfig.minQuality, "", LEVEL_INFO);
+        println(" to ", quality, "", LEVEL_INFO);
         lidarConfig.minQuality = quality;
     }
     if (distance != -1)
     {
-        Debugger::log("Lidar Config 'Distance Threshold' from ", lidarConfig.distanceThreshold, "", INFO, false);
-        Debugger::log(" to ", distance, "", INFO);
+        print("Lidar Config 'Distance Threshold' from ", lidarConfig.distanceThreshold, "", LEVEL_INFO);
+        println(" to ", distance, "", LEVEL_INFO);
         lidarConfig.distanceThreshold = distance;
     }
     if (angle != -1)
     {
-        Debugger::log("Lidar Config 'Angle Threshold' from ", lidarConfig.angleThreshold, "", INFO, false);
-        Debugger::log(" to ", angle, "", INFO);
+        print("Lidar Config 'Angle Threshold' from ", lidarConfig.angleThreshold, "", LEVEL_INFO);
+        println(" to ", angle, "", LEVEL_INFO);
         lidarConfig.angleThreshold = angle;
     }
 }
@@ -129,7 +129,7 @@ boolean Lidar::CheckContinuity()
 
     if (delta > angleMaxDiscontinuity)
     {
-        Debugger::log("Discontinuity : ", (float)delta / 100, " deg", WARN);
+        println("Discontinuity : ", (float)delta / 100, " deg", LEVEL_WARN);
         return false;
     }
     else
@@ -140,7 +140,7 @@ boolean Lidar::CheckContinuity()
 
 PacketLidar Lidar::GetData() { return lidarPacket; }
 
-Point Lidar::PolarToCartesian(PointLidar lidar_point, Robot robot)
+Point Lidar::PolarToCartesian(PolarPoint lidar_point, Robot robot)
 {
     Point point;
     RobotPosition robotPosition = robot.GetPosition();
@@ -160,7 +160,7 @@ bool Lidar::IsOutsideTable(Point point)
     return (point.x < table_margin || point.x > 2000 - table_margin || point.y < table_margin || point.y > 3000 - table_margin);
 }
 
-void Lidar::AggregatePoint(PointLidar lidar_point, Tracker *tracker, Robot robot)
+void Lidar::AggregatePoint(PolarPoint lidar_point, Tracker *tracker, Robot robot)
 {
     boolean aggregate = true;
 
@@ -169,7 +169,7 @@ void Lidar::AggregatePoint(PointLidar lidar_point, Tracker *tracker, Robot robot
 
     if (IsOutsideTable(point))
     {
-        // Debugger::log("Outside table : ", point);
+        // println("Outside table : ", point);
         aggregate = false;
     }
 
@@ -177,14 +177,14 @@ void Lidar::AggregatePoint(PointLidar lidar_point, Tracker *tracker, Robot robot
         lidar_point.distance > lidarConfig.maxDistance ||
         lidar_point.confidence < lidarConfig.minQuality)
     {
-        // Debugger::log("Outside config : ", point);
+        // println("Outside config : ", point);
         aggregate = false;
     }
 
     // TODO TEMP FIX TO DETECT ONLY ON FRONT OF THE ROBOT (90°)
     // if (lidar_point.angle > 4500 && lidar_point.angle < 31500)
     // {
-    //     // Debugger::log("Not in front of robot : ", point);
+    //     // println("Not in front of robot : ", point);
     //     aggregate = false;
     // }
 
@@ -213,29 +213,25 @@ void Lidar::AggregatePoint(PointLidar lidar_point, Tracker *tracker, Robot robot
             }
         }
     }
-    // Debugger::log("PointsCounter : ", pointsCounter);
+    // println("PointsCounter : ", pointsCounter);
     if (aggregate)
     {
         // save the coord of current lidar point
-        obstacleTmp.data[pointsCounter++] = {(double)lidar_point.angle,
-                                             lidar_point.distance,
-                                             lidar_point.confidence,
-                                             point.x,
-                                             point.y};
+        obstacleTmp.data[pointsCounter++] = PolarPoint(lidar_point.angle, lidar_point.distance, lidar_point.confidence, point.x, point.y);
     }
 }
 
 void Lidar::ObstacleDetected(Tracker *tracker, uint8_t size)
 {
-    Debugger::log("Size obs :", size);
+    println("Size obs :", size);
     obstacleTmp.size = size;
     Point mid = ComputeCenter(obstacleTmp);
-    Debugger::log("Mid :", mid);
+    print("Mid :", mid);
     tracker->track(mid, obstacleTmp.data, obstacleTmp.size);
     pointsCounter = 0;
 }
 
-bool Lidar::NewObstacleThreshold(PointLidar lidar_point)
+bool Lidar::NewObstacleThreshold(PolarPoint lidar_point)
 {
     // TODO recalculate minimum angle threshold, or convert it to distance to have a better threshold config
     return (fabsf(obstacleTmp.data[pointsCounter - 1].distance - lidar_point.distance) > lidarConfig.distanceThreshold ||

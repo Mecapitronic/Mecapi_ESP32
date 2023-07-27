@@ -2,9 +2,9 @@
 
 Tracker::Tracker(float lpf_cutoff_distance, float hpf_cutoff_distance) : lpf_cutoff(lpf_cutoff_distance), hpf_cutoff(hpf_cutoff_distance)
 {
-    Debugger::log("Init Tracker", INFO);
-    Debugger::log("Track new point if nothing close enough: ", lpf_cutoff, " mm", INFO);
-    Debugger::log("Ignore movements under ", hpf_cutoff, " mm", INFO);
+    println("Init Tracker", LEVEL_INFO);
+    println("Track new point if nothing close enough: ", lpf_cutoff, " mm", LEVEL_INFO);
+    println("Ignore movements under ", hpf_cutoff, " mm", LEVEL_INFO);
     for (int i = 0; i < TRACKED_POINTS_SIZE; i++)
     {
         tracked_points[i].point = {0, 0};
@@ -29,7 +29,7 @@ void Tracker::track(Point newPoint, PolarPoint data[], uint8_t size)
     int matching_point_index = -1;
     int first_available_slot = -1; // free slot to add new point
 
-    Debugger::log("Search point:", newPoint, "", VERBOSE, true);
+    print("Search point:", newPoint);
 
     for (int i = 0; i < TRACKED_POINTS_SIZE; i++)
     {
@@ -42,7 +42,7 @@ void Tracker::track(Point newPoint, PolarPoint data[], uint8_t size)
         }
         else
         {
-            Debugger::log("Compare to:", tracked_points[i].point, "", VERBOSE, true);
+            print("Compare to:", tracked_points[i].point);
 
             // TODO remove sqrt and use x and y comparison
             float dist = sqrt(pow(newPoint.x - tracked_points[i].point.x, 2) + pow(newPoint.y - tracked_points[i].point.y, 2));
@@ -59,7 +59,7 @@ void Tracker::track(Point newPoint, PolarPoint data[], uint8_t size)
 
     if (best_match < hpf_cutoff)
     {
-        Debugger::log("This is exactly the same point; do nothing");
+        println("This is exactly the same point; do nothing");
         tracked_points[matching_point_index].lastUpdateTime = getTimeNowMs();
         return;
     }
@@ -67,14 +67,14 @@ void Tracker::track(Point newPoint, PolarPoint data[], uint8_t size)
     // TODO what to do if found nothing and no slot???
     if (matching_point_index == -1 && first_available_slot == -1)
     {
-        Debugger::log("No slot available for new point: drop it");
+        println("No slot available for new point: drop it");
         return;
     }
 
     if (matching_point_index == -1 && first_available_slot != -1)
     {
         matching_point_index = first_available_slot;
-        Debugger::log("New point detected, add to tracked");
+        println("New point detected, add to tracked");
     }
 
     PointTracker newPointTracker;
@@ -87,9 +87,9 @@ void Tracker::track(Point newPoint, PolarPoint data[], uint8_t size)
         newPointTracker.data[i] = data[i]; // Polar points associated
     }
 
-    Debugger::log("Updating point ", matching_point_index, " ", VERBOSE, false);
-    Debugger::log("from ", tracked_points[matching_point_index].point, "", VERBOSE, true);
-    Debugger::log("  to ", newPointTracker.point, "", VERBOSE, true);
+    print("Updating point ", matching_point_index, " ");
+    print("from ", tracked_points[matching_point_index].point, "");
+    print("  to ", newPointTracker.point, "");
     tracked_points[matching_point_index] = newPointTracker;
 }
 
@@ -102,8 +102,8 @@ void Tracker::sendObstaclesToRobot(Robot robot)
         {
             robot.WriteSerialdsPic(i, tracked_points[i].point);
             tracked_points[i].hasBeenSent = true;
-            Debugger::plotPoint(tracked_points[i].point, varName + i);
-            // Debugger::plotTrackerPoints(tracked_points[i], tracked_points[i].size, "points");
+            plotPoint(tracked_points[i].point, varName + i);
+            // plotTrackerPoints(tracked_points[i], tracked_points[i].size, "points");
         }
     }
 }
@@ -119,8 +119,8 @@ void Tracker::untrackOldObstacles(Robot robot)
             tracked_points[i].point = {0, 0};
             robot.WriteSerialdsPic(i, {0, 0});
 
-            Debugger::plotPoint({0, 0}, varName + i);
-            Debugger::log("Untracking point: ", i);
+            plotPoint({0, 0}, varName + i);
+            println("Untracking point: ", i, "");
         }
     }
 }
