@@ -5,8 +5,8 @@ void setup()
     // put your setup code here, to run once:
     Debugger::init();
 
-    queue = xQueueCreate(queueSize, sizeof(PointLidar));
-    if (queue == NULL)
+    myQueue = xQueueCreate(queueSize, sizeof(PointLidar));
+    if (myQueue == NULL)
     {
         Debugger::log("Error creating the queue", ERROR);
     }
@@ -78,14 +78,14 @@ void Task1code(void *pvParameters)
                 }
                 else
                 {
-                    xQueueSend(queue, &lidarPacket.dataPoint[i], 0);
+                    xQueueSend(myQueue, &lidarPacket.dataPoint[i], 0);
                 }
             }
             // TODO at least send 1 or 2 points to the queue (min max ?, middle ?) to end aggregation for obstacle
             if (counter == LIDAR_DATA_PACKET_SIZE)
             {
                 // we did not have any point to send, we send at least the last one.
-                xQueueSend(queue, &lidarPacket.dataPoint[LIDAR_DATA_PACKET_SIZE - 1], 0);
+                xQueueSend(myQueue, &lidarPacket.dataPoint[LIDAR_DATA_PACKET_SIZE - 1], 0);
                 Debugger::log("No point to send, Sending dull point", lidarPacket.dataPoint[LIDAR_DATA_PACKET_SIZE - 1]);
             }
             else
@@ -105,9 +105,9 @@ void Task2code(void *pvParameters)
     RobotPosition data;
     while (1)
     {
-        if (uxQueueMessagesWaiting(queue) > 0)
+        if (uxQueueMessagesWaiting(myQueue) > 0)
         {
-            if (xQueueReceive(queue, &point, portTICK_PERIOD_MS * 0))
+            if (xQueueReceive(myQueue, &point, portTICK_PERIOD_MS * 0))
             {
                 lidar06.AggregatePoint(point, &tracker, robot);
             }

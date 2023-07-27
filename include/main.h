@@ -22,7 +22,7 @@ void Task2code(void *pvParameters);
 TaskHandle_t Task1;
 TaskHandle_t Task2;
 
-QueueHandle_t queue;
+QueueHandle_t myQueue;
 int queueSize = 500;
 
 Lidar lidar06;
