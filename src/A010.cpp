@@ -109,7 +109,7 @@ boolean A010::ReadSerial()
                         cloudFrame[indexTmp].x = tmpF * coefX[col];
                         cloudFrame[indexTmp].y = tmpF * coefY[col];
                         cloudFrame[indexTmp].z = tmpF * coefZ[row];
-                        cloudFrame[indexTmp].d = tmpInt;
+                        cloudFrame[indexTmp].w = tmpInt;
                     }
                 }
                 cursorTmp++;
