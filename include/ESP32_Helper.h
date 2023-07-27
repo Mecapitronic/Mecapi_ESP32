@@ -7,7 +7,6 @@
 #ifndef ESP32_HELPER_H
 #define ESP32_HELPER_H
 
-#include <Arduino.h>
 #include <queue>
 #include "Structure.h"
 #include "Printer.h"

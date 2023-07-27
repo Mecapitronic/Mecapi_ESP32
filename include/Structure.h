@@ -314,6 +314,19 @@ struct PolarPoint
     }
 };
 
+/**
+ * @brief Position of robot on the table
+ * @param x int mm
+ * @param y int mm
+ * @param angle float Degree
+ */
+struct RobotPosition
+{
+    int x;
+    int y;
+    float angle;
+};
+
 struct Command
 {
     String cat;
