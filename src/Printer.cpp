@@ -244,6 +244,21 @@ void plotPoint(Point p, Level level)
     SERIAL_DEBUG.println((int)p.y);
 }
 
+void plotTrackerPoints(PointTracker p, int size, String varName, Level level)
+{
+    if (!IsPrintable(level))
+        return;
+    String data = ">" + varName + ":" + (int)(p.data[0].angle) + ":" + (int)p.data[0].distance;
+    String separator = ";";
+
+    for (size_t i = 1; i < size; i++)
+    {
+        data += separator + (int)p.data[i].angle + ":" + (int)p.data[i].distance;
+    }
+    data += "|xy";
+    SERIAL_DEBUG.println(data);
+}
+
 void plot3D(Point3D p, String varName)
 {
     // 3D|A:B:C|E
