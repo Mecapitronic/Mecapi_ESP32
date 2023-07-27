@@ -4,7 +4,6 @@
  * @brief All data structures used across program
  * @date 2023-07-25
  */
-
 #ifndef STRUCTURE_H
 #define STRUCTURE_H
 
