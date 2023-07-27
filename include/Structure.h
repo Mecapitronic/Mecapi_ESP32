@@ -314,4 +314,11 @@ struct PolarPoint
     }
 };
 
+struct Command
+{
+    String cat;
+    String cmd;
+    int num;
+};
+
 #endif

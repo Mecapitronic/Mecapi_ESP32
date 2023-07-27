@@ -12,12 +12,11 @@
 namespace Debugger
 {
 
-Enable EnableDebugger(Enable enable);
+void EnableDebugger(Enable enable);
 bool IsEnable();
 
 void Initialisation();
 bool WaitForAvailableSteps();
-void AddSteps(uint16_t steps);
-void SubSteps(uint16_t steps = 1);
+void AddSteps(int16_t steps);
 };  // namespace Debugger
 #endif

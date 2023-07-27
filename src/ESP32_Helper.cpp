@@ -5,6 +5,28 @@ using namespace Printer;
 namespace ESP32_Helper
 {
 
+namespace
+{
+uint16_t indexBuffer = 0;
+const int Serial_Read_Buffer = 64;
+char readBuffer[Serial_Read_Buffer];
+bool foundFirstColon = false;
+int indexFirstColon = 0;
+bool foundSecondColon = false;
+int indexSecondColon = 0;
+char tmpChar = '\0';
+std::queue<Command> awaitingCommand;
+
+void resetVar()
+{
+    indexBuffer = 0;
+    foundFirstColon = false;
+    indexFirstColon = 0;
+    foundSecondColon = false;
+    indexSecondColon = 0;
+}
+}  // namespace
+
 void ESP32_Helper(int baud_speed)
 {
     SERIAL_DEBUG.begin(baud_speed);
@@ -31,33 +53,70 @@ void ESP32_Helper(int baud_speed)
     Debugger::Initialisation();
 }
 
-char* checkSerial()
+void UpdateSerial()
 {
-    // static declaration to initialise only once at startup
-    static uint16_t indexBuffer = 0;
-    static char readBuffer[Serial_Read_Buffer];
-
-    if (SERIAL_DEBUG.available() > 0)
+    while (SERIAL_DEBUG.available() > 0)
     {
-        char tmpChar = SERIAL_DEBUG.read();
+        tmpChar = SERIAL_DEBUG.read();
         if (indexBuffer < Serial_Read_Buffer)
         {
             readBuffer[indexBuffer++] = tmpChar;
+
+            if (foundFirstColon && !foundSecondColon && tmpChar == ':')
+            {
+                foundSecondColon = true;
+                indexSecondColon = indexBuffer;
+            }
+            if (!foundFirstColon && tmpChar == ':')
+            {
+                foundFirstColon = true;
+                indexFirstColon = indexBuffer;
+            }
             if (tmpChar == '\n')
             {
                 SERIAL_DEBUG.print("Received : ");
                 SERIAL_DEBUG.write(readBuffer, indexBuffer);
-                indexBuffer = 0;
-                return readBuffer;
+                if (foundFirstColon && foundSecondColon)
+                {
+                    Command cmd = {String(&readBuffer[0], indexFirstColon - 1), String(&readBuffer[indexFirstColon], indexSecondColon - indexFirstColon - 1),
+                                   atoi(String(&readBuffer[indexSecondColon], indexBuffer - indexSecondColon).c_str())};
+
+                    print("Command received => ");
+                    print(" Cat=" + cmd.cat);
+                    print(" Cmd=" + cmd.cmd);
+                    print(" Num=", cmd.num);
+                    println();
+                    awaitingCommand.push(cmd);
+                }
+                resetVar();
             }
         }
         else
         {
             SERIAL_DEBUG.print("Read Buffer Overflow : ");
             SERIAL_DEBUG.println(indexBuffer);
-            indexBuffer = 0;
+            SERIAL_DEBUG.flush();
+            resetVar();
         }
     }
-    return nullptr;
 }
+
+bool HasWaitingCommand() { return awaitingCommand.size() > 0; }
+
+Command GetCommand()
+{
+    Command cmd = {"bad", "bad", 0};
+    if (HasWaitingCommand())
+    {
+        cmd = awaitingCommand.front();
+        awaitingCommand.pop();
+        print("Command POP => ");
+        print(" Cat=" + cmd.cat);
+        print(" Cmd=" + cmd.cmd);
+        print(" Num=", cmd.num);
+        println();
+    }
+    return cmd;
+}
+
 }  // namespace ESP32_Helper

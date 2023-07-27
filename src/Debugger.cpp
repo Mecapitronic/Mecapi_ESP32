@@ -6,11 +6,10 @@ namespace  // anonymous nested namespace, cannot access outside this file
 {
 QueueHandle_t queueSteps = nullptr;
 const uint16_t queueStepsSize = 100;
-uint16_t debugStep = 0;
 Enable debuggerEnable = ENABLE_NONE;
 }  // namespace
 
-Enable EnableDebugger(Enable enable)
+void EnableDebugger(Enable enable)
 {
     if (enable != ENABLE_NONE)
     {
@@ -27,16 +26,14 @@ Enable EnableDebugger(Enable enable)
         if (debuggerEnable != enable && enable == ENABLE_TRUE)
         {
             Printer::print(" Enable");
-            debugStep = 0;
         }
         if (debuggerEnable != enable && enable == ENABLE_FALSE)
         {
             Printer::print(" Disable");
-            debugStep = 1;  // so we can escape the current waiting loop
         }
+        Printer::println();
         debuggerEnable = enable;
     }
-    return debuggerEnable;
 }
 
 bool IsEnable() { return debuggerEnable == ENABLE_TRUE; }
@@ -45,41 +42,42 @@ void Initialisation()
 {
     Printer::print("Debugger : ");
     Printer::print("Preparing queueSteps : ");
-    queueSteps = xQueueCreate(queueStepsSize, sizeof(uint16_t));
+    queueSteps = xQueueCreate(queueStepsSize, sizeof(int16_t));
     if (queueSteps == NULL)
     {
         Printer::println("Error creating the queueSteps !");
     }
-    debugStep = 0;
     Printer::println("done.");
 }
 
 bool WaitForAvailableSteps()
 {
+    static int16_t debugStep = 0;
     if (IsEnable())
     {
-        if (debugStep == 0)
+        if (debugStep <= 0)
             Printer::println("waitForAvailableSteps");
 
-        while (debugStep == 0)
+        while (debugStep <= 0 && IsEnable())
         {
             if (uxQueueMessagesWaiting(queueSteps) > 0)
             {
-                uint16_t steps = 0;
+                int16_t steps = 0;
                 if (xQueueReceive(queueSteps, &steps, portTICK_PERIOD_MS * 0))
                 {
-                    AddSteps(steps);
-                    Printer::print("xQueueReceive queueSteps : ", steps);
+                    debugStep += steps;
+                    Printer::println("xQueueReceive queueSteps : ", debugStep);
                 }
             }
             vTaskDelay(1);
         }
-        SubSteps();
+        debugStep--;
     }
+    else if (debugStep != 0)
+        debugStep = 0;
     return true;
 }
 
-void AddSteps(uint16_t steps) { debugStep += steps; }
+void AddSteps(int16_t steps) { xQueueSend(queueSteps, &steps, 0); }
 
-void SubSteps(uint16_t steps) { debugStep -= steps; }
 }  // namespace Debugger
