@@ -10,6 +10,8 @@
 
 #include <Arduino.h>
 
+#define ENUM_STRING(p) #p
+
 enum Level
 {
     LEVEL_NONE,

@@ -1,5 +1,7 @@
 #include "ESP32_Helper.h"
 
+using namespace Printer;
+
 namespace ESP32_Helper
 {
 
@@ -10,19 +12,20 @@ void ESP32_Helper(int baud_speed)
     {
         SERIAL_DEBUG.flush();
     }
-
-    SERIAL_DEBUG.println();
-    SERIAL_DEBUG.println(".--------------.");
-    SERIAL_DEBUG.println("  MECAPITRONIC  ");
-    SERIAL_DEBUG.println("'--------------'");
-    SERIAL_DEBUG.println();
-    SERIAL_DEBUG.print(__DATE__);
-    SERIAL_DEBUG.print(" at ");
-    SERIAL_DEBUG.println(__TIME__);
     SERIAL_DEBUG.println();
 
-    Printer::PrintLevel(Level::LEVEL_VERBOSE);
     Printer::PrintEnable(Enable::ENABLE_TRUE);
+    Printer::PrintLevel(Level::LEVEL_VERBOSE);
+
+    println();
+    println("|--------------|");
+    println("  MECAPITRONIC  ");
+    println("|--------------|");
+    println();
+    print(__DATE__);
+    print(" at ");
+    println(__TIME__);
+    println();
 }
 
 char* checkSerial()

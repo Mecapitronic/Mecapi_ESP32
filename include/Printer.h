@@ -9,6 +9,11 @@
 
 #include "ESP32_Helper.h"
 
+#define ENUM_PRINT(p)             \
+    case (p):                     \
+        SERIAL_DEBUG.println(#p); \
+        break;
+
 namespace Printer
 {
 // static bool printEnable = false;

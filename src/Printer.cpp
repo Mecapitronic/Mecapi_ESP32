@@ -9,6 +9,15 @@ Level PrintLevel(Level level)
     if (level != Level::LEVEL_NONE)
     {
         printLevel = level;
+        print("PrintLevel : ");
+        switch (level)
+        {
+            ENUM_PRINT(LEVEL_NONE);
+            ENUM_PRINT(LEVEL_VERBOSE);
+            ENUM_PRINT(LEVEL_INFO);
+            ENUM_PRINT(LEVEL_WARN);
+            ENUM_PRINT(LEVEL_ERROR);
+        }
     }
     return printLevel;
 }
@@ -16,12 +25,22 @@ Level PrintLevel(Level level)
 Enable PrintEnable(Enable enable)
 {
     static Enable printEnable = ENABLE_NONE;
+
     if (enable != ENABLE_NONE)
+    {
         printEnable = enable;
+        print("PrintEnable : ");
+        switch (enable)
+        {
+            ENUM_PRINT(ENABLE_FALSE);
+            ENUM_PRINT(ENABLE_TRUE);
+            ENUM_PRINT(ENABLE_NONE);
+        }
+    }
     return printEnable;
 }
 
-bool IsPrintable(Level level) { return PrintEnable() == ENABLE_TRUE && PrintLevel() < level; }
+bool IsPrintable(Level level) { return PrintEnable() == ENABLE_TRUE && PrintLevel() <= level; }
 
 void println(Level level)
 {
