@@ -23,20 +23,6 @@ using namespace Printer;
 
 #define kMaxPoints 25
 
-struct PointTracker
-{
-    // point coordinates beeing tracked
-    Point point;
-    // timestamp of the last time the tracker has been updated
-    int64_t lastUpdateTime;
-    // Polar points that define the mid point
-    PolarPoint data[kMaxPoints];  // TODO kMaxPoints
-    // Size of the polar points array
-    uint8_t size = 0;
-    // avoid to send the same points twice
-    bool hasBeenSent = false;
-};
-
 /**
  * @brief In charge of tracking objects on the field based on Lidar detections and Kalman filter
  */
