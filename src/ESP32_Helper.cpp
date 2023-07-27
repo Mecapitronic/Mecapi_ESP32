@@ -26,6 +26,9 @@ void ESP32_Helper(int baud_speed)
     print(" at ");
     println(__TIME__);
     println();
+
+    Debugger::EnableDebugger(ENABLE_TRUE);
+    Debugger::Initialisation();
 }
 
 char* checkSerial()

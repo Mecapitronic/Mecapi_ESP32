@@ -4,35 +4,20 @@
  * @brief Software debugger
  * @date 2023-07-25
  */
-
 #ifndef DEBUGGER_H
 #define DEBUGGER_H
 
 #include "ESP32_Helper.h"
 
-class Debugger
+namespace Debugger
 {
-   private:
-    static const boolean enabled = true;
 
-   public:
-    /**
-     * Print custom header on debugging serial
-     */
-    static void header();
-    /**
-     * Initialize debugging serial for PC communication
-     */
-    static void init();
+Enable EnableDebugger(Enable enable);
+bool IsEnable();
 
-    /**
-     * Check for commands send on debugging serial plugged to a computer
-     * List of commands is still empty now
-     */
-    static char* checkSerial();
-
-    static bool waitForAvailableSteps();
-    static void addSteps(uint16_t steps);
-    static void subSteps(uint16_t steps = 1);
-};
+void Initialisation();
+bool WaitForAvailableSteps();
+void AddSteps(uint16_t steps);
+void SubSteps(uint16_t steps = 1);
+};  // namespace Debugger
 #endif

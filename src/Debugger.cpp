@@ -1,50 +1,85 @@
 #include "Debugger.h"
 
-QueueHandle_t queueSteps;
-const uint16_t queueStepsSize = 100;
-uint16_t debugStep;
-
-void Debugger::init()
+namespace Debugger
 {
-    if (enabled)
+namespace  // anonymous nested namespace, cannot access outside this file
+{
+QueueHandle_t queueSteps = nullptr;
+const uint16_t queueStepsSize = 100;
+uint16_t debugStep = 0;
+Enable debuggerEnable = ENABLE_NONE;
+}  // namespace
+
+Enable EnableDebugger(Enable enable)
+{
+    if (enable != ENABLE_NONE)
     {
-        SERIAL_DEBUG.print("Preparing queueSteps : ");
-        queueSteps = xQueueCreate(queueStepsSize, sizeof(uint16_t));
-        if (queueSteps == NULL)
+        Printer::print("Debugger : ");
+
+        if (debuggerEnable == enable && enable == ENABLE_TRUE)
         {
-            SERIAL_DEBUG.println("Error creating the queueSteps");
+            Printer::print("already Enable");
         }
-        debugStep = 0;
-        delay(200);
-        SERIAL_DEBUG.println("done.");
+        if (debuggerEnable == enable && enable == ENABLE_FALSE)
+        {
+            Printer::print("already Disable");
+        }
+        if (debuggerEnable != enable && enable == ENABLE_TRUE)
+        {
+            Printer::print(" Enable");
+            debugStep = 0;
+        }
+        if (debuggerEnable != enable && enable == ENABLE_FALSE)
+        {
+            Printer::print(" Disable");
+            debugStep = 1;  // so we can escape the current waiting loop
+        }
+        debuggerEnable = enable;
     }
-    else
-        SERIAL_DEBUG.println("Debugger Disable");
+    return debuggerEnable;
 }
 
-bool Debugger::waitForAvailableSteps()
-{
-    if (debugStep == 0)
-        SERIAL_DEBUG.println("waitForAvailableSteps");
+bool IsEnable() { return debuggerEnable == ENABLE_TRUE; }
 
-    while (debugStep == 0)
+void Initialisation()
+{
+    Printer::print("Debugger : ");
+    Printer::print("Preparing queueSteps : ");
+    queueSteps = xQueueCreate(queueStepsSize, sizeof(uint16_t));
+    if (queueSteps == NULL)
     {
-        if (uxQueueMessagesWaiting(queueSteps) > 0)
-        {
-            uint16_t steps = 0;
-            if (xQueueReceive(queueSteps, &steps, portTICK_PERIOD_MS * 0))
-            {
-                addSteps(steps);
-                SERIAL_DEBUG.print("xQueueReceive queueSteps : ");
-                SERIAL_DEBUG.println(steps);
-            }
-        }
-        vTaskDelay(1);
+        Printer::println("Error creating the queueSteps !");
     }
-    subSteps();
+    debugStep = 0;
+    Printer::println("done.");
+}
+
+bool WaitForAvailableSteps()
+{
+    if (IsEnable())
+    {
+        if (debugStep == 0)
+            Printer::println("waitForAvailableSteps");
+
+        while (debugStep == 0)
+        {
+            if (uxQueueMessagesWaiting(queueSteps) > 0)
+            {
+                uint16_t steps = 0;
+                if (xQueueReceive(queueSteps, &steps, portTICK_PERIOD_MS * 0))
+                {
+                    AddSteps(steps);
+                    Printer::print("xQueueReceive queueSteps : ", steps);
+                }
+            }
+            vTaskDelay(1);
+        }
+        SubSteps();
+    }
     return true;
 }
 
-void Debugger::addSteps(uint16_t steps) { debugStep += steps; }
+void AddSteps(uint16_t steps) { debugStep += steps; }
 
-void Debugger::subSteps(uint16_t steps) { debugStep -= steps; }
+void SubSteps(uint16_t steps) { debugStep -= steps; }
+}  // namespace Debugger
