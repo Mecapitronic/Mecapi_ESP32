@@ -14,11 +14,11 @@
 
 enum Level
 {
-    LEVEL_NONE,
     LEVEL_VERBOSE,
     LEVEL_INFO,
     LEVEL_WARN,
-    LEVEL_ERROR
+    LEVEL_ERROR,
+    LEVEL_NONE
 };
 
 enum Enable

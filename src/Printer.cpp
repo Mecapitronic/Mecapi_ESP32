@@ -2,34 +2,33 @@
 
 namespace Printer
 {
-Level PrintLevel(Level level)
+namespace
 {
-    static Level printLevel = LEVEL_NONE;
+Level printLevel = LEVEL_VERBOSE;
+Enable printEnable = ENABLE_NONE;
+}  // namespace
 
-    if (level != Level::LEVEL_NONE)
+void PrintLevel(Level level)
+{
+    printLevel = level;
+    SERIAL_DEBUG.print("PrintLevel : ");
+    switch (level)
     {
-        printLevel = level;
-        print("PrintLevel : ");
-        switch (level)
-        {
-            ENUM_PRINT(LEVEL_NONE);
-            ENUM_PRINT(LEVEL_VERBOSE);
-            ENUM_PRINT(LEVEL_INFO);
-            ENUM_PRINT(LEVEL_WARN);
-            ENUM_PRINT(LEVEL_ERROR);
-        }
+        ENUM_PRINT(LEVEL_VERBOSE);
+        ENUM_PRINT(LEVEL_INFO);
+        ENUM_PRINT(LEVEL_WARN);
+        ENUM_PRINT(LEVEL_ERROR);
+        ENUM_PRINT(LEVEL_NONE);
     }
-    return printLevel;
 }
+Level PrintLevel() { return printLevel; }
 
-Enable PrintEnable(Enable enable)
+void PrintEnable(Enable enable)
 {
-    static Enable printEnable = ENABLE_NONE;
-
     if (enable != ENABLE_NONE)
     {
         printEnable = enable;
-        print("PrintEnable : ");
+        SERIAL_DEBUG.print("PrintEnable : ");
         switch (enable)
         {
             ENUM_PRINT(ENABLE_FALSE);
@@ -37,8 +36,9 @@ Enable PrintEnable(Enable enable)
             ENUM_PRINT(ENABLE_NONE);
         }
     }
-    return printEnable;
 }
+
+Enable PrintEnable() { return printEnable; }
 
 bool IsPrintable(Level level) { return PrintEnable() == ENABLE_TRUE && PrintLevel() <= level; }
 

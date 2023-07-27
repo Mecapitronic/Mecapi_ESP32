@@ -19,8 +19,11 @@ namespace Printer
 // static bool printEnable = false;
 // Level printLevel = LEVEL_NONE;
 
-Level PrintLevel(Level level = LEVEL_NONE);
-Enable PrintEnable(Enable enable = Enable::ENABLE_NONE);
+void PrintLevel(Level level);
+Level PrintLevel();
+void PrintEnable(Enable enable);
+Enable PrintEnable();
+
 bool IsPrintable();
 
 void println(Level level = LEVEL_VERBOSE);
