@@ -11,7 +11,7 @@ import serial
 FILE = "data_ld06_3.txt"
 
 
-BAUDRATE = 921600
+BAUDRATE = 230400
 SERIAL_LNX = "/dev/ttyUSB"
 SERIAL_WIN = "COM"
 
