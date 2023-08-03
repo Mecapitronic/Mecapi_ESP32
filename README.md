@@ -16,6 +16,8 @@ Choose which sensor to simulate, then execute :
 -   First argument is the serial port : "/dev/ttyUSB" or COM6
 -   Second argument is the type of sensor, for now : ld06 or a010
 -   Third argument is the number of sample file to send, example : data_ld06_1.txt
+    <br />
+    (See config at end for VSCode Debug)<br />
 
 Data must be formatted as a packet par line like this
 
@@ -41,4 +43,22 @@ Data must be formatted as a packet par line like this
 
 ```
 00 FF DD
+```
+
+## VS Code Debug Config at /.vscode/launch.json
+
+```{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python : fichier actif",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": ["COM10", "ld06", "2"]
+        }
+    ]
+}
 ```
