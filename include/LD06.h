@@ -83,6 +83,18 @@ public:
     ConfigLidar GetConfig();
 
     /**
+     * @brief Change duty cycle for the PWM
+     *
+     * @param duty_cycle (int) the duty cycle of PWM in percentage (20% to 50%)
+     * @details Scan rate around 5.0  HZ when PWM duty at 21 %
+     * @details Scan rate around 6.1  HZ when PWM duty at 25 %
+     * @details Scan rate around 10.1 HZ when PWM duty at 39 %
+     * @details Scan rate around 13.2 HZ when PWM duty at 50 %
+     *
+     */
+    void ChangePWM(uint32_t duty_cycle);
+
+    /**
      * Read data from serial and put in a buffer if it comes form the Lidar LD06
      */
     boolean ReadSerial();

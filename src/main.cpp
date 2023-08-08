@@ -138,6 +138,11 @@ void Task2code(void *pvParameters)
 
                 if (cmd.cat == ("LD06"))
                 {
+                    if (cmd.cmd == "PWM")
+                    {
+                        // LD06:PWM:25
+                        lidar06.ChangePWM(cmd.num);
+                    }
                     /*
                     cmd.remove(0, 6);
                         int i = atoi(cmd.c_str());

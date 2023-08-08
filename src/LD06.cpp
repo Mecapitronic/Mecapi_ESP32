@@ -7,6 +7,23 @@ Lidar::Lidar()
     // minDistance, maxDistance, minQuality, distanceThreshold, angleThreshold;
     Config(100, 1500, 200, 200, 0.8 * 5);
     SERIAL_LIDAR.begin(230400);
+
+    int pwmChannel = 0;    // Choisit le canal 0
+    int frequence = 30000; // Fréquence PWM de 30 KHz
+    int resolution = 8;    // Résolution de 8 bits, 256 valeurs possibles
+    int pwmPin = 23;
+
+    // Configuration du canal 0 avec la fréquence et la résolution choisie
+    ledcSetup(pwmChannel, frequence, resolution);
+
+    // Assigne le canal PWM à la pin choisie
+    ledcAttachPin(pwmPin, pwmChannel);
+
+    // Créer le rapport cyclique en fonction de la résolution
+    uint32_t max_duty = (1 << resolution) - 1;
+    uint32_t duty = max_duty * 25 / 100;
+
+    ledcWrite(pwmChannel, duty);
 }
 
 void Lidar::Config(int min = -1, int max = -1, int quality = -1, int distance = -1, int angle = -1)
@@ -46,6 +63,19 @@ void Lidar::Config(int min = -1, int max = -1, int quality = -1, int distance = 
 ConfigLidar Lidar::GetConfig()
 {
     return lidarConfig;
+}
+
+void Lidar::ChangePWM(uint32_t duty_cycle)
+{
+    // Créer le rapport cyclique en fonction de la résolution
+    uint32_t max_duty = (1 << 8) - 1;
+    uint32_t duty = max_duty * duty_cycle / 100;
+    // Limit the min and max
+    if (duty < 20)
+        duty = 20;
+    if (duty > 50)
+        duty = 50;
+    ledcWrite(0, duty);
 }
 
 boolean Lidar::ReadSerial()
