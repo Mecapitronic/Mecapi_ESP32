@@ -211,7 +211,7 @@ void print(String prefix, RobotPosition data, String suffix, Level level, boolea
         SERIAL_DEBUG.println();
 }
 
-    void print(String prefix, Command data, String suffix, Level level, boolean lineFeed)
+    void print(String prefix, Command cmd, String suffix, Level level, boolean lineFeed)
     {
         if (!IsPrintable(level))
             return;
