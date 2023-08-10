@@ -194,6 +194,27 @@ void print(String prefix, RobotPosition data, String suffix, Level level, boolea
         SERIAL_DEBUG.println();
 }
 
+    void print(String prefix, Command data, String suffix, Level level, boolean lineFeed)
+    {
+        if (!IsPrintable(level))
+            return;
+        print("Command => ");
+        print(prefix);
+        print(" Cat=" + cmd.cat);
+        print(" Cmd=" + cmd.cmd);
+        print(" Size=", cmd.size);
+        print(" Data=", cmd.data[0]);
+        if (cmd.size > 1)
+        {
+            for (size_t size_data = 1; size_data < cmd.size; size_data++)
+            {
+                print(",", cmd.data[size_data]);
+            }
+        }
+        if (lineFeed)
+            SERIAL_DEBUG.println();
+    }
+
 // bool needs to be the last because it overrides all functions
 void print(String prefix, bool data, String suffix, Level level, boolean lineFeed)
 {

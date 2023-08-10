@@ -80,13 +80,10 @@ void UpdateSerial()
                 {
                     Command cmd = {String(&readBuffer[0], indexFirstColon - 1), String(&readBuffer[indexFirstColon], indexSecondColon - indexFirstColon - 1),
                                    atoi(String(&readBuffer[indexSecondColon], indexBuffer - indexSecondColon).c_str())};
+                    print("Received", cmdTmp);
+                    awaitingCommand.push(cmdTmp);
 
-                    print("Command received => ");
-                    print(" Cat=" + cmd.cat);
-                    print(" Cmd=" + cmd.cmd);
-                    print(" Num=", cmd.num);
-                    println();
-                    awaitingCommand.push(cmd);
+                    
                 }
                 resetVar();
             }
@@ -105,16 +102,13 @@ bool HasWaitingCommand() { return awaitingCommand.size() > 0; }
 
 Command GetCommand()
 {
-    Command cmd = {"bad", "bad", 0};
+        Command cmd;
+        cmd.cat = "BAD";
     if (HasWaitingCommand())
     {
         cmd = awaitingCommand.front();
         awaitingCommand.pop();
-        print("Command POP => ");
-        print(" Cat=" + cmd.cat);
-        print(" Cmd=" + cmd.cmd);
-        print(" Num=", cmd.num);
-        println();
+            print("POP", cmd);
     }
     return cmd;
 }

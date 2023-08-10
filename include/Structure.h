@@ -344,7 +344,8 @@ struct Command
 {
     String cat;
     String cmd;
-    int num;
+    int8_t size;
+    int32_t data[8];
 };
 
 #endif
