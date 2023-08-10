@@ -115,6 +115,23 @@ void println(String prefix, float data, String suffix, Level level)
     SERIAL_DEBUG.println();
 }
 
+    void print(String prefix, String data, String suffix, Level level)
+    {
+        if (!IsPrintable(level))
+            return;
+        SERIAL_DEBUG.print(prefix);
+        SERIAL_DEBUG.print(data);
+        SERIAL_DEBUG.print(suffix);
+    }
+
+    void println(String prefix, String data, String suffix, Level level)
+    {
+        if (!IsPrintable(level))
+            return;
+        print(prefix, data, suffix, level);
+        SERIAL_DEBUG.println();
+    }
+
 void print(String prefix, Point data, String suffix, Level level, boolean lineFeed)
 {
     if (!IsPrintable(level))

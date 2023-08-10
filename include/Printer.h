@@ -36,6 +36,8 @@ void print(String prefix, char data, String suffix = "", Level level = LEVEL_VER
 void println(String prefix, char data, String suffix = "", Level level = LEVEL_VERBOSE);
 void print(String prefix, float data, String suffix = "", Level level = LEVEL_VERBOSE);
 void println(String prefix, float data, String suffix = "", Level level = LEVEL_VERBOSE);
+    void print(String prefix, String data, String suffix = "", Level level = LEVEL_VERBOSE);
+    void println(String prefix, String data, String suffix = "", Level level = LEVEL_VERBOSE);
 
 void print(String prefix, Point data, String suffix = "", Level level = LEVEL_VERBOSE, boolean lineFeed = true);
 void print(String prefix, Point3D data, String suffix = "", Level level = LEVEL_VERBOSE, boolean lineFeed = true);
