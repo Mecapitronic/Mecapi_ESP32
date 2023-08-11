@@ -32,19 +32,21 @@ void print(String data, Level level = LEVEL_VERBOSE);
 void println(String data, Level level = LEVEL_VERBOSE);
 void print(String prefix, int data, String suffix = "", Level level = LEVEL_VERBOSE);
 void println(String prefix, int data, String suffix = "", Level level = LEVEL_VERBOSE);
+void print(String prefix, uint data, String suffix = "", Level level = LEVEL_VERBOSE);
+void println(String prefix, uint data, String suffix = "", Level level = LEVEL_VERBOSE);
 void print(String prefix, char data, String suffix = "", Level level = LEVEL_VERBOSE);
 void println(String prefix, char data, String suffix = "", Level level = LEVEL_VERBOSE);
 void print(String prefix, float data, String suffix = "", Level level = LEVEL_VERBOSE);
 void println(String prefix, float data, String suffix = "", Level level = LEVEL_VERBOSE);
-    void print(String prefix, String data, String suffix = "", Level level = LEVEL_VERBOSE);
-    void println(String prefix, String data, String suffix = "", Level level = LEVEL_VERBOSE);
+void print(String prefix, String data, String suffix = "", Level level = LEVEL_VERBOSE);
+void println(String prefix, String data, String suffix = "", Level level = LEVEL_VERBOSE);
 
 void print(String prefix, Point data, String suffix = "", Level level = LEVEL_VERBOSE, boolean lineFeed = true);
 void print(String prefix, Point3D data, String suffix = "", Level level = LEVEL_VERBOSE, boolean lineFeed = true);
 void print(String prefix, Point4D data, String suffix = "", Level level = LEVEL_VERBOSE, boolean lineFeed = true);
 void print(String prefix, PolarPoint data, String suffix = "", Level level = LEVEL_VERBOSE, boolean lineFeed = true);
 void print(String prefix, RobotPosition data, String suffix = "", Level level = LEVEL_VERBOSE, boolean lineFeed = true);
-    void print(String prefix, Command cmd, String suffix = "", Level level = LEVEL_VERBOSE, boolean lineFeed = true);
+void print(String prefix, Command cmd, String suffix = "", Level level = LEVEL_VERBOSE, boolean lineFeed = true);
 
 // bool needs to be the last because it overrides all functions
 void print(String prefix, bool data, String suffix = "", Level level = LEVEL_VERBOSE, boolean lineFeed = true);
