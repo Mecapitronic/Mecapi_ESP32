@@ -342,7 +342,6 @@ struct PointTracker
 
 struct Command
 {
-    String cat;
     String cmd;
     int8_t size;
     int32_t data[8];
