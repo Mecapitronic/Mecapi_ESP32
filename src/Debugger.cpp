@@ -78,6 +78,10 @@ bool WaitForAvailableSteps()
     return true;
 }
 
-void AddSteps(int16_t steps) { xQueueSend(queueSteps, &steps, 0); }
+    void AddSteps(int16_t steps)
+    {
+        xQueueSend(queueSteps, &steps, 0);
+        Printer::println("Adding ", steps, " steps to Debugger.");
+    }
 
 }  // namespace Debugger
