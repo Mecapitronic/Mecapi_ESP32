@@ -136,35 +136,19 @@ void Task2code(void *pvParameters)
             {
                 Command cmd = ESP32_Helper::GetCommand();
 
-                if (cmd.cat == ("LD06"))
+                if (cmd.cmd == ("LD06PWM"))
                 {
-                    if (cmd.cmd == "PWM")
-                    {
-                        // LD06:PWM:25
-                        lidar06.ChangePWM(cmd.num);
-                    }
-                    /*
-                    cmd.remove(0, 6);
-                        int i = atoi(cmd.c_str());
-                        println("Lidar: ", i);
-                        lidar06.Config(-1, i, -1, -1, -1);
-                        // TODO : make a function for reading commands
-                        */
+                    // LD06PWM:25
+                    lidar06.ChangePWM(cmd.data[0]);
+                    println("Lidar LD06 Change PWM : ", lidar06.GetPWM(), "");
                 }
-                else if (cmd.cat == ("RobotXYA"))
+                else if (cmd.cmd == ("RobotXYA"))
                 {
-                    /*
-                        // RobotXYA:0000,0000,00000
-                        int cmdLength = 9;
-                        int x = atoi(cmd.substring(cmdLength, cmdLength + 4).c_str());
-                        int y = atoi(cmd.substring(cmdLength + 5, cmdLength + 9).c_str());
-                        int angle = atoi(cmd.substring(cmdLength + 10, cmdLength + 15).c_str());
-                        robot.SetPosition(x, y, angle);
-                        println("Robot Position : ", robot.GetPosition());
-                        // TODO : make a function for reading commands
-                    */
+                    // RobotXYA:0000;0000;00000
+                    robot.SetPosition(cmd.data[0], cmd.data[1], cmd.data[2]);
+                    print("Robot Position : ", robot.GetPosition());
                 }
-                else if (cmd.cat == ("RobotState"))
+                else if (cmd.cmd == ("RobotState"))
                 {
                     /*
                         // RobotState:0
@@ -175,19 +159,21 @@ void Task2code(void *pvParameters)
                         // TODO : make a function for reading commands
                     */
                 }
-                else if (cmd.cat == ("Debug"))
+                else if (cmd.cmd == ("DebugSteps"))
                 {
-                    if (cmd.cmd == "Steps")
-                        Debugger::AddSteps(cmd.num);
-                    else if (cmd.cmd == "Enable")
-                        Debugger::EnableDebugger((Enable)cmd.num);
+                    Debugger::AddSteps(cmd.data[0]);
                 }
-                else if (cmd.cat == ("Print"))
+                else if (cmd.cmd == "DebugEnable")
                 {
-                    if (cmd.cmd == "Level")
-                        Printer::PrintLevel((Level)cmd.num);
-                    else if (cmd.cmd == "Enable")
-                        Printer::PrintEnable((Enable)cmd.num);
+                    Debugger::EnableDebugger((Enable)cmd.data[0]);
+                }
+                else if (cmd.cmd == ("PrintLevel"))
+                {
+                    Printer::PrintLevel((Level)cmd.data[0]);
+                }
+                else if (cmd.cmd == "PrintEnable")
+                {
+                    Printer::PrintEnable((Enable)cmd.data[0]);
                 }
             }
         }

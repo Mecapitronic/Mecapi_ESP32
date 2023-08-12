@@ -67,16 +67,20 @@ ConfigLidar Lidar::GetConfig()
 
 void Lidar::ChangePWM(uint32_t duty_cycle)
 {
-    // Créer le rapport cyclique en fonction de la résolution
-    uint32_t max_duty = (1 << 8) - 1;
-    uint32_t duty = max_duty * duty_cycle / 100;
+    uint32_t duty = duty_cycle;
     // Limit the min and max
     if (duty < 20)
         duty = 20;
     if (duty > 50)
         duty = 50;
+    // Créer le rapport cyclique en fonction de la résolution
+    uint32_t max_duty = (1 << 8) - 1;
+    duty = max_duty * duty / 100;
+
     ledcWrite(0, duty);
 }
+
+uint32_t Lidar::GetPWM() { return ledcRead(0) * 100 / ((1 << 8) - 1); }
 
 boolean Lidar::ReadSerial()
 {

@@ -95,6 +95,13 @@ public:
     void ChangePWM(uint32_t duty_cycle);
 
     /**
+     * @brief Return the duty cycle of the PWM
+     *
+     * @return uint32_t the duty cycle
+     */
+    uint32_t GetPWM();
+
+    /**
      * Read data from serial and put in a buffer if it comes form the Lidar LD06
      */
     boolean ReadSerial();
