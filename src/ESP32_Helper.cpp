@@ -88,9 +88,35 @@ void UpdateSerial()
                         index1 = i + 1;
                     }
                 }
-                // LD06CFG:0123;99
+
                 print("Received", cmdTmp);
-                awaitingCommand.push(cmdTmp);
+
+                // We first handle if the command is for the Lib
+                if (cmdTmp.cmd == "DebugSteps")
+                {
+                    // DebugSteps:10
+                    Debugger::AddSteps(cmdTmp.data[0]);
+                }
+                else if (cmdTmp.cmd == "DebugEnable")
+                {
+                    // DebugSteps:1
+                    Debugger::EnableDebugger((Enable)cmdTmp.data[0]);
+                }
+                else if (cmdTmp.cmd == "PrintLevel")
+                {
+                    // PrintLevel:0
+                    Printer::PrintLevel((Level)cmdTmp.data[0]);
+                }
+                else if (cmdTmp.cmd == "PrintEnable")
+                {
+                    // PrintEnable:1
+                    Printer::PrintEnable((Enable)cmdTmp.data[0]);
+                }
+                else
+                {
+                    // If command is not for Lib, we sent it to the main
+                    awaitingCommand.push(cmdTmp);
+                }
                 resetVar();
             }
         }
