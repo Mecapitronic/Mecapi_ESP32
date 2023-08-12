@@ -1,0 +1,33 @@
+{
+    "version": 1,
+    "author": "Geoffroy Arenou",
+    "editor": "wokwi",
+    "parts": [
+        {
+            "type": "wokwi-esp32-devkit-v1",
+            "id": "esp",
+            "top": 0,
+            "left": 0,
+            "attrs": {}
+        },
+        {
+            "type": "wokwi-serial-port",
+            "id": "serial",
+            "top": 0,
+            "left": 0,
+            "attrs": { "baud": "230400" }
+        }
+    ],
+    "connections": [
+        ["esp:TX0", "$serialMonitor:RX", "", []],
+        ["esp:RX0", "$serialMonitor:TX", "", []],
+        ["esp:TX2", "serial:TX", "", []],
+        ["esp:RX2", "serial:RX", "", []]
+    ],
+    "dependencies": {},
+    "serialMonitor": {
+        "display": "auto",
+        "newline": "lf",
+        "convertEol": false
+    }
+}
