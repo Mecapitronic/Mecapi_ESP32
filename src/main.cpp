@@ -120,23 +120,11 @@ void Task2code(void *pvParameters)
             {
                 Command cmd = ESP32_Helper::GetCommand();
 
-                if (cmd.cat == ("A010"))
+                if (cmd.cmd.startsWith("A010"))
                 {
-                    SERIAL_A010.write(cmd.cmd.c_str());
-                }
-                else if (cmd.cat == ("Debug"))
-                {
-                    if (cmd.cmd == "Steps")
-                        Debugger::AddSteps(cmd.num);
-                    else if (cmd.cmd == "Enable")
-                        Debugger::EnableDebugger((Enable)cmd.num);
-                }
-                else if (cmd.cat == ("Print"))
-                {
-                    if (cmd.cmd == "Level")
-                        Printer::PrintLevel((Level)cmd.num);
-                    else if (cmd.cmd == "Enable")
-                        Printer::PrintEnable((Enable)cmd.num);
+                    String s = cmd.cmd;
+                    s.remove(0, 4);
+                    SERIAL_A010.write(s.c_str());
                 }
             }
         }
