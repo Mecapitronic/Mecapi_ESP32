@@ -159,22 +159,6 @@ void Task2code(void *pvParameters)
                         // TODO : make a function for reading commands
                     */
                 }
-                else if (cmd.cmd == ("DebugSteps"))
-                {
-                    Debugger::AddSteps(cmd.data[0]);
-                }
-                else if (cmd.cmd == "DebugEnable")
-                {
-                    Debugger::EnableDebugger((Enable)cmd.data[0]);
-                }
-                else if (cmd.cmd == ("PrintLevel"))
-                {
-                    Printer::PrintLevel((Level)cmd.data[0]);
-                }
-                else if (cmd.cmd == "PrintEnable")
-                {
-                    Printer::PrintEnable((Enable)cmd.data[0]);
-                }
             }
         }
         catch (std::exception const &e)
