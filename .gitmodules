@@ -1,0 +1,8 @@
+[submodule "SerialPacketSimulator"]
+	path = SerialPacketSimulator
+	url = https://github.com/Mecapitronic/SerialPacketSimulator.git
+	branch = master
+[submodule "lib/ESP32_Helper"]
+	path = lib/ESP32_Helper
+	url = https://github.com/Mecapitronic/ESP32_Helper.git
+	branch = master
