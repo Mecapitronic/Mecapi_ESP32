@@ -3,18 +3,23 @@
     // for the documentation about the extensions.json format
     "recommendations": [
         "aaron-bond.better-comments",
+        "akiramiyakoda.cppincludeguard",
         "alefragnani.project-manager",
+        "cschlosser.doxdocgen",
+        "eamodio.gitlens",
         "github.vscode-pull-request-github",
         "gruntfuggly.todo-tree",
         "jeff-hykin.better-cpp-syntax",
         "mhutchie.git-graph",
+        "ms-azuretools.vscode-docker",
         "ms-ceintl.vscode-language-pack-fr",
+        "ms-python.isort",
+        "ms-python.vscode-pylance",
         "ms-vscode.cpptools",
         "ms-vscode.vscode-serial-monitor",
         "platformio.platformio-ide",
         "streetsidesoftware.code-spell-checker-french",
         "vscode-icons-team.vscode-icons",
-        "cschlosser.doxdocgen"
     ],
     "unwantedRecommendations": [
         "ms-vscode.cmake-tools",
