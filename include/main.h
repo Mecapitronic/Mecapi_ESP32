@@ -1,11 +1,33 @@
+
+// comment this line to disable LD06 and enable A010
+#define LD06
+
 #ifndef MAIN_H
 #define MAIN_H
 
 #include "ESP32_Helper.h"
+
+using namespace Printer;
+
+#ifdef LD06
+
 #include "LD06.h"
 #include "Robot.h"
 
-using namespace Printer;
+Lidar lidar06;
+Robot robot;
+Tracker tracker;
+Point obstacle;
+
+#else
+
+#include "A010.h"
+#include "DBSCAN.h"
+
+A010 a010;
+Dbscan dbscan;
+
+#endif
 
 /**
  * Get lidar data from serial
@@ -24,11 +46,5 @@ TaskHandle_t Task2;
 
 QueueHandle_t myQueue;
 int queueSize = 500;
-
-Lidar lidar06;
-Robot robot;
-Tracker tracker;
-
-Point obstacle;
 
 #endif
