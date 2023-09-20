@@ -1,0 +1,25 @@
+http://paulbourke.net/dataformats/ply/
+https://pcl.readthedocs.io/projects/tutorials/en/latest/pcd_file_format.html
+https://people.math.sc.edu/Burkardt/data/xyz/xyz.html
+http://lidarview.com/
+
+Nom : vscode-3d-preview
+ID : tatsy.vscode-3d-preview
+Description : VS Code 3D Preview
+Version : 0.2.1
+Serveur de publication : Tatsuya Yatagawa
+Lien de la Place de marché pour VS : https://marketplace.visualstudio.com/items?itemName=tatsy.vscode-3d-preview
+
+Nom : vscode-pc-viewer
+ID : obarads.vscode-pc-viewer
+Description : Display points of a file.
+Version : 0.9.1
+Serveur de publication : obarads
+Lien de la Place de marché pour VS : https://marketplace.visualstudio.com/items?itemName=obarads.vscode-pc-viewer
+
+Nom : pcd-viewer
+ID : azurity.pcd-viewer
+Description : an extension to preview pcd file in vscode.
+Version : 0.0.5
+Serveur de publication : azurity
+Lien de la Place de marché pour VS : https://marketplace.visualstudio.com/items?itemName=azurity.pcd-viewer
