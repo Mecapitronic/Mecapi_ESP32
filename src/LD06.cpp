@@ -1,8 +1,8 @@
 #include "LD06.h"
 
-Lidar::Lidar()
+LidarLD06::LidarLD06()
 {
-    println("Init Lidar");
+    println("Init LidarLD06");
 
     // minDistance, maxDistance, minQuality, distanceThreshold, angleThreshold;
     Config(100, 1500, 200, 200, 0.8 * 5);
@@ -26,46 +26,48 @@ Lidar::Lidar()
     ledcWrite(pwmChannel, duty);
 }
 
-void Lidar::Config(int min = -1, int max = -1, int quality = -1, int distance = -1, int angle = -1)
+void LidarLD06::Config(int min = -1, int max = -1, int quality = -1, int distance = -1,
+                       int angle = -1)
 {
     if (min != -1)
     {
-        print("Lidar Config 'Distance Min' from ", lidarConfig.minDistance, "", LEVEL_INFO);
+        print("LidarLD06 Config 'Distance Min' from ", lidarConfig.minDistance, "",
+              LEVEL_INFO);
         println(" to ", min, "", LEVEL_INFO);
         lidarConfig.minDistance = min;
     }
     if (max != -1)
     {
-        print("Lidar Config 'Distance Max' from ", lidarConfig.maxDistance, "", LEVEL_INFO);
+        print("LidarLD06 Config 'Distance Max' from ", lidarConfig.maxDistance, "",
+              LEVEL_INFO);
         println(" to ", max, "", LEVEL_INFO);
         lidarConfig.maxDistance = max;
     }
     if (quality != -1)
     {
-        print("Lidar Config 'Quality' from ", lidarConfig.minQuality, "", LEVEL_INFO);
+        print("LidarLD06 Config 'Quality' from ", lidarConfig.minQuality, "", LEVEL_INFO);
         println(" to ", quality, "", LEVEL_INFO);
         lidarConfig.minQuality = quality;
     }
     if (distance != -1)
     {
-        print("Lidar Config 'Distance Threshold' from ", lidarConfig.distanceThreshold, "", LEVEL_INFO);
+        print("LidarLD06 Config 'Distance Threshold' from ",
+              lidarConfig.distanceThreshold, "", LEVEL_INFO);
         println(" to ", distance, "", LEVEL_INFO);
         lidarConfig.distanceThreshold = distance;
     }
     if (angle != -1)
     {
-        print("Lidar Config 'Angle Threshold' from ", lidarConfig.angleThreshold, "", LEVEL_INFO);
+        print("LidarLD06 Config 'Angle Threshold' from ", lidarConfig.angleThreshold, "",
+              LEVEL_INFO);
         println(" to ", angle, "", LEVEL_INFO);
         lidarConfig.angleThreshold = angle;
     }
 }
 
-ConfigLidar Lidar::GetConfig()
-{
-    return lidarConfig;
-}
+ConfigLidar LidarLD06::GetConfig() { return lidarConfig; }
 
-void Lidar::ChangePWM(uint32_t duty_cycle)
+void LidarLD06::ChangePWM(uint32_t duty_cycle)
 {
     uint32_t duty = duty_cycle;
     // Limit the min and max
@@ -80,9 +82,9 @@ void Lidar::ChangePWM(uint32_t duty_cycle)
     ledcWrite(0, duty);
 }
 
-uint32_t Lidar::GetPWM() { return ledcRead(0) * 100 / ((1 << 8) - 1); }
+uint32_t LidarLD06::GetPWM() { return ledcRead(0) * 100 / ((1 << 8) - 1); }
 
-boolean Lidar::ReadSerial()
+boolean LidarLD06::ReadSerial()
 {
     while (SERIAL_LIDAR.available() > 0)
     {
@@ -112,7 +114,7 @@ boolean Lidar::ReadSerial()
     return false;
 }
 
-void Lidar::Analyze()
+void LidarLD06::Analyze()
 {
     lidarPacket.header = serialBuffer[0];
     lidarPacket.dataLength = 0x1F & serialBuffer[1];
@@ -147,7 +149,7 @@ void Lidar::Analyze()
     }
 }
 
-boolean Lidar::CheckContinuity()
+boolean LidarLD06::CheckContinuity()
 {
     // We compare the first point of this packet with the last point of the previous packet
     // we do not care about distance and confidence as we only seek continuity in angle
@@ -172,9 +174,9 @@ boolean Lidar::CheckContinuity()
     }
 }
 
-PacketLidar Lidar::GetData() { return lidarPacket; }
+PacketLidar LidarLD06::GetData() { return lidarPacket; }
 
-Point Lidar::PolarToCartesian(PolarPoint lidar_point, Robot robot)
+Point LidarLD06::PolarToCartesian(PolarPoint lidar_point, Robot robot)
 {
     Point point;
     RobotPosition robotPosition = robot.GetPosition();
@@ -186,7 +188,7 @@ Point Lidar::PolarToCartesian(PolarPoint lidar_point, Robot robot)
     return point;
 }
 
-bool Lidar::IsOutsideTable(Point point)
+bool LidarLD06::IsOutsideTable(Point point)
 {
     // the margin represents the distance between the center of the obstacle
     // and the edges of the table (which is 3000mm long and 2000mm large)
@@ -194,7 +196,7 @@ bool Lidar::IsOutsideTable(Point point)
     return (point.x < table_margin || point.x > 2000 - table_margin || point.y < table_margin || point.y > 3000 - table_margin);
 }
 
-void Lidar::AggregatePoint(PolarPoint lidar_point, Tracker *tracker, Robot robot)
+void LidarLD06::AggregatePoint(PolarPoint lidar_point, Tracker *tracker, Robot robot)
 {
     boolean aggregate = true;
 
@@ -255,7 +257,7 @@ void Lidar::AggregatePoint(PolarPoint lidar_point, Tracker *tracker, Robot robot
     }
 }
 
-void Lidar::ObstacleDetected(Tracker *tracker, uint8_t size)
+void LidarLD06::ObstacleDetected(Tracker *tracker, uint8_t size)
 {
     println("Size obs :", size);
     obstacleTmp.size = size;
@@ -265,14 +267,14 @@ void Lidar::ObstacleDetected(Tracker *tracker, uint8_t size)
     pointsCounter = 0;
 }
 
-bool Lidar::NewObstacleThreshold(PolarPoint lidar_point)
+bool LidarLD06::NewObstacleThreshold(PolarPoint lidar_point)
 {
     // TODO recalculate minimum angle threshold, or convert it to distance to have a better threshold config
     return (fabsf(obstacleTmp.data[pointsCounter - 1].distance - lidar_point.distance) > lidarConfig.distanceThreshold ||
             fabsf(obstacleTmp.data[pointsCounter - 1].angle) - fabsf(lidar_point.angle) > lidarConfig.angleThreshold * 100);
 }
 
-Point Lidar::ComputeCenter(Obstacle lidar_obstacle)
+Point LidarLD06::ComputeCenter(Obstacle lidar_obstacle)
 {
     Point mid = {0, 0};
     for (int8_t d = 0; d < lidar_obstacle.size; d++)
@@ -286,9 +288,12 @@ Point Lidar::ComputeCenter(Obstacle lidar_obstacle)
     return mid;
 }
 
-Point Lidar::FindCircle(Point p1, Point p2, Point p3) { return FindCircle(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y); }
+Point LidarLD06::FindCircle(Point p1, Point p2, Point p3)
+{
+    return FindCircle(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
+}
 
-Point Lidar::FindCircle(float x1, float y1, float x2, float y2, float x3, float y3)
+Point LidarLD06::FindCircle(float x1, float y1, float x2, float y2, float x3, float y3)
 {
     float x12 = x1 - x2;
     float x13 = x1 - x3;

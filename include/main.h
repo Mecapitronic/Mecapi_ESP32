@@ -1,7 +1,3 @@
-
-// comment this line to disable LD06 and enable A010
-#define LD06
-
 #ifndef MAIN_H
 #define MAIN_H
 
@@ -10,21 +6,24 @@
 using namespace Printer;
 
 #ifdef LD06
+#warning "! Compiling for LD06 !"
 
 #include "LD06.h"
 #include "Robot.h"
 
-Lidar lidar06;
+LidarLD06 ld06;
 Robot robot;
 Tracker tracker;
 Point obstacle;
+#endif
 
-#else
+#ifdef A010
+#warning "! Compiling for MetaSenseA010 !"
 
 #include "A010.h"
 #include "DBSCAN.h"
 
-A010 a010;
+MetaSenseA010 a010;
 Dbscan dbscan;
 
 #endif

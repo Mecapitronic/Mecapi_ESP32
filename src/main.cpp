@@ -7,7 +7,8 @@ void setup()
 
 #ifdef LD06
     myQueue = xQueueCreate(queueSize, sizeof(PolarPoint));
-#else
+#endif
+#ifdef A010
     myQueue = xQueueCreate(queueSize, sizeof(uint8_t));
 #endif
 
@@ -19,11 +20,12 @@ void setup()
 #ifdef LD06
     robot = Robot();
     delay(500);
-    lidar06 = Lidar();
+    ld06 = LidarLD06();
     delay(500);
     tracker = Tracker();
-#else
-    println("A010 setup");
+#endif
+#ifdef A010
+    println("MetaSenseA010 setup");
     a010.Initialisation();
     delay(500);
 
@@ -69,12 +71,12 @@ void Task1code(void *pvParameters)
                 robot.Analyze();
             }
 
-            if (lidar06.ReadSerial())
+            if (ld06.ReadSerial())
             {
-                lidar06.Analyze();
-                lidar06.CheckContinuity();
+                ld06.Analyze();
+                ld06.CheckContinuity();
 
-                lidarPacket = lidar06.GetData();
+                lidarPacket = ld06.GetData();
                 int counter = 0;
                 for (int i = 0; i < LIDAR_DATA_PACKET_SIZE; i++)
                 {
@@ -83,7 +85,7 @@ void Task1code(void *pvParameters)
                     // TODO increase the confidence limit to avoid aberrations
 
                     // if the point is out of bound, we will not use it
-                    ConfigLidar configLidar = lidar06.GetConfig();
+                    ConfigLidar configLidar = ld06.GetConfig();
                     if (lidarPacket.dataPoint[i].distance < configLidar.minDistance ||
                         lidarPacket.dataPoint[i].distance > configLidar.maxDistance ||
                         lidarPacket.dataPoint[i].confidence < configLidar.minQuality)
@@ -136,7 +138,7 @@ void Task2code(void *pvParameters)
             {
                 if (xQueueReceive(myQueue, &point, portTICK_PERIOD_MS * 0))
                 {
-                    lidar06.AggregatePoint(point, &tracker, robot);
+                    ld06.AggregatePoint(point, &tracker, robot);
                 }
             }
             tracker.sendObstaclesToRobot(robot);
@@ -152,8 +154,8 @@ void Task2code(void *pvParameters)
                 if (cmd.cmd == ("LD06PWM"))
                 {
                     // LD06PWM:25
-                    lidar06.ChangePWM(cmd.data[0]);
-                    println("Lidar LD06 Change PWM : ", lidar06.GetPWM(), "");
+                    ld06.ChangePWM(cmd.data[0]);
+                    println("LidarLD06 Change PWM : ", ld06.GetPWM(), "");
                 }
                 else if (cmd.cmd == ("RobotXYA"))
                 {
@@ -260,7 +262,7 @@ void Task2code(void *pvParameters)
             {
                 Command cmd = ESP32_Helper::GetCommand();
 
-                if (cmd.cmd.startsWith("A010"))
+                if (cmd.cmd.startsWith("MetaSenseA010"))
                 {
                     String s = cmd.cmd;
                     s.remove(0, 4);

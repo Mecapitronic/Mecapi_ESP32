@@ -24,7 +24,7 @@ using namespace Printer;
 #define kMaxPoints 25
 
 /**
- * @brief In charge of tracking objects on the field based on Lidar detections and Kalman filter
+ * @brief In charge of tracking objects on the field based on LidarLD06 detections and Kalman filter
  */
 class Tracker
 {

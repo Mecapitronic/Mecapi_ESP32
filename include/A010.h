@@ -1,6 +1,6 @@
 /**
  * Camera TOF manipulation and data computation
- * fetch data from A010 scans and compute filters
+ * fetch data from MetaSenseA010 scans and compute filters
  * Computations are done on ESP32 for performances purposes
  */
 #ifndef A010_H
@@ -112,13 +112,13 @@ struct ConfigA010
     int IDMaxDiscontinuity;
 };
 
-class A010
+class MetaSenseA010
 {
    public:
     /**
-     * A010 Constructor
+     * MetaSenseA010 Constructor
      */
-    A010(void);
+    MetaSenseA010(void);
 
     void Initialisation();
     void InitTmpVariables();
@@ -133,7 +133,7 @@ class A010
     void Config(int min, int max, int discontinuity);
 
     /**
-     * Read data from serial and put in a buffer if it comes from the A010
+     * Read data from serial and put in a buffer if it comes from the MetaSenseA010
      */
     boolean ReadSerial();
     boolean CheckContinuity();

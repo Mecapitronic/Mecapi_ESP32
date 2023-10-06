@@ -1,12 +1,12 @@
 /**
- * Lidar manipulation and data computation
+ * LidarLD06 manipulation and data computation
  * fetch data from LIDAR scans and compute filters to extract other robots positions
  * Computations are done on ESP32 for performances purposes
  */
 #ifndef LD06_H
 #define LD06_H
 
-// Serial 2 : U2TX = GPIO17 (Not Used for Lidar LD06); U2RX = GPIO16
+// Serial 2 : U2TX = GPIO17 (Not Used for LidarLD06 LD06); U2RX = GPIO16
 #define SERIAL_LIDAR Serial2
 // 47 = 1(Start) + 1(Datalen) + 2(Speed) + 2(StartAngle) + 36(12 * 3 DataByte) + 2(EndAngle) + 2(TimeStamp) + 1(CRC)
 #define LIDAR_SERIAL_PACKET_SIZE 47
@@ -57,14 +57,14 @@ struct Obstacle
     uint8_t size = 0;
 };
 
-class Lidar
+class LidarLD06
 {
 
 public:
     /**
-     * Lidar Constructor
+     * LidarLD06 Constructor
      */
-    Lidar(void);
+    LidarLD06(void);
 
     /**
      * @brief Configure lidarConfig local variable with the given values in parameters
@@ -78,7 +78,7 @@ public:
     void Config(int min, int max, int quality, int distance, int angle);
 
     /**
-     * Get Lidar Configuration
+     * Get LidarLD06 Configuration
      */
     ConfigLidar GetConfig();
 
@@ -102,7 +102,7 @@ public:
     uint32_t GetPWM();
 
     /**
-     * Read data from serial and put in a buffer if it comes form the Lidar LD06
+     * Read data from serial and put in a buffer if it comes form the LidarLD06 LD06
      */
     boolean ReadSerial();
 
@@ -170,7 +170,7 @@ private:
     // minimum number of points needed to qualify as an obstacle
     static const uint8_t obstacleMinPoints = 3;
 
-    // Maximum angle between Lidar packet admissible  = angle * 100
+    // Maximum angle between LidarLD06 packet admissible  = angle * 100
     static const uint8_t angleMaxDiscontinuity = 160; // TODO move into config ?
 
     // counter of points while detecting an obstacle from data

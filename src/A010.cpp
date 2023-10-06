@@ -1,15 +1,15 @@
 #include "A010.h"
 
-A010::A010() {}
+MetaSenseA010::MetaSenseA010() {}
 
-void A010::Initialisation()
+void MetaSenseA010::Initialisation()
 {
-    println("Init A010");
+    println("Init MetaSenseA010");
     // minDistance, maxDistance
     Config(100, 1500, 2);
     SERIAL_A010.begin(115200);
 
-    // wait A010 power up
+    // wait MetaSenseA010 power up
     delay(1000);
 
     // pre-computing of coefficient to convert depth data to cartesian coordinate point
@@ -41,11 +41,11 @@ void A010::Initialisation()
     SERIAL_A010.setRxBufferSize(SERIAL_SIZE_RX);
     SERIAL_A010.begin(BAUD_RATE_SPEED);
 
-    // println("Init A010 COPY");
+    // println("Init MetaSenseA010 COPY");
     //  SERIAL_A010_COPY.begin(115200, SERIAL_8N1, RX1, TX1);
 }
 
-void A010::InitTmpVariables()
+void MetaSenseA010::InitTmpVariables()
 {
     cursorTmp = 0;
     indexTmp = 0;
@@ -53,30 +53,30 @@ void A010::InitTmpVariables()
     checksum = 0;
 }
 
-void A010::Config(int min = -1, int max = -1, int discontinuity = -1)
+void MetaSenseA010::Config(int min = -1, int max = -1, int discontinuity = -1)
 {
     if (min != -1)
     {
-        print("A010 Config 'Distance Min' from ", a010Config.minDistance, "", LEVEL_INFO);
+        print("MetaSenseA010 Config 'Distance Min' from ", a010Config.minDistance, "", LEVEL_INFO);
         println(" to ", min, "", LEVEL_INFO);
         a010Config.minDistance = min;
     }
     if (max != -1)
     {
-        print("A010 Config 'Distance Max' from ", a010Config.maxDistance, "", LEVEL_INFO);
+        print("MetaSenseA010 Config 'Distance Max' from ", a010Config.maxDistance, "", LEVEL_INFO);
         println(" to ", max, "", LEVEL_INFO);
         a010Config.maxDistance = max;
     }
     if (discontinuity != -1)
     {
-        print("A010 Config 'Discontinuity' from ", a010Config.IDMaxDiscontinuity, "", LEVEL_INFO);
+        print("MetaSenseA010 Config 'Discontinuity' from ", a010Config.IDMaxDiscontinuity, "", LEVEL_INFO);
         println(" to ", discontinuity, "", LEVEL_INFO);
         a010Config.IDMaxDiscontinuity = discontinuity;
     }
 }
 bool waitEndOfPacket = true;
 
-boolean A010::ReadSerial()
+boolean MetaSenseA010::ReadSerial()
 {
     while (SERIAL_A010.available() > 0)
     {
@@ -295,7 +295,7 @@ boolean A010::ReadSerial()
     return false;
 }
 
-boolean A010::CheckContinuity()
+boolean MetaSenseA010::CheckContinuity()
 {
     // We compare the ID of this packet with the ID of the previous packet
     int delta = a010Packet.frame_head.frame_id - a010LastPacketHeader.frame_id;
@@ -323,7 +323,7 @@ boolean A010::CheckContinuity()
 }
 
 /*
-Point3D A010::DepthToPoint3D(uint8_t id, uint16_t depth)
+Point3D MetaSenseA010::DepthToPoint3D(uint8_t id, uint16_t depth)
 {
     Point3D p;
 
@@ -335,7 +335,7 @@ Point3D A010::DepthToPoint3D(uint8_t id, uint16_t depth)
 }*/
 
 // camera parameter : horizontal and vertical resolution, horizontal and vertical field of view in degree,  horizontal and vertical offset angle setup
-void A010::ComputeCartesianCoefficient(uint16_t horRes, uint16_t verRes, float horFOVdeg, float verFOVdeg, float horOFFSETdeg, float verOFFSETdeg)
+void MetaSenseA010::ComputeCartesianCoefficient(uint16_t horRes, uint16_t verRes, float horFOVdeg, float verFOVdeg, float horOFFSETdeg, float verOFFSETdeg)
 {
     uint16_t i = 0;
     float angle;
@@ -360,7 +360,7 @@ void A010::ComputeCartesianCoefficient(uint16_t horRes, uint16_t verRes, float h
     }
 }
 
-void A010::logCartesianCoefficient()
+void MetaSenseA010::logCartesianCoefficient()
 {
     SERIAL_DEBUG.println("***");
     for (int16_t i = 0; i < PICTURE_SIZE; i++)
@@ -374,7 +374,7 @@ void A010::logCartesianCoefficient()
     SERIAL_DEBUG.println("---");
 }
 
-void A010::logHeader()
+void MetaSenseA010::logHeader()
 {
     println("frame_data_len ", a010Packet.frame_head.frame_data_len);
     println("output_mode ", a010Packet.frame_head.output_mode);
