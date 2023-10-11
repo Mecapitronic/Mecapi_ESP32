@@ -5,26 +5,20 @@ void setup()
     // put your setup code here, to run once:
     ESP32_Helper::ESP32_Helper(921600);
 
-#ifdef LD06
-    myQueue = xQueueCreate(queueSize, sizeof(PolarPoint));
-#endif
-#ifdef A010
+    // myQueue = xQueueCreate(queueSize, sizeof(PolarPoint));
     myQueue = xQueueCreate(queueSize, sizeof(uint8_t));
-#endif
 
     if (myQueue == NULL)
     {
         println("Error creating the queue", LEVEL_ERROR);
     }
 
-#ifdef LD06
     robot = Robot();
     delay(500);
     ld06 = LidarLD06();
     delay(500);
     tracker = Tracker();
-#endif
-#ifdef A010
+
     println("MetaSenseA010 setup");
     a010.Initialisation();
     delay(500);
@@ -32,7 +26,6 @@ void setup()
     println("Dbscan setup");
     dbscan.Config(60.0f, 3, TCHEBYCHEV);
     delay(500);
-#endif
 
     /* Task function. */
     /* name of task. */
@@ -51,8 +44,6 @@ void loop()
     // loop() is the only task that is guaranteed to not be ran per tasking iteration.
     delay(1000);
 }
-
-#ifdef LD06
 
 // Note the 1 Tick delay, this is need so the watchdog doesn't get confused
 void Task1code(void *pvParameters)
@@ -111,6 +102,37 @@ void Task1code(void *pvParameters)
                 {
                     println("Sending ", LIDAR_DATA_PACKET_SIZE - counter, " point");
                 }
+            }
+
+            // we enter once we have the complete frame
+            if (a010.ReadSerial())
+            {
+                // a010.CheckContinuity();
+
+                println("***");
+
+                // for (uint16_t i = 0; i < PICTURE_SIZE; i++)  // FIXME: n'affiche plus
+                // rien !
+                //{
+                //  String data = "" + String(a010.cloudFrame[i].x) + " " +
+                //  String(a010.cloudFrame[i].y) + " " + String(a010.cloudFrame[i].z) + "
+                //  " + String("65520"); println(data);
+                //}
+                // println("---");
+                // println();
+
+                // Erasing all previous _clusters
+                for (size_t i = 0; i < _clusters.size(); i++)
+                {
+                    _clusters[i].clear();
+                }
+                _clusters.clear();
+                println("Dbscan Process");
+                //_clusters = dbscan.Process((Dbscan::Point3D *)&(a010.cloudFrame));
+                //_clusters = dbscan.Process((Point4D *)&(a010.cloudFrame));
+                // dbscan.displayStats();
+
+                // xQueueSend(myQueue, &a010Packet, 0);
             }
         }
         catch (std::exception const &e)
@@ -174,99 +196,12 @@ void Task2code(void *pvParameters)
                         // TODO : make a function for reading commands
                     */
                 }
-            }
-        }
-        catch (std::exception const &e)
-        {
-            print("error : ");
-            println(e.what());
-        }
-        vTaskDelay(1);
-    }
-}
-
-#else
-
-// Note the 1 Tick delay, this is need so the watchdog doesn't get confused
-void Task1code(void *pvParameters)
-{
-    println("Start Task1code");
-
-    vector<vector<uint16_t> > _clusters;
-
-    while (1)
-    {
-        try
-        {
-            // we enter once we have the complete frame
-            if (a010.ReadSerial())
-            {
-                // a010.CheckContinuity();
-
-                println("***");
-
-                // for (uint16_t i = 0; i < PICTURE_SIZE; i++)  // FIXME: n'affiche plus
-                // rien !
-                //{
-                //  String data = "" + String(a010.cloudFrame[i].x) + " " +
-                //  String(a010.cloudFrame[i].y) + " " + String(a010.cloudFrame[i].z) + "
-                //  " + String("65520"); println(data);
-                //}
-                // println("---");
-                // println();
-
-                // Erasing all previous _clusters
-                for (size_t i = 0; i < _clusters.size(); i++)
+                else if (cmd.cmd.startsWith("A010"))
                 {
-                    _clusters[i].clear();
-                }
-                _clusters.clear();
-                println("Dbscan Process");
-                //_clusters = dbscan.Process((Dbscan::Point3D *)&(a010.cloudFrame));
-                //_clusters = dbscan.Process((Point4D *)&(a010.cloudFrame));
-                // dbscan.displayStats();
-
-                // xQueueSend(myQueue, &a010Packet, 0);
-            }
-        }
-        catch (std::exception const &e)
-        {
-            print("error : ");
-            println(e.what());
-        }
-        vTaskDelay(1);
-    }
-}
-
-// Note the 1 Tick delay, this is need so the watchdog doesn't get confused
-void Task2code(void *pvParameters)
-{
-    println("Start Task2code");
-    uint8_t test = 0;
-    while (1)
-    {
-        try
-        {
-            if (uxQueueMessagesWaiting(myQueue) > 0)
-            {
-                if (xQueueReceive(myQueue, &test, portTICK_PERIOD_MS * 0))
-                {
-                    println("xQueueReceive : ", test, "");
-                }
-            }
-
-            // Check if we get commands from operator via debug serial
-            ESP32_Helper::UpdateSerial();
-
-            if (ESP32_Helper::HasWaitingCommand())
-            {
-                Command cmd = ESP32_Helper::GetCommand();
-
-                if (cmd.cmd.startsWith("MetaSenseA010"))
-                {
-                    String s = cmd.cmd;
-                    s.remove(0, 4);
-                    SERIAL_A010.write(s.c_str());
+                    a010.HandleCommand(cmd);
+                    // String s = cmd.cmd;
+                    // s.remove(0, 4);
+                    // SERIAL_A010.write(s.c_str());
                 }
             }
         }
@@ -278,5 +213,3 @@ void Task2code(void *pvParameters)
         vTaskDelay(1);
     }
 }
-
-#endif

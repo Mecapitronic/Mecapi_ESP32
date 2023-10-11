@@ -5,8 +5,8 @@
 
 using namespace Printer;
 
-#ifdef LD06
-#warning "! Compiling for LD06 !"
+// #ifdef LD06
+// #warning "! Compiling for LD06 !"
 
 #include "LD06.h"
 #include "Robot.h"
@@ -15,10 +15,10 @@ LidarLD06 ld06;
 Robot robot;
 Tracker tracker;
 Point obstacle;
-#endif
+// #endif
 
-#ifdef A010
-#warning "! Compiling for MetaSenseA010 !"
+// #ifdef A010
+// #warning "! Compiling for MetaSenseA010 !"
 
 #include "A010.h"
 #include "DBSCAN.h"
@@ -26,17 +26,17 @@ Point obstacle;
 MetaSenseA010 a010;
 Dbscan dbscan;
 
-#endif
+// #endif
 
 /**
- * Get lidar data from serial
+ * Get data from serial
  * Get robot position from serial
- * Send lidar data in a queue for another thread to compute
+ * Send data in a queue for the other thread to compute
  */
 void Task1code(void *pvParameters);
 
 /**
- * Get lidar data from queue and compute them in order to send obstacles positions to PIC
+ * Get data from queue and compute them
  */
 void Task2code(void *pvParameters);
 
