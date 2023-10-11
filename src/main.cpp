@@ -122,12 +122,14 @@ void Task1code(void *pvParameters)
                 // println();
 
                 // Erasing all previous _clusters
-                for (size_t i = 0; i < _clusters.size(); i++)
+
+                /*for (size_t i = 0; i < _clusters.size(); i++)
                 {
                     _clusters[i].clear();
                 }
                 _clusters.clear();
-                println("Dbscan Process");
+                println("Dbscan Process");*/
+
                 //_clusters = dbscan.Process((Dbscan::Point3D *)&(a010.cloudFrame));
                 //_clusters = dbscan.Process((Point4D *)&(a010.cloudFrame));
                 // dbscan.displayStats();
@@ -198,10 +200,10 @@ void Task2code(void *pvParameters)
                 }
                 else if (cmd.cmd.startsWith("A010"))
                 {
-                    a010.HandleCommand(cmd);
-                    // String s = cmd.cmd;
-                    // s.remove(0, 4);
-                    // SERIAL_A010.write(s.c_str());
+                    // a010.HandleCommand(cmd);
+                    //  String s = cmd.cmd;
+                    //  s.remove(0, 4);
+                    //  SERIAL_A010.write(s.c_str());
                 }
             }
         }
