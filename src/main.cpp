@@ -13,13 +13,13 @@ void setup()
         println("Error creating the queue", LEVEL_ERROR);
     }
 
-    robot = Robot();
+    robot.Initialisation();
     delay(500);
-    ld06 = LidarLD06();
+    ld06.Initialisation();
     delay(500);
     tracker = Tracker();
+    delay(500);
 
-    println("MetaSenseA010 setup");
     a010.Initialisation();
     delay(500);
 

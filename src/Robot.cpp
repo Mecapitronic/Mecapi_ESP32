@@ -1,8 +1,8 @@
 #include "Robot.h"
 
-Robot::Robot()
+void Robot::Initialisation()
 {
-    Printer::println("Init Robot", LEVEL_INFO);
+    println("Init Robot");
 
     robotPosition = {1000, 1000, 0.0};
     print("Robot Position : ", robotPosition, "", LEVEL_INFO);

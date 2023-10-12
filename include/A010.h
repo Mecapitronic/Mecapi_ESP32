@@ -6,6 +6,7 @@
 #ifndef A010_H
 #define A010_H
 
+#pragma region DEFINE
 // Serial 2 : U2TX = GPIO17 ; U2RX = GPIO16
 #define SERIAL_A010 Serial2
 
@@ -97,6 +98,7 @@
 #if BAUD_RATE_SPEED < BAUD_RATE_MIN
 #error "!!! Baud rate selected is not enough or BINN - FPS are too high !!!"
 #endif
+#pragma endregion
 
 #include <Arduino.h>
 #include "ESP32_Helper.h"
@@ -115,11 +117,6 @@ struct ConfigA010
 class MetaSenseA010
 {
    public:
-    /**
-     * MetaSenseA010 Constructor
-     */
-    MetaSenseA010(void);
-
     void Initialisation();
     void InitTmpVariables();
 

@@ -1,10 +1,9 @@
 #include "A010.h"
 
-MetaSenseA010::MetaSenseA010() {}
-
 void MetaSenseA010::Initialisation()
 {
     println("Init MetaSenseA010");
+
     // minDistance, maxDistance
     Config(100, 1500, 2);
     SERIAL_A010.begin(115200);

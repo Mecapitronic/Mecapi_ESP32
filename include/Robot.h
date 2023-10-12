@@ -25,14 +25,14 @@ using namespace Printer;
 
 class Robot
 {
-public:
+   public:
     /**
-     * Robot Constructor: init all variables and serial communication with PIC
+     * Robot Init : init all variables and serial communication with PIC
      */
-    Robot();
+    void Initialisation();
 
     /**
-     * Enable or disable communication to dsPIC : used for debug as it re-route serial to PC
+     * Enable/disable communication to dsPIC : used for debug as it re-route serial to PC
      */
     void dsPicSerial(Enable enable);
     Enable dsPicSerial();
@@ -63,8 +63,8 @@ public:
      */
     void WriteSerialdsPic(int n, Point p);
 
-private:
-    RobotPosition robotPosition = {0, 0, 0.0}; // x, y, angle
+   private:
+    RobotPosition robotPosition = {0, 0, 0.0};  // x, y, angle
     uint32_t serialBuffer[ROBOT_SERIAL_PACKET_SIZE] = {0};
     uint8_t cursorTmp = 0;
     Enable dsPicSerialStatus = ENABLE_TRUE;

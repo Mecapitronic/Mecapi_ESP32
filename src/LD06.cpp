@@ -1,6 +1,6 @@
 #include "LD06.h"
 
-LidarLD06::LidarLD06()
+void LidarLD06::Initialisation()
 {
     println("Init LidarLD06");
 
