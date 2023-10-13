@@ -4,7 +4,7 @@ import serial
 
 #TODO : see examples: https://snyk.io/advisor/python/open3d/functions/open3d.geometry.PointCloud
 
-ser = serial.Serial('COM6', 921600, timeout=0)
+ser = serial.Serial('COM16', 921600, timeout=0)
 ser.flushInput()
 
 # create visualizer and window.
@@ -44,7 +44,7 @@ while keep_running:
         try:
             if ser.in_waiting:
                 #TODO : enregistrer et afficher tous les points d'une trame d'un coup => au bout de qq secondes ça ne répond plus...
-                for i in range(625): 
+                for i in range(2500):
                     l = ser.readline()
                     line=l.decode("utf-8")
                     line_splitted = line.replace("\n","").replace("\r","").split(' ')
@@ -53,7 +53,7 @@ while keep_running:
                     x = int(line_splitted[0],10) / 1000
                     y = int(line_splitted[1],10) / 1000
                     z = int(line_splitted[2],10) / 1000
-                    
+
                     t1=np.asarray([x, z, y])
                     #t=np.fromstring(line, dtype=int, sep=' ')
                     t2=np.array([t1.tolist()])
