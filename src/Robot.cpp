@@ -50,6 +50,8 @@ void Robot::SetPosition(int x, int y, int angle)
 
 boolean Robot::ReadSerial()
 {
+    if (dsPicSerialStatus != ENABLE_NONE)
+{
     if (SERIAL_ROBOT.available() > 0)
     {
         uint32_t tmpInt = SERIAL_ROBOT.read();
@@ -67,6 +69,7 @@ boolean Robot::ReadSerial()
                 if (serialBuffer[ROBOT_DATA_PACKET_SIZE - 1] == 10)
                 {
                     return true;
+                    }
                 }
             }
         }

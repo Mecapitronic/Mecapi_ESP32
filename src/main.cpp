@@ -15,18 +15,19 @@ void setup()
 
     robot.Initialisation();
     delay(500);
+#ifdef LD06
     ld06.Initialisation();
     delay(500);
     tracker = Tracker();
     delay(500);
+#endif
 
+#ifdef A010
     a010.Initialisation();
     delay(500);
-
-    println("Dbscan setup");
-    dbscan.Config(60.0f, 3, TCHEBYCHEV);
+    dbscan.Initialisation();
     delay(500);
-
+#endif
     /* Task function. */
     /* name of task. */
     /* Stack size of task */
@@ -61,7 +62,7 @@ void Task1code(void *pvParameters)
                 // set the new robot position
                 robot.Analyze();
             }
-
+#ifdef LD06
             if (ld06.ReadSerial())
             {
                 ld06.Analyze();
@@ -103,7 +104,9 @@ void Task1code(void *pvParameters)
                     println("Sending ", LIDAR_DATA_PACKET_SIZE - counter, " point");
                 }
             }
+#endif
 
+#ifdef A010
             // we enter once we have the complete frame
             if (a010.ReadSerial())
             {
@@ -111,15 +114,16 @@ void Task1code(void *pvParameters)
 
                 println("***");
 
-                // for (uint16_t i = 0; i < PICTURE_SIZE; i++)  // FIXME: n'affiche plus
-                // rien !
-                //{
-                //  String data = "" + String(a010.cloudFrame[i].x) + " " +
-                //  String(a010.cloudFrame[i].y) + " " + String(a010.cloudFrame[i].z) + "
-                //  " + String("65520"); println(data);
-                //}
-                // println("---");
-                // println();
+                // ! FIXME: n'affiche plus rien
+                for (uint16_t i = 0; i < PICTURE_SIZE; i++)
+                {
+                    String data = "" + String(a010.cloudFrame[i].x) + " " +
+                                  String(a010.cloudFrame[i].y) + " " +
+                                  String(a010.cloudFrame[i].z) + " " + String("65520");
+                    println(data);
+                }
+                println("---");
+                println();
 
                 // Erasing all previous _clusters
 
@@ -136,6 +140,7 @@ void Task1code(void *pvParameters)
 
                 // xQueueSend(myQueue, &a010Packet, 0);
             }
+#endif
         }
         catch (std::exception const &e)
         {
