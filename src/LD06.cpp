@@ -196,6 +196,13 @@ bool LidarLD06::IsOutsideTable(Point point)
     return (point.x < table_margin || point.x > 2000 - table_margin || point.y < table_margin || point.y > 3000 - table_margin);
 }
 
+bool LidarLD06::IsOutsideConfig(PolarPoint point)
+{
+    return (point.distance < lidarConfig.minDistance ||
+            point.distance > lidarConfig.maxDistance ||
+            point.confidence < lidarConfig.minQuality);
+}
+
 void LidarLD06::AggregatePoint(PolarPoint lidar_point, Tracker *tracker, Robot robot)
 {
     boolean aggregate = true;
@@ -205,15 +212,13 @@ void LidarLD06::AggregatePoint(PolarPoint lidar_point, Tracker *tracker, Robot r
 
     if (IsOutsideTable(point))
     {
-        // println("Outside table : ", point);
+        print("Outside table : ", point);
         aggregate = false;
     }
 
-    if (lidar_point.distance < lidarConfig.minDistance ||
-        lidar_point.distance > lidarConfig.maxDistance ||
-        lidar_point.confidence < lidarConfig.minQuality)
+    if (IsOutsideConfig(lidar_point))
     {
-        // println("Outside config : ", point);
+        print("Outside config : ", point);
         aggregate = false;
     }
 
@@ -245,6 +250,8 @@ void LidarLD06::AggregatePoint(PolarPoint lidar_point, Tracker *tracker, Robot r
             else
             {
                 // not enough point, we drop the current obstacle
+                println("Not enough point : ", pointsCounter,
+                        " ,we drop the current obstacle");
                 pointsCounter = 0;
             }
         }
@@ -253,7 +260,14 @@ void LidarLD06::AggregatePoint(PolarPoint lidar_point, Tracker *tracker, Robot r
     if (aggregate)
     {
         // save the coord of current lidar point
-        obstacleTmp.data[pointsCounter++] = PolarPoint(lidar_point.angle, lidar_point.distance, lidar_point.confidence, point.x, point.y);
+        print("Aggregate : ", lidar_point);
+        obstacleTmp.data[pointsCounter++] =
+            PolarPoint(lidar_point.angle, lidar_point.distance, lidar_point.confidence,
+                       point.x, point.y);
+    }
+    else
+    {
+        println("Do not Aggregate");
     }
 }
 

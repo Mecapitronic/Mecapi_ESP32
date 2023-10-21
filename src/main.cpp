@@ -77,8 +77,7 @@ void Task1code(void *pvParameters)
                     // TODO increase the confidence limit to avoid aberrations
 
                     // if the point is out of bound, we will not use it
-                    ConfigLidar configLidar = ld06.GetConfig();
-                    if (lidarPacket.dataPoint[i].distance < configLidar.minDistance ||
+                    /*if (lidarPacket.dataPoint[i].distance < configLidar.minDistance ||
                         lidarPacket.dataPoint[i].distance > configLidar.maxDistance ||
                         lidarPacket.dataPoint[i].confidence < configLidar.minQuality)
                     {
@@ -87,8 +86,10 @@ void Task1code(void *pvParameters)
                     else
                     {
                         xQueueSend(myQueue, &lidarPacket.dataPoint[i], 0);
-                    }
+                    }*/
+                    ld06.AggregatePoint(lidarPacket.dataPoint[i], &tracker, robot);
                 }
+                /*
                 // TODO at least send 1 or 2 points to the queue (min max ?, middle ?) to
                 // end aggregation for obstacle
                 if (counter == LIDAR_DATA_PACKET_SIZE)
@@ -102,7 +103,12 @@ void Task1code(void *pvParameters)
                 else
                 {
                     println("Sending ", LIDAR_DATA_PACKET_SIZE - counter, " point");
-                }
+                }*/
+
+                Debugger::WaitForAvailableSteps();
+
+                tracker.sendObstaclesToRobot(robot);
+                tracker.untrackOldObstacles(robot);
             }
 #endif
 
@@ -167,11 +173,11 @@ void Task2code(void *pvParameters)
             {
                 if (xQueueReceive(myQueue, &point, portTICK_PERIOD_MS * 0))
                 {
-                    ld06.AggregatePoint(point, &tracker, robot);
+                    // ld06.AggregatePoint(point, &tracker, robot);
                 }
             }
-            tracker.sendObstaclesToRobot(robot);
-            tracker.untrackOldObstacles(robot);
+            // tracker.sendObstaclesToRobot(robot);
+            // tracker.untrackOldObstacles(robot);
 
             // Check if we get commands from operator via debug serial
             ESP32_Helper::UpdateSerial();

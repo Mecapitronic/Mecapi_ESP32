@@ -134,6 +134,12 @@ class LidarLD06
  bool IsOutsideTable(Point point);
 
  /**
+  * returns whether or not the given point is outside the config in distance min and max
+  * and quality
+  */
+ bool IsOutsideConfig(PolarPoint point);
+
+ /**
   * Custom segmentation algorithm to detect cylinders in 2D plan
   * Send data to object tracker that send it to the PIC
   */
