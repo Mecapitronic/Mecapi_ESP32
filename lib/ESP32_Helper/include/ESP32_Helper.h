@@ -11,6 +11,7 @@
 #include "Structure.h"
 #include "Printer.h"
 #include "Debugger.h"
+#include "ModuleTemplate.h"
 
 #define SERIAL_DEBUG Serial
 

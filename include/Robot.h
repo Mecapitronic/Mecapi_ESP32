@@ -23,7 +23,7 @@
 
 using namespace Printer;
 
-class Robot
+class Robot  // : public IModule
 {
    public:
     /**
