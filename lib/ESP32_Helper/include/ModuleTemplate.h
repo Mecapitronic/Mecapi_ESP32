@@ -13,12 +13,18 @@ class IModule
     static const int queueSize = 500;
 
    public:
-    virtual void Initialisation();
-    virtual void SetConfig();
-    virtual bool ReadSerial();
-    virtual void SendSerial();
-    virtual void AnalyseSerial();
-    virtual void CreateQueue(int size = queueSize)
+    IModule(void)
+    {
+        CreateQueue();
+        return;
+    };
+    virtual ~IModule(){}
+    virtual void Initialisation()=0;
+    virtual void SetConfig() = 0;
+    virtual bool ReadSerial() = 0;
+    virtual void SendSerial() = 0;
+    virtual void Analyse() = 0;
+    void CreateQueue(int size = queueSize)
     {
         myQueue = xQueueCreate(size, sizeof(uint8_t));
         if (myQueue == NULL)

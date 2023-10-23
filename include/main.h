@@ -5,20 +5,23 @@
 
 using namespace Printer;
 
-// #ifdef LD06
-// #warning "! Compiling for LD06 !"
+#ifdef LD06
+#warning "! Compiling for LD06 !"
 
 #include "LD06.h"
 #include "Robot.h"
+#include "testModule.h"
 
 LidarLD06 ld06;
 Robot robot;
 Tracker tracker;
 Point obstacle;
-// #endif
+testModule test;
 
-// #ifdef A010
-// #warning "! Compiling for MetaSenseA010 !"
+#endif
+
+#ifdef A010
+#warning "! Compiling for MetaSenseA010 !"
 
 #include "A010.h"
 #include "DBSCAN.h"
@@ -26,7 +29,7 @@ Point obstacle;
 MetaSenseA010 a010;
 Dbscan dbscan;
 
-// #endif
+#endif
 
 /**
  * Get data from serial
