@@ -3,7 +3,7 @@
 void LidarLD06::Initialisation()
 {
     println("Init LidarLD06");
-
+    scan.clear();
     // minDistance, maxDistance, minQuality, distanceThreshold, angleThreshold;
     Config(100, 1500, 200, 200, 0.8 * 5);
     SERIAL_LIDAR.begin(230400);
@@ -209,6 +209,9 @@ void LidarLD06::AggregatePoint(PolarPoint lidar_point, Tracker *tracker, Robot r
 
     // Ignore points outside of the table
     Point point = PolarToCartesian(lidar_point, robot);
+    lidar_point.x = point.x;
+    lidar_point.y = point.y;
+    scan.push_back(lidar_point);
 
     if (IsOutsideTable(point))
     {
@@ -218,7 +221,7 @@ void LidarLD06::AggregatePoint(PolarPoint lidar_point, Tracker *tracker, Robot r
 
     if (IsOutsideConfig(lidar_point))
     {
-        print("Outside config : ", point);
+        print("Outside config : ", lidar_point);
         aggregate = false;
     }
 

@@ -68,6 +68,8 @@ void Task1code(void *pvParameters)
                 ld06.Analyze();
                 ld06.CheckContinuity();
 
+                plotRobot(robot.GetPosition());
+
                 lidarPacket = ld06.GetData();
                 int counter = 0;
                 for (int i = 0; i < LIDAR_DATA_PACKET_SIZE; i++)
@@ -104,7 +106,8 @@ void Task1code(void *pvParameters)
                 {
                     println("Sending ", LIDAR_DATA_PACKET_SIZE - counter, " point");
                 }*/
-
+                plotScan(ld06.scan);
+                ld06.scan.clear();
                 Debugger::WaitForAvailableSteps();
 
                 tracker.sendObstaclesToRobot(robot);

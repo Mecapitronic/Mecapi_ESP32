@@ -188,5 +188,9 @@ private:
     PacketLidar lidarPacket;
     PacketLidar lidarLastPacket;
     ConfigLidar lidarConfig = {0, 0, 0, 0, 0};
+
+   public:
+    // Data
+    std::vector<PolarPoint> scan;
 };
 #endif
