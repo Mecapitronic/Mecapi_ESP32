@@ -49,18 +49,19 @@ void println(Level level)
     SERIAL_DEBUG.println();
 }
 
-void print(String data, Level level)
+    void print(String prefix, String suffix, Level level)
 {
     if (!IsPrintable(level))
         return;
-    SERIAL_DEBUG.print(data);
+        SERIAL_DEBUG.print(prefix);
+        SERIAL_DEBUG.print(suffix);
 }
 
-void println(String data, Level level)
+    void println(String prefix, String suffix, Level level)
 {
     if (!IsPrintable(level))
         return;
-    SERIAL_DEBUG.print(data);
+        print(prefix, suffix, level);
     SERIAL_DEBUG.println();
 }
 
@@ -232,8 +233,7 @@ void print(String prefix, RobotPosition data, String suffix, Level level, boolea
     {
         if (!IsPrintable(level))
             return;
-        print("Command => ");
-        print(prefix);
+        print("Command => " + prefix);
         print(" Cmd=" + cmd.cmd);
         print(" Size=", cmd.size);
         print(" Data=", cmd.data[0]);
