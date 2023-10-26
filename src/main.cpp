@@ -3,7 +3,7 @@
 void setup()
 {
     // put your setup code here, to run once:
-    ESP32_Helper::ESP32_Helper(921600);
+    ESP32_Helper::ESP32_Helper();
 
     // myQueue = xQueueCreate(queueSize, sizeof(PolarPoint));
     myQueue = xQueueCreate(queueSize, sizeof(uint8_t));

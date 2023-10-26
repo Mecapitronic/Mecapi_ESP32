@@ -27,7 +27,7 @@ void resetVar()
 }
 }  // namespace
 
-void ESP32_Helper(int baud_speed)
+void ESP32_Helper(int baud_speed, Enable printEnable, Level printLvl, Enable debugEnable)
 {
     SERIAL_DEBUG.begin(baud_speed);
     if (SERIAL_DEBUG.available() > 0)
@@ -36,8 +36,8 @@ void ESP32_Helper(int baud_speed)
     }
     SERIAL_DEBUG.println();
 
-    Printer::PrintEnable(Enable::ENABLE_TRUE);
-    Printer::PrintLevel(Level::LEVEL_VERBOSE);
+    Printer::PrintEnable(printEnable);
+    Printer::PrintLevel(printLvl);
 
     println();
     println("|--------------|");
@@ -49,7 +49,7 @@ void ESP32_Helper(int baud_speed)
     println(__TIME__);
     println();
 
-    Debugger::EnableDebugger(ENABLE_TRUE);
+    Debugger::EnableDebugger(debugEnable);
     Debugger::Initialisation();
 
     resetVar();
