@@ -62,6 +62,10 @@ void plotPoint(Point p, String varName, Level level = LEVEL_VERBOSE);
  */
 void plotPoint(Point p, Level level = LEVEL_VERBOSE);
 
+void plotScan(std::vector<PolarPoint> scan, Level level = LEVEL_VERBOSE);
+
+void plotRobot(RobotPosition pos, Level level = LEVEL_VERBOSE);
+
 void plotTrackerPoints(PointTracker p, int size, String varName, Level level = LEVEL_VERBOSE);
 
 /**
