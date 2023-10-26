@@ -1,0 +1,39 @@
+{
+    "version": 1,
+    "author": "Mecapitronic",
+    "editor": "wokwi",
+    "parts": [
+        {
+            "type": "board-esp32-devkit-c-v4",
+            "id": "esp"
+        },
+        {
+            "type": "wokwi-serial-port",
+            "id": "serial",
+            "top": 0,
+            "left": 100,
+            "attrs": { "baud": "115200" }
+        },
+        {
+            "type": "wokwi-serial-port",
+            "id": "serial2",
+            "top": 0,
+            "left": 200,
+            "attrs": { "baud": "230400" }
+        }
+    ],
+    "connections": [
+        ["esp:TX", "$serialMonitor:RX", "", []],
+        ["esp:RX", "$serialMonitor:TX", "", []],
+        ["esp:TX1", "$serial:RX", "", []],
+        ["esp:RX1", "$serial:TX", "", []],
+        ["esp:TX2", "$serial2:RX", "", []],
+        ["esp:RX2", "$serial2:TX", "", []]
+    ],
+    "dependencies": {},
+    "serialMonitor": {
+        "display": "auto",
+        "newline": "lf",
+        "convertEol": false
+    }
+}
