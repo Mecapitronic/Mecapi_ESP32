@@ -14,6 +14,7 @@ class testModule : public IModule
     bool ReadSerial();
     void SendSerial();
     void Analyse();
+    void HandleCommand(Command cmd);
     // void CreateQueue(int size = 0);
 };
 #endif /* C0C4AD91_075C_4E09_A32E_1DE70EF23269 */
