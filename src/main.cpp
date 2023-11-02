@@ -13,9 +13,9 @@ void setup()
         println("Error creating the queue", LEVEL_ERROR);
     }
 
+#ifdef LD06
     robot.Initialisation();
     delay(500);
-#ifdef LD06
     ld06.Initialisation();
     delay(500);
     tracker = Tracker();
@@ -28,6 +28,50 @@ void setup()
     dbscan.Initialisation();
     delay(500);
 #endif
+
+#ifdef VL53
+    Serial.end();
+    Serial.begin(115200);
+    delay(1000);
+    Serial.println("SparkFun VL53L5CX Imager Example");
+
+    Wire.begin();            // This resets I2C bus to 100kHz
+    Wire.setClock(1000000);  // Sensor has max I2C freq of 1MHz
+
+    // myImager.setWireMaxPacketSize(128);  // Increase default from 32 bytes to 128 - not supported on all platforms
+
+    Serial.println("Initializing sensor board. This can take up to 10s. Please wait.");
+    // Time how long it takes to transfer firmware to sensor
+    long startTime = millis();
+    bool startup = myImager.begin();
+    long stopTime = millis();
+
+    if (startup == false)
+    {
+        Serial.println(F("Sensor not found - check your wiring. Freezing"));
+        while (1)
+            ;
+    }
+
+    Serial.print("Firmware transfer time: ");
+    float timeTaken = (stopTime - startTime) / 1000.0;
+    Serial.print(timeTaken, 3);
+    Serial.println("s");
+
+    myImager.setResolution(8 * 8);  // Enable all 64 pads
+
+    imageResolution = myImager.getResolution();  // Query sensor for current resolution - either 4x4 or 8x8
+    imageWidth = sqrt(imageResolution);          // Calculate printing width
+
+    // Using 4x4, min frequency is 1Hz and max is 60Hz
+    // Using 8x8, min frequency is 1Hz and max is 15Hz
+    myImager.setRangingFrequency(2);
+
+    myImager.startRanging();
+
+    measurementStartTime = millis();
+#endif
+
     /* Task function. */
     /* name of task. */
     /* Stack size of task */
@@ -51,18 +95,61 @@ void Task1code(void *pvParameters)
 {
     println("Start Task1code");
 
-    PacketLidar lidarPacket;
-
     while (1)
     {
         try
         {
+#ifdef VL53
+            // #define _CSV_FORMAT_
+            //  Poll sensor for new data
+            if (myImager.isDataReady() == true)
+            {
+                if (myImager.getRangingData(&measurementData))  // Read distance data into array
+                {
+                    // The ST library returns the data transposed from zone mapping shown in datasheet
+                    // Pretty-print data with increasing y, decreasing x to reflect reality
+
+#ifdef _CSV_FORMAT_
+                    for (int y = 0; y <= imageWidth * (imageWidth - 1); y += imageWidth)
+                    {
+                        for (int x = 0; x <= (imageWidth - 1); x++)
+                        {
+                            Serial.print(measurementData.distance_mm[x + y]);
+                            Serial.print(",");
+                        }
+                    }
+#else
+                    for (int y = 0; y <= imageWidth * (imageWidth - 1); y += imageWidth)
+                    {
+                        // for (int x = imageWidth - 1; x >= 0; x--)
+                        for (int x = 0; x <= (imageWidth - 1); x++)
+                        {
+                            Serial.print("\t");
+                            Serial.print(measurementData.distance_mm[x + y]);
+                        }
+                        Serial.println();
+                    }
+#endif
+                    Serial.println();
+
+                    // Uncomment to display actual measurement rate
+                    // measurements++;
+                    // float measurementTime = (millis() - measurementStartTime) / 1000.0;
+                    // Serial.print("rate: ");
+                    // Serial.print(measurements / measurementTime, 3);
+                    // Serial.println("Hz");
+                }
+            }
+
+            delay(5);  // Small delay between polling
+#endif
+
+#ifdef LD06
             if (robot.ReadSerial())
             {
                 // set the new robot position
                 robot.Analyze();
             }
-#ifdef LD06
             if (ld06.ReadSerial())
             {
                 ld06.Analyze();
@@ -70,7 +157,6 @@ void Task1code(void *pvParameters)
 
                 plotRobot(robot.GetPosition());
 
-                lidarPacket = ld06.GetData();
                 int counter = 0;
                 for (int i = 0; i < LIDAR_DATA_PACKET_SIZE; i++)
                 {
@@ -89,7 +175,7 @@ void Task1code(void *pvParameters)
                     {
                         xQueueSend(myQueue, &lidarPacket.dataPoint[i], 0);
                     }*/
-                    ld06.AggregatePoint(lidarPacket.dataPoint[i], &tracker, robot);
+                    ld06.AggregatePoint(ld06.GetData().dataPoint[i], &tracker, robot);
                 }
                 /*
                 // TODO at least send 1 or 2 points to the queue (min max ?, middle ?) to
@@ -189,6 +275,11 @@ void Task2code(void *pvParameters)
             {
                 Command cmd = ESP32_Helper::GetCommand();
 
+                if (cmd.cmd.startsWith("VL53"))
+                {
+                    println("VL53 : ", cmd.size, "");
+                }
+#ifdef LD06
                 if (cmd.cmd == ("LD06PWM"))
                 {
                     // LD06PWM:25
@@ -219,6 +310,7 @@ void Task2code(void *pvParameters)
                     //  s.remove(0, 4);
                     //  SERIAL_A010.write(s.c_str());
                 }
+#endif
             }
         }
         catch (std::exception const &e)

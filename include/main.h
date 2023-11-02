@@ -31,6 +31,24 @@ Dbscan dbscan;
 
 #endif
 
+#ifdef VL53
+#warning "! Compiling for VL53L5CX !"
+
+// #include <Wire.h>
+
+#include <SparkFun_VL53L5CX_Library.h>  //http://librarymanager/All#SparkFun_VL53L5CX
+
+SparkFun_VL53L5CX myImager;
+VL53L5CX_ResultsData measurementData;  // Result data class structure, 1356 byes of RAM
+
+int imageResolution = 0;  // Used to pretty print output
+int imageWidth = 0;       // Used to pretty print output
+
+long measurements = 0;          // Used to calculate actual output rate
+long measurementStartTime = 0;  // Used to calculate actual output rate
+
+#endif
+
 /**
  * Get data from serial
  * Get robot position from serial
