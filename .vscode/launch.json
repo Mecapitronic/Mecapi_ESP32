@@ -16,16 +16,17 @@
             "console": "integratedTerminal",
             "justMyCode": true,
             "args": [
-                "COM8",
+                "socket",
+                "rfc2217://localhost:4000",
                 "ld06",
-                "2"
+                "1"
             ]
         },
         {
             "name": "Wokwi GDB",
             "type": "cppdbg",
             "request": "launch",
-            "program": ".pio/build/esp32-freertos/firmware.elf",
+            "program": ".pio/build/esp32-freertos_LD06/firmware.elf",
             "cwd": "${workspaceFolder}",
             "MIMode": "gdb",
             "miDebuggerPath": "${command:espIdf.getXtensaGdb}",

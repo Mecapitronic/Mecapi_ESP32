@@ -13,7 +13,7 @@ Choose which sensor to simulate, then execute :
 
 `./Serial_Packet_Simulator.py COM6 ld06 2`
 
--   First argument is the serial port : "/dev/ttyUSB" or COM6
+-   First argument is the serial port : "/dev/ttyUSB" or COM6, or rfc2217://localhost:4000, or \\\\.\\CNCA0
 -   Second argument is the type of sensor, for now : ld06 or a010
 -   Third argument is the number of sample file to send, example : data_ld06_1.txt
     <br />

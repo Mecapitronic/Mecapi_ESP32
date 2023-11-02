@@ -26,7 +26,7 @@
     ],
     "platformio-ide.disablePIOHomeStartup": true,
     "platformio-ide.autoOpenPlatformIOIniFile": false,
-    "C_Cpp.clang_format_fallbackStyle": "{ BasedOnStyle: Google, IndentWidth: 4, ColumnLimit: 90, BreakBeforeBraces: Allman, AllowShortIfStatementsOnASingleLine: false, IncludeBlocks: Merge,SortIncludes: false }",
+    "C_Cpp.clang_format_fallbackStyle": "{ BasedOnStyle: Google, IndentWidth: 4, ColumnLimit: 120, BreakBeforeBraces: Allman, AllowShortIfStatementsOnASingleLine: false, IncludeBlocks: Merge,SortIncludes: false }",
     "[python]": {
         "editor.defaultFormatter": "ms-python.python"
     },
