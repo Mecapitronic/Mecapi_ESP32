@@ -2,41 +2,41 @@
 
 namespace Printer
 {
-namespace
-{
-Level printLevel = LEVEL_VERBOSE;
-Enable printEnable = ENABLE_NONE;
-}  // namespace
-
-void PrintLevel(Level level)
-{
-    printLevel = level;
-    SERIAL_DEBUG.print("PrintLevel : ");
-    switch (level)
+    namespace
     {
-        ENUM_PRINT(LEVEL_VERBOSE);
-        ENUM_PRINT(LEVEL_INFO);
-        ENUM_PRINT(LEVEL_WARN);
-        ENUM_PRINT(LEVEL_ERROR);
-        ENUM_PRINT(LEVEL_NONE);
-    }
-}
-Level PrintLevel() { return printLevel; }
+        Level printLevel = LEVEL_VERBOSE;
+        Enable printEnable = ENABLE_NONE;
+    }  // namespace
 
-void PrintEnable(Enable enable)
-{
-    if (enable != ENABLE_NONE)
+    void PrintLevel(Level level)
     {
-        printEnable = enable;
-        SERIAL_DEBUG.print("PrintEnable : ");
-        switch (enable)
+        printLevel = level;
+        SERIAL_DEBUG.print("PrintLevel : ");
+        switch (level)
         {
-            ENUM_PRINT(ENABLE_FALSE);
-            ENUM_PRINT(ENABLE_TRUE);
-            ENUM_PRINT(ENABLE_NONE);
+            ENUM_PRINT(LEVEL_VERBOSE);
+            ENUM_PRINT(LEVEL_INFO);
+            ENUM_PRINT(LEVEL_WARN);
+            ENUM_PRINT(LEVEL_ERROR);
+            ENUM_PRINT(LEVEL_NONE);
         }
     }
-}
+    Level PrintLevel() { return printLevel; }
+
+    void PrintEnable(Enable enable)
+    {
+        if (enable != ENABLE_NONE)
+        {
+            printEnable = enable;
+            SERIAL_DEBUG.print("PrintEnable : ");
+            switch (enable)
+            {
+                ENUM_PRINT(ENABLE_FALSE);
+                ENUM_PRINT(ENABLE_TRUE);
+                ENUM_PRINT(ENABLE_NONE);
+            }
+        }
+    }
 
     Enable PrintEnable() { return printEnable; }
 
@@ -44,9 +44,9 @@ void PrintEnable(Enable enable)
 
     void println(Level level)
     {
-    if (!IsPrintable(level))
-        return;
-    SERIAL_DEBUG.println();
+        if (!IsPrintable(level))
+            return;
+        SERIAL_DEBUG.println();
     }
 
     void print(String prefix, String suffix, Level level)
@@ -339,13 +339,15 @@ void PrintEnable(Enable enable)
     void plot3D(Point3D p, String varName)
     {
         // 3D|A:B:C|E
-    // '3D|sphere1,widget0:S:sphere:RA:'+ str(sphere1rad)+':P:'+ str(sphere1x) +':'+ str(sphere1y) +':'+ str(sphere1z) + ':C:black:O:1'
-    // msg = '3D|sphere' + sphere1num + ',widget0:S:sphere:RA:' + str(sphere1rad) + ':P:' + str(sphere1x) + ':' + str(sphere1y) + ':' + str(sphere1z)
+        // '3D|sphere1,widget0:S:sphere:RA:'+ str(sphere1rad)+':P:'+ str(sphere1x) +':'+ str(sphere1y) +':'+
+        // str(sphere1z) + ':C:black:O:1' msg = '3D|sphere' + sphere1num + ',widget0:S:sphere:RA:' + str(sphere1rad) +
+        // ':P:' + str(sphere1x) + ':' + str(sphere1y) + ':' + str(sphere1z)
         // + ':C:black:O:1' #2ecc71
         // TODO : rester en cm sinon le point est perdu dans le brouillard de l'horizon 3D de teleplot...
         // FIXME : la couleur n'est pas prise en compte
         // FIXME : le repère 3D de teleplot est basé sur un plan XZ avec Y en "hauteur" (sans axe!)
-        String data = ">3D|" + varName + ",widget0:S:sphere:P:" + p.x + ":" + p.y + ":" + p.z / 10 + ":RA:1:C:black:O:1";
+        String data =
+            ">3D|" + varName + ",widget0:S:sphere:P:" + p.x + ":" + p.y + ":" + p.z / 10 + ":RA:1:C:black:O:1";
         SERIAL_DEBUG.println(data);
     }
 
