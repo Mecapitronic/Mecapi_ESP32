@@ -13,6 +13,21 @@ void setup()
         println("Error creating the queue", LEVEL_ERROR);
     }
 
+    println("modules clear");
+    modules.clear();
+    modules.push_back(new testModule());
+
+    println("modules[0] Init");
+    modules.front()->Initialisation();
+
+    println("modules Init");
+    for (const auto &object : modules) object->Initialisation();
+
+    println("modules delete");
+    for (const auto &object : modules) delete object;
+
+    modules.clear();
+
 #ifdef LD06
     robot.Initialisation();
     delay(500);

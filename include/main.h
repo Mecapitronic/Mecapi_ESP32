@@ -2,15 +2,20 @@
 #define MAIN_H
 
 #include "ESP32_Helper.h"
+#include "ModuleTemplate.h"
+#include "testModule.h"
+#include <list>
+#include <functional>
 
 using namespace Printer;
+
+std::list<IModule *> modules;
 
 #ifdef LD06
 #warning "! Compiling for LD06 !"
 
 #include "LD06.h"
 #include "Robot.h"
-#include "testModule.h"
 
 LidarLD06 ld06;
 Robot robot;
