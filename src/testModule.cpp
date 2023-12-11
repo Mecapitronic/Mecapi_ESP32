@@ -1,7 +1,7 @@
 #include "testModule.h"
 
 #pragma region IModule
-testModule::testModule(void)
+testModule::testModule()
 {
     println("Constructor testModule");
     return;

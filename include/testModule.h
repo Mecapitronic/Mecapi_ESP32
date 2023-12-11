@@ -8,7 +8,7 @@ class testModule : public IModule
 {
    public:
 #pragma region IModule
-    // testModule(void);
+    testModule(void);
     // ~testModule();
     // void Initialisation();
     bool ReadSerial();
