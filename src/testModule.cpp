@@ -1,12 +1,18 @@
 #include "testModule.h"
 
-testModule::testModule(void) { return; }
-// testModule ::~testModule() {}
-void testModule::Initialisation() {}
-void testModule::SetConfig() {}
+#pragma region IModule
+testModule::testModule(void)
+{
+    println("Constructor testModule");
+    return;
+}
+// testModule::~testModule() {}
+// void testModule::Initialisation() { println("Init testModule"); }
 bool testModule::ReadSerial() { return true; }
 void testModule::SendSerial() {}
-void testModule::Analyse() {}
 void testModule::HandleCommand(Command cmd) { print("testModule : ", cmd); }
 
-// void testModule::CreateQueue(int size = 0) {}
+#pragma endregion
+
+void testModule::SetConfig() {}
+void testModule::Analyse() {}
