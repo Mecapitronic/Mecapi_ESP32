@@ -107,6 +107,7 @@ boolean LidarLD06::ReadSerial()
             if (cursorTmp == LIDAR_SERIAL_PACKET_SIZE)
             {
                 cursorTmp = 0;
+                Analyze();
                 return true;
             }
         }
@@ -235,6 +236,7 @@ void LidarLD06::AggregatePoint(PolarPoint lidar_point, Tracker *tracker, Robot r
     // if we have too much data for this obstacle, we move to save another obstacle
     if (pointsCounter >= kMaxPoints)
     {
+        // TODO do not take this as obstacle because it's too large (wall, person, ...)
         ObstacleDetected(tracker, kMaxPoints);
     }
     else

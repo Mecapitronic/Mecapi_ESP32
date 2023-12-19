@@ -152,7 +152,6 @@ void Task1code(void *pvParameters)
             }
             if (ld06.ReadSerial())
             {
-                ld06.Analyze();
                 ld06.CheckContinuity();
 
                 plotRobot(robot.GetPosition());
