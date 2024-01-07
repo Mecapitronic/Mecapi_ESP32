@@ -1,4 +1,4 @@
-# MECAPITRONIC ESP32 for LIDAR and MetaSenseA010
+# MECAPI ESP32 for LIDAR and MetaSenseA010
 
 Get data from a LD06 LIDAR and analyze / compute points to get resulting adversary robots positions
 Robots positions are then send to PIC via serial.

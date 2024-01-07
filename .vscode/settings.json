@@ -1,7 +1,4 @@
 {
-    "todo-tree.highlights.useColourScheme": true,
-    "todo-tree.general.showActivityBarBadge": true,
-    "todo-tree.tree.showCountsInTree": true,
     "editor.defaultFormatter": "ms-vscode.cpptools",
     "editor.formatOnPaste": true,
     "editor.formatOnSave": true,
@@ -11,9 +8,20 @@
     "editor.guides.bracketPairsHorizontal": true,
     "editor.rulers": [
         90,
-        120,
-        180
+        120
     ],
+    "files.insertFinalNewline": true,
+    "files.trimFinalNewlines": true,
+    "git.autofetch": true,
+    "terminal.integrated.scrollback": 100000,
+    "C_Cpp.clang_format_fallbackStyle": "{ BasedOnStyle: Google, IndentWidth: 4, ColumnLimit: 120, BreakBeforeBraces: Allman, AllowShortIfStatementsOnASingleLine: false, IncludeBlocks: Merge,SortIncludes: false,NamespaceIndentation: All,IndentCaseLabels: true }",
+    "[python]": {
+        "editor.defaultFormatter": "charliermarsh.ruff",
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": "explicit",
+            "source.fixAll": "explicit"
+        },
+    },
     "cSpell.language": "en,fr",
     "cSpell.words": [
         "dbscan",
@@ -26,11 +34,9 @@
     ],
     "platformio-ide.disablePIOHomeStartup": true,
     "platformio-ide.autoOpenPlatformIOIniFile": false,
-    "C_Cpp.clang_format_fallbackStyle": "{ BasedOnStyle: Google, IndentWidth: 4, ColumnLimit: 120, BreakBeforeBraces: Allman, AllowShortIfStatementsOnASingleLine: false, IncludeBlocks: Merge,SortIncludes: false,NamespaceIndentation: All,IndentCaseLabels: true }",
-    "[python]": {
-        "editor.defaultFormatter": "ms-python.python"
-    },
-    "workbench.iconTheme": "vscode-icons",
+    "todo-tree.highlights.useColourScheme": true,
+    "todo-tree.general.showActivityBarBadge": true,
+    "todo-tree.tree.showCountsInTree": true,
     "files.associations": {
         "*.tmpl": "html",
         "array": "cpp",
@@ -85,12 +91,8 @@
         "iostream": "cpp",
         "queue": "cpp"
     },
-    "files.trimFinalNewlines": true,
-    "files.insertFinalNewline": true,
-    "terminal.integrated.scrollback": 100000,
-    "git.autofetch": true,
     "doxdocgen.generic.authorEmail": "mecapitronic@gmail.com",
-    "doxdocgen.generic.authorName": "Mecapitronic",
+    "doxdocgen.generic.authorName": "Mecapi",
     "doxdocgen.file.fileOrder": [
         "file",
         "author",
