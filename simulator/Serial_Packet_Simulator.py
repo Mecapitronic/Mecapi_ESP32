@@ -10,10 +10,12 @@ from serial import Serial
 import serial
 import socket
 
-teleplot = ("teleplot.fr",64390)
+teleplot = ("teleplot.fr",51545)
+teleplotLocal = ("localhost",64390)
 loopback = ("127.0.0.1",4000)
 sockUDP = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, 0)
 sockTCP = socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0)
+serialPort = None
 
 FILE = "data_ld06_3.txt"
 
@@ -23,32 +25,30 @@ SERIAL_WIN = "COM"
 
 
 def init_serial(serial_if: str) -> None:
-    #if serial_if.startswith("rfc2217://"):
-    ser = serial.serial_for_url(serial_if, BAUDRATE)
-    #else:
-    #    ser = serial.Serial(serial_if, BAUDRATE)
-    ser.reset_input_buffer()
-    ser.reset_output_buffer()
-    ser.close()
+    global serialPort
+    try:
+        if serial_if.startswith("rfc2217://"):            
+            serialPort = serial.serial_for_url(serial_if, BAUDRATE)
+        else:
+            serialPort = serial.Serial(serial_if, BAUDRATE)
+        serialPort.reset_input_buffer()
+        serialPort.reset_output_buffer()
+    except :
+        print(f"Error with Serial")
+        quit()
 
 
 def send_packet(packet: bytes, serial_if: str) -> None:
-    #if serial_if.startswith("rfc2217://"):
-    ser = serial.serial_for_url(serial_if, BAUDRATE)
-    #else:
-    #    ser = serial.Serial(serial_if, BAUDRATE)
-    ser.write(packet)
-    ser.close()
+    global serialPort
+    serialPort.write(packet)
 
 
 def get_packet(serial_if: str) -> bytes:
-    #if serial_if.startswith("rfc2217://"):
-    ser = serial.serial_for_url(serial_if, BAUDRATE)
-    #else:
-    #    ser = serial.Serial(serial_if, BAUDRATE)
-    packet = ser.read()
-    ser.close()
-    return packet
+    global serialPort
+    if serialPort.in_waiting > 0:
+        packet = serialPort.readline()
+        return packet
+    return None
 
 
 def which_serial(serial_if: str = None, serial_num: int = 0) -> str:
@@ -74,27 +74,24 @@ def packets_from_file(data_file: Path) -> List:
 
 
 def main(serial_if: str, file: str):
-    print(f"Starting Sensor, sending packets to {serial_if}:")
+    print(f"Starting Sensor -> {serial_if}")
     data_file = Path(__file__).parent / file
-    #init_serial(serial_if)
-    sockTCP.connect(loopback)
-    sockTCP.settimeout(0.1)
+    init_serial(serial_if)
+    #sockTCP.connect(loopback)
+    #sockTCP.settimeout(0.1)
     packets = packets_from_file(Path(data_file))
+    print(f"Sending packets...")
     for packet in packets:
-        #send_packet(bytes.fromhex(packet), serial_if)
-        send = sockTCP.send(bytes.fromhex(packet))
-        #try:
-        #    bytesRecv = sockTCP.recv(100)
-        #except socket.timeout:
-        #    error = 0
-        #if ser.in_waiting>0:
-            #with serial.Serial("\\\\.\\CNCA0", 115200) as serTeleplot:
-            #    serTeleplot.write(ser.read_all())
-            #    serTeleplot.close()
-                #sockUDP.sendto(ser.read_all(), teleplot)
+        send_packet(bytes.fromhex(packet), serial_if)
+        packet2 = get_packet(serial_if)
+        while packet2 != None:
+            decoded_string = packet2.decode("utf-8")
+            if decoded_string.startswith(">"):
+                decoded_string = decoded_string.replace(">","",1)
+            sockUDP.sendto(decoded_string.encode(), teleplot)
+            packet2 = get_packet(serial_if)
         print(f"{packets.index(packet)}/{len(packets)}", end="\r")
-        time.sleep(1.1)
-
+        time.sleep(0.5)
     print("All data sent")
 
 
@@ -103,14 +100,14 @@ if __name__ == "__main__":
     argParser.add_argument(
         "interface_type",
         type=str,
-        default='serial',
+        default='socket',
         nargs="?",
         help="type of interface, serial or socket",
     )
     argParser.add_argument(
         "interface",
         type=str,
-        default='COM5',
+        default='rfc2217://localhost:4000',
         nargs="?",
         help="interface where to send packets",
     )
