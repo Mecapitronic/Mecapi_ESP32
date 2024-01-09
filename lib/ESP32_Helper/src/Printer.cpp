@@ -202,12 +202,13 @@ namespace Printer
     {
         if (!IsPrintable(level))
             return;
+        SERIAL_DEBUG.print(prefix);
         SERIAL_DEBUG.print("A: ");
         SERIAL_DEBUG.print((int)(data.angle / 100));
         SERIAL_DEBUG.print(" D: ");
         SERIAL_DEBUG.print(data.distance);
         SERIAL_DEBUG.print(" C: ");
-        SERIAL_DEBUG.println(data.confidence);
+        SERIAL_DEBUG.print(data.confidence);
         SERIAL_DEBUG.print(suffix);
         if (lineFeed)
             SERIAL_DEBUG.println();
