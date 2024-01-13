@@ -5,30 +5,25 @@
     "build": {
         "dockerfile": "Dockerfile"
     },
-    // Uncomment to connect as another user instead. More info: https://aka.ms/dev-containers-non-root.
-    // "remoteUser": "vscode",
     "runArgs": [
         "--privileged"
     ],
     "containerEnv": {
-        "DISPLAY": "${localEnv:DISPLAY}",
-        "XDG_RUNTIME_DIR": "/run/user/1000"
+        "DISPLAY": ":0",
+        "XDG_RUNTIME_DIR": "/tmp",
+        "WAYLAND_DISPLAY": "${localEnv:WAYLAND_DISPLAY}"
     },
     // Use 'forwardPorts' to make a list of ports inside the container available locally.
     "forwardPorts": [
         8008
     ],
     // Use 'postCreateCommand' to run commands after the container is created.
-    "postCreateCommand": "bash .devcontainer/post-create-command.sh",
+    "postCreateCommand": "python3 -m pip install -r requirements.txt",
     "postAttachCommand": "sudo service udev restart",
+    // to access USB devices via /dev
     "mounts": [
-        "source=/dev/,target=/dev/,type=bind,consistency=consistent",
-        "source=/run/user/1000,target=/run/user/1000,type=bind",
-        "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind",
-        "source=/${localEnv:HOME}/.gitconfig,target=/root/.gitconfig,type=bind",
-        "source=/${localEnv:HOME}/.ssh,target=/root/.ssh,type=bind"
+        "source=/dev/,target=/dev/,type=bind,consistency=consistent"
     ]
-    // "source=/run/user/1000,target=/run/user/1000,type=bind,consistency=cached",
     // Configure tool-specific properties.
     // "customizations": {},
 }
