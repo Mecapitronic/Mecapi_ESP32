@@ -1,7 +1,9 @@
 {
+    "editor.defaultFormatter": "ms-vscode.cpptools",
     "editor.formatOnPaste": true,
     "editor.formatOnSave": true,
     "editor.formatOnSaveMode": "modifications",
+    "editor.formatOnType": true,
     "editor.guides.bracketPairs": true,
     "editor.guides.bracketPairsHorizontal": true,
     "editor.rulers": [
@@ -13,9 +15,6 @@
     "git.autofetch": true,
     "terminal.integrated.scrollback": 100000,
     "C_Cpp.clang_format_fallbackStyle": "{ BasedOnStyle: Google, IndentWidth: 4, ColumnLimit: 120, BreakBeforeBraces: Allman, AllowShortIfStatementsOnASingleLine: false, IncludeBlocks: Merge,SortIncludes: false,NamespaceIndentation: All,IndentCaseLabels: true }",
-    "[cpp]": {
-        "editor.defaultFormatter": "ms-vscode.cpptools",
-    },
     "[python]": {
         "editor.defaultFormatter": "charliermarsh.ruff",
         "editor.codeActionsOnSave": {
