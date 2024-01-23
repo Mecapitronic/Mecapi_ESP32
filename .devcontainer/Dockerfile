@@ -35,6 +35,8 @@ RUN apt-get update \
     python3-venv \
     srecord \
     xz-utils \
+    # for processing
+    openjdk-21-jre \
     && apt-get autoremove -y \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/*
@@ -56,3 +58,10 @@ RUN python3 -c "$(curl -fsSL https://raw.githubusercontent.com/platformio/platfo
 
 # simulator dependencies
 RUN python3 -m pip install pyserial
+
+# visualizer dependencies
+RUN wget http://py.processing.org/processing.py-linux64.tgz -O /tmp/processing.tgz \
+    && tar -xzf /tmp/processing.tgz -C /tmp \
+    && sudo mv /tmp/processing*/processing-py.jar /usr/bin/ \
+    && rm -rf /tmp/processing* \
+    && echo 'alias processing="java -jar /usr/bin/processing-py.jar"' >> /home/$USERNAME/.bashrc
