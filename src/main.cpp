@@ -149,49 +149,18 @@ void Task1code(void *pvParameters)
             {
                 // set the new robot position
                 robot.Analyze();
+                plotRobot(robot.GetPosition());
             }
             if (ld06.ReadSerial())
             {
                 ld06.CheckContinuity();
 
-                plotRobot(robot.GetPosition());
-
                 int counter = 0;
                 for (int i = 0; i < LIDAR_DATA_PACKET_SIZE; i++)
                 {
-                    // Filter point before sending to queue : increase speed for later
-                    // calculus
-                    // TODO increase the confidence limit to avoid aberrations
-
-                    // if the point is out of bound, we will not use it
-                    /*if (lidarPacket.dataPoint[i].distance < configLidar.minDistance ||
-                        lidarPacket.dataPoint[i].distance > configLidar.maxDistance ||
-                        lidarPacket.dataPoint[i].confidence < configLidar.minQuality)
-                    {
-                        counter++;
-                    }
-                    else
-                    {
-                        xQueueSend(myQueue, &lidarPacket.dataPoint[i], 0);
-                    }*/
                     ld06.AggregatePoint(ld06.GetData().dataPoint[i], &tracker, robot);
                 }
-                /*
-                // TODO at least send 1 or 2 points to the queue (min max ?, middle ?) to
-                // end aggregation for obstacle
-                if (counter == LIDAR_DATA_PACKET_SIZE)
-                {
-                    // we did not have any point to send, we send at least the last one.
-                    xQueueSend(myQueue,
-                               &lidarPacket.dataPoint[LIDAR_DATA_PACKET_SIZE - 1], 0);
-                    print("No point to send, Sending dull point",
-                          lidarPacket.dataPoint[LIDAR_DATA_PACKET_SIZE - 1]);
-                }
-                else
-                {
-                    println("Sending ", LIDAR_DATA_PACKET_SIZE - counter, " point");
-                }*/
-                plotScan(ld06.scan);
+                plotScanXY(ld06.scan);
                 ld06.scan.clear();
                 Debugger::WaitForAvailableSteps();
 

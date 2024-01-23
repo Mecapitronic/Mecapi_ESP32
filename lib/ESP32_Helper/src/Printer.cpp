@@ -299,7 +299,19 @@ namespace Printer
         SERIAL_DEBUG.println((int)p.y);
     }
 
-    void plotScan(std::vector<PolarPoint> scan, Level level)
+    void plotScanTD(std::vector<PolarPoint> scan, Level level)
+    {
+        if (!IsPrintable(level))
+            return;
+        SERIAL_DEBUG.print(">lidar:");
+        for (uint16_t i = 0; i < scan.size(); i++)
+        {
+            SERIAL_DEBUG.print(String() + (int)scan[i].angle + ":" + (int)scan[i].distance + ";");
+        }
+        SERIAL_DEBUG.println("|ad");
+    }
+
+    void plotScanXY(std::vector<PolarPoint> scan, Level level)
     {
         if (!IsPrintable(level))
             return;
