@@ -209,6 +209,10 @@ namespace Printer
         SERIAL_DEBUG.print(data.distance);
         SERIAL_DEBUG.print(" C: ");
         SERIAL_DEBUG.print(data.confidence);
+        SERIAL_DEBUG.print(" X: ");
+        SERIAL_DEBUG.print(data.x);
+        SERIAL_DEBUG.print(" Y: ");
+        SERIAL_DEBUG.print(data.y);
         SERIAL_DEBUG.print(suffix);
         if (lineFeed)
             SERIAL_DEBUG.println();
@@ -286,6 +290,19 @@ namespace Printer
         if (!IsPrintable(level))
             return;
         String data = ">" + varName + ":" + (int)p.x + ":" + (int)p.y + "|xy";
+        SERIAL_DEBUG.println(data);
+    }
+
+    void plotPolarPoints(PolarPoint polarPoints[], uint16_t size, String varName, Level level)
+    {
+        if (!IsPrintable(level))
+            return;
+        String data = ">" + varName + ":";
+        for (uint16_t i = 0; i < size; i++)
+        {
+            data += String() + (int)(polarPoints[i].x) + ":" + (int)(polarPoints[i].y) + ";";
+        }
+        data += "|xy";
         SERIAL_DEBUG.println(data);
     }
 

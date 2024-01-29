@@ -56,9 +56,14 @@ namespace Printer
                     Level level = LEVEL_VERBOSE);
 
     /**
-     * send point data on serial for teleplot to trace x and y in a graph
+     * send point data to teleplot to trace x and y in a graph
      */
     void plotPoint(Point p, String varName, Level level = LEVEL_VERBOSE);
+
+    /**
+     * send batch of point data to teleplot to trace x and y in a graph
+     */
+    void plotPolarPoints(PolarPoint polarPoints[], uint16_t size, String varName, Level level = LEVEL_VERBOSE);
 
     /**
      * send point data on serial for teleplot to trace x and y as two separate graphs
