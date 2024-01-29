@@ -198,6 +198,7 @@ bool LidarLD06::IsOutsideTable(Point point)
     // the margin represents the distance between the center of the obstacle
     // and the edges of the table (which is 3000mm long and 2000mm large)
     const float table_margin = 100;
+    //! TODO : Remove -5000 (it's for test) and put correct map boundaries
     return (point.x < -5000 + table_margin || point.x > 5000 - table_margin || point.y < -5000 + table_margin ||
             point.y > 5000 - table_margin);
 }
