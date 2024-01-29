@@ -11,7 +11,7 @@ import serial
 import socket
 
 teleplot = ("teleplot.fr",51545)
-teleplotLocal = ("localhost",64390)
+teleplotLocal = ("localhost",47269)
 loopback = ("127.0.0.1",4000)
 sockUDP = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, 0)
 sockTCP = socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0)
@@ -88,10 +88,10 @@ def main(serial_if: str, file: str):
             decoded_string = packet2.decode("utf-8")
             if decoded_string.startswith(">"):
                 decoded_string = decoded_string.replace(">","",1)
-            sockUDP.sendto(decoded_string.encode(), teleplot)
+            sockUDP.sendto(decoded_string.encode(), teleplotLocal)
             packet2 = get_packet(serial_if)
         print(f"{packets.index(packet)}/{len(packets)}", end="\r")
-        time.sleep(0.5)
+        time.sleep(0.3)
     print("All data sent")
 
 
