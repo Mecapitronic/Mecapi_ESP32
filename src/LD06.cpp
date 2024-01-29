@@ -4,8 +4,8 @@ void LidarLD06::Initialisation()
 {
     println("Init LidarLD06");
     scan.clear();
-    // minDistance, maxDistance, minQuality, distanceThreshold, angleThreshold;
-    Config(100, 1500, 200, 200, 0.8 * 5);
+    // minDistance, maxDistance, minQuality, distanceThreshold, angleThreshold, countThreshold;
+    Config(100, 1500, 200, 200, 0.8 * 5, 2);
     SERIAL_LIDAR.begin(230400);
 
     int pwmChannel = 0;    // Choisit le canal 0
@@ -26,8 +26,7 @@ void LidarLD06::Initialisation()
     ledcWrite(pwmChannel, duty);
 }
 
-void LidarLD06::Config(int min = -1, int max = -1, int quality = -1, int distance = -1,
-                       int angle = -1)
+void LidarLD06::Config(int min = -1, int max = -1, int quality = -1, int distance = -1, int angle = -1, int count = -1)
 {
     if (min != -1)
     {
@@ -58,10 +57,15 @@ void LidarLD06::Config(int min = -1, int max = -1, int quality = -1, int distanc
     }
     if (angle != -1)
     {
-        print("LidarLD06 Config 'Angle Threshold' from ", lidarConfig.angleThreshold, "",
-              LEVEL_INFO);
+        print("LidarLD06 Config 'Angle Threshold' from ", lidarConfig.angleThreshold, "", LEVEL_INFO);
         println(" to ", angle, "", LEVEL_INFO);
         lidarConfig.angleThreshold = angle;
+    }
+    if (count != -1)
+    {
+        print("LidarLD06 Config 'Count Threshold' from ", lidarConfig.countThreshold, "", LEVEL_INFO);
+        println(" to ", count, "", LEVEL_INFO);
+        lidarConfig.countThreshold = count;
     }
 }
 
@@ -194,7 +198,8 @@ bool LidarLD06::IsOutsideTable(Point point)
     // the margin represents the distance between the center of the obstacle
     // and the edges of the table (which is 3000mm long and 2000mm large)
     const float table_margin = 100;
-    return (point.x < table_margin || point.x > 2000 - table_margin || point.y < table_margin || point.y > 3000 - table_margin);
+    return (point.x < -5000 + table_margin || point.x > 5000 - table_margin || point.y < -5000 + table_margin ||
+            point.y > 5000 - table_margin);
 }
 
 bool LidarLD06::IsOutsideConfig(PolarPoint point)
@@ -204,6 +209,7 @@ bool LidarLD06::IsOutsideConfig(PolarPoint point)
             point.confidence < lidarConfig.minQuality);
 }
 
+uint8_t thresholdCount = 0;
 void LidarLD06::AggregatePoint(PolarPoint lidar_point, Tracker *tracker, Robot robot)
 {
     boolean aggregate = true;
@@ -216,7 +222,7 @@ void LidarLD06::AggregatePoint(PolarPoint lidar_point, Tracker *tracker, Robot r
 
     if (IsOutsideTable(point))
     {
-        print("Outside table : ", point);
+        print("Outside table : ", lidar_point);
         aggregate = false;
     }
 
@@ -237,72 +243,97 @@ void LidarLD06::AggregatePoint(PolarPoint lidar_point, Tracker *tracker, Robot r
     if (pointsCounter >= kMaxPoints)
     {
         // TODO do not take this as obstacle because it's too large (wall, person, ...)
-        ObstacleDetected(tracker, kMaxPoints);
+        // ObstacleDetected(tracker, kMaxPoints);
+
+        // we don't need this point into the batch : overflow of point number
+        aggregate = false;
+
+        // we finally move to next batch of point to aggregate
+        if (NewObstacleThreshold(lidar_point))
+        {
+            println("Drop batch, too much points : ", pointsCounter);
+            pointsCounter = 0;
+            thresholdCount = 0;
+        }
     }
     else
     {
         // if we are still under the maximum size of an obstacle
 
         // Determine if it is a new obstacle
-        if (NewObstacleThreshold(lidar_point))
+        if (pointsCounter > 0 && NewObstacleThreshold(lidar_point))
         {
-            //  if we have sufficient data for this obstacle
-            //  we move to save another obstacle
-            if (pointsCounter >= obstacleMinPoints)
+            thresholdCount++;
+            println("thresholdCount : ", thresholdCount);
+            if (thresholdCount >= lidarConfig.countThreshold)
             {
-                ObstacleDetected(tracker, pointsCounter);
-            }
-            else
-            {
-                // not enough point, we drop the current obstacle
-                println("Not enough point : ", pointsCounter,
-                        " ,we drop the current obstacle");
-                pointsCounter = 0;
+                // TODO : To test countThreshold if accurate
+                // TODO : We need to test if the batch of point is really a beacon
+                thresholdCount = 0;
+
+                //  if we have sufficient data for this obstacle
+                //  we save current batch of points into an obstacle
+                if (pointsCounter >= obstacleMinPoints)
+                {
+                    println("Obstacle Detected : ", pointsCounter);
+                    ObstacleDetected(tracker, pointsCounter);
+
+                    // we start another batch of points
+                    pointsCounter = 0;
+                }
+                else
+                {
+                    // not enough point, we drop the current obstacle
+                    println("Drop batch, not enough point : ", pointsCounter);
+                    pointsCounter = 0;
+                }
             }
         }
     }
     // println("PointsCounter : ", pointsCounter);
     if (aggregate)
     {
-        // save the coord of current lidar point
-        print("Aggregate : ", lidar_point);
-        obstacleTmp.data[pointsCounter++] =
-            PolarPoint(lidar_point.angle, lidar_point.distance, lidar_point.confidence,
-                       point.x, point.y);
+        // save the coord of current lidar point (a copy is made)
+        // print("Aggregate : ", lidar_point);
+        pointsTmp.data[pointsCounter++] =
+            PolarPoint(lidar_point.angle, lidar_point.distance, lidar_point.confidence, point.x, point.y);
     }
     else
     {
-        println("Do not Aggregate");
+        // println("Do not Aggregate");
     }
 }
 
 void LidarLD06::ObstacleDetected(Tracker *tracker, uint8_t size)
 {
-    println("Size obs :", size);
-    obstacleTmp.size = size;
-    Point mid = ComputeCenter(obstacleTmp);
-    print("Mid :", mid);
-    tracker->track(mid, obstacleTmp.data, obstacleTmp.size);
-    pointsCounter = 0;
+    // println("Size obs :", size);
+    pointsTmp.size = size;
+    Point mid = ComputeCenter(pointsTmp);
+    plotPoint(mid, "Mid");
+    plotPolarPoints(pointsTmp.data, size, "Aggregation");
+
+    tracker->track(mid, pointsTmp.data, pointsTmp.size);
+    // pointsCounter = 0;
 }
 
-bool LidarLD06::NewObstacleThreshold(PolarPoint lidar_point)
+bool LidarLD06::NewObstacleThreshold(PolarPoint currentPoint)
 {
     // TODO recalculate minimum angle threshold, or convert it to distance to have a better threshold config
-    return (fabsf(obstacleTmp.data[pointsCounter - 1].distance - lidar_point.distance) > lidarConfig.distanceThreshold ||
-            fabsf(obstacleTmp.data[pointsCounter - 1].angle) - fabsf(lidar_point.angle) > lidarConfig.angleThreshold * 100);
+    return (abs(pointsTmp.data[pointsCounter - 1].distance - currentPoint.distance) > lidarConfig.distanceThreshold ||
+            abs((int)(pointsTmp.data[pointsCounter - 1].angle)) - abs((int)(currentPoint.angle)) >
+                lidarConfig.angleThreshold * 100);
 }
 
-Point LidarLD06::ComputeCenter(Obstacle lidar_obstacle)
+Point LidarLD06::ComputeCenter(PointAggregation points)
 {
     Point mid = {0, 0};
-    for (int8_t d = 0; d < lidar_obstacle.size; d++)
+    for (int8_t d = 0; d < points.size; d++)
     {
-        mid.x += lidar_obstacle.data[d].x;
-        mid.y += lidar_obstacle.data[d].y;
+        mid.x += points.data[d].x;
+        mid.y += points.data[d].y;
     }
-    mid.x = mid.x / lidar_obstacle.size;
-    mid.y = mid.y / lidar_obstacle.size;
+    mid.x = mid.x / points.size;
+    mid.y = mid.y / points.size;
 
     return mid;
 }

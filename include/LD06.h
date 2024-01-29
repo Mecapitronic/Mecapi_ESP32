@@ -32,8 +32,9 @@ struct ConfigLidar
     int minDistance;
     int maxDistance;
     int minQuality;
-    int distanceThreshold; // represents the distance threshold to differentiate two obstacles
-    int angleThreshold;    // represents the angle threshold to differentiate two obstacles
+    int distanceThreshold;  // represents the distance threshold to differentiate two obstacles
+    int angleThreshold;     // represents the angle threshold to differentiate two obstacles
+    int countThreshold;     // represents the number of point to pass the threshold
 };
 
 struct PacketLidar
@@ -52,7 +53,7 @@ struct PacketLidar
  * Represent an obstacle, the topping cylinder on adversary robots
  * The maximum points needed to represent a 70mm wide cylinder is 20 (kMaxPoints)
  */
-struct Obstacle
+struct PointAggregation
 {
     PolarPoint data[kMaxPoints];
     uint8_t size = 0;
@@ -72,8 +73,9 @@ class LidarLD06
   * @param quality (int) minimum confidence required to consider the detected point (%)
   * @param distance (int) distance threshold (mm)
   * @param angle (int) angle threshold (°)
+  * @param count (int) count threshold (num)
   */
- void Config(int min, int max, int quality, int distance, int angle);
+ void Config(int min, int max, int quality, int distance, int angle, int count);
 
  /**
   * Get LidarLD06 Configuration
@@ -151,14 +153,14 @@ class LidarLD06
   * the limit of passing to new obstacle
   * compare the difference with the previous point to the defined threshold
   */
- bool NewObstacleThreshold(PolarPoint polar_point);
+ bool NewObstacleThreshold(PolarPoint currentPoint);
 
  /**
-  * Compute the center of local var lidar_obstacle
+  * Compute the center of the points aggregated
   * computes the mean of all points position to approximate circle center (without offset)
   * based on the fact that it is a cylinder of 70mm diameter
   */
- Point ComputeCenter(Obstacle lidar_obstacle);
+ Point ComputeCenter(PointAggregation points);
 
  /**
   * Find the circle on which the given three points lie
@@ -179,7 +181,7 @@ private:
 
     // counter of points while detecting an obstacle from data
     uint16_t pointsCounter = 0;
-    Obstacle obstacleTmp;
+    PointAggregation pointsTmp;
 
     // why are you using uint32 instead of chars?
     uint32_t serialBuffer[LIDAR_SERIAL_PACKET_SIZE] = {0};
@@ -187,7 +189,7 @@ private:
 
     PacketLidar lidarPacket;
     PacketLidar lidarLastPacket;
-    ConfigLidar lidarConfig = {0, 0, 0, 0, 0};
+    ConfigLidar lidarConfig = {0, 0, 0, 0, 0, 0};
 
    public:
     // Data
