@@ -25,12 +25,14 @@
     "cSpell.language": "en,fr",
     "cSpell.words": [
         "dbscan",
+        "doxygen",
+        "Mecapi",
+        "MECAPI",
         "Mecapitronic",
         "MECAPITRONIC",
         "neighbourhoods",
         "neighbours",
-        "teleplot",
-        "doxygen"
+        "teleplot"
     ],
     "platformio-ide.disablePIOHomeStartup": true,
     "platformio-ide.autoOpenPlatformIOIniFile": false,
