@@ -29,9 +29,9 @@ using namespace Printer;
 
 struct ConfigLidar
 {
-    int minDistance;
-    int maxDistance;
-    int minQuality;
+    int minDistance;        // represents the minimum distance of point from robot to be accepted
+    int maxDistance;        // represents the maximum distance of point from robot to be accepted
+    int minQuality;         // represents the minimum quality of a point to be accepted as good enough
     int distanceThreshold;  // represents the distance threshold to differentiate two obstacles
     int angleThreshold;     // represents the angle threshold to differentiate two obstacles
     int countThreshold;     // represents the number of point to pass the threshold

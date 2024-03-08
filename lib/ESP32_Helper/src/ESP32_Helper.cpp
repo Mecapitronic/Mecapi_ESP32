@@ -99,7 +99,7 @@ void UpdateSerial()
                 }
                 else if (cmdTmp.cmd == "DebugEnable")
                 {
-                    // DebugSteps:1
+                    // DebugEnable:1
                     Debugger::EnableDebugger((Enable)cmdTmp.data[0]);
                 }
                 else if (cmdTmp.cmd == "PrintLevel")

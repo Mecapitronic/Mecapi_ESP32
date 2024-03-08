@@ -215,12 +215,12 @@ void LidarLD06::AggregatePoint(PolarPoint lidar_point, Tracker *tracker, Robot r
 {
     boolean aggregate = true;
 
-    // Ignore points outside of the table
     Point point = PolarToCartesian(lidar_point, robot);
     lidar_point.x = point.x;
     lidar_point.y = point.y;
     scan.push_back(lidar_point);
 
+    // Ignore points outside of the table and outside config
     if (IsOutsideTable(point))
     {
         print("Outside table : ", lidar_point);
@@ -240,7 +240,7 @@ void LidarLD06::AggregatePoint(PolarPoint lidar_point, Tracker *tracker, Robot r
     //     aggregate = false;
     // }
 
-    // if we have too much data for this obstacle, we move to save another obstacle
+    // if we have too much data for this obstacle
     if (pointsCounter >= kMaxPoints)
     {
         // TODO do not take this as obstacle because it's too large (wall, person, ...)
@@ -249,7 +249,7 @@ void LidarLD06::AggregatePoint(PolarPoint lidar_point, Tracker *tracker, Robot r
         // we don't need this point into the batch : overflow of point number
         aggregate = false;
 
-        // we finally move to next batch of point to aggregate
+        // we drop the current batch of point
         if (NewObstacleThreshold(lidar_point))
         {
             println("Drop batch, too much points : ", pointsCounter);
@@ -259,7 +259,7 @@ void LidarLD06::AggregatePoint(PolarPoint lidar_point, Tracker *tracker, Robot r
     }
     else
     {
-        // if we are still under the maximum size of an obstacle
+        // if we are still under the maximum size of the batch
 
         // Determine if it is a new obstacle
         if (pointsCounter > 0 && NewObstacleThreshold(lidar_point))
