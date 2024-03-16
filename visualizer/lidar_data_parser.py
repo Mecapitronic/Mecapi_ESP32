@@ -1,9 +1,13 @@
-from pathlib import Path
 from dataclasses import dataclass
+from pathlib import Path
+from typing import List, Tuple
 
-DATA_FOLDER = Path(__file__).parent.parent.parent /"simlator/LD06"
+from serial import Serial
 
-data_files = DATA_FOLDER.iterdir()
+DATA_FOLDER = Path(__file__).parent.parent / "simulator/LD06"
+
+# data_files = DATA_FOLDER.iterdir()
+data_file = DATA_FOLDER / "data_ld06_1.txt"
 
 
 def read_file(file: Path) -> List[str]:
@@ -41,7 +45,7 @@ def parse_lidar_ld06(data: str) -> Tuple[float, float]:
 
 
 
-def read_packet(ld06: serial.Serial) -> Tuple[float, float]:
+def read_packet(ld06: Serial) -> Tuple[float, float]:
     """
     Read a packet from the LD06 Lidar sensor
     """
@@ -49,4 +53,17 @@ def read_packet(ld06: serial.Serial) -> Tuple[float, float]:
     return data
 
 
-def 
+def print_point(point: Tuple[float, float]):
+    print(f"dist: {point[0]}; angle: {point[1]}")
+
+
+def main(file: Path):
+    with open(file, "r") as f:
+        lines = f.readlines()
+    for line in lines:
+        point = parse_lidar_ld06(line)
+        print_point(point)
+
+
+if __name__ == "__main__":
+    main(data_file)
