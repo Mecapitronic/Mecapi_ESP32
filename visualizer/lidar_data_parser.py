@@ -1,3 +1,4 @@
+import math
 from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Tuple
@@ -83,6 +84,30 @@ def read_packet(ld06: Serial) -> Tuple[float, float]:
     """
     data = ld06.readline().decode("utf-8")
     return data
+
+
+def polar_to_cartesian(angle, distance):
+    """
+    Convert polar coordinates to cartesian.
+    Angle is expected in degrees.
+    """
+    angle_rad = math.radians(angle)  # Convert angle from degrees to radians
+    x = distance * math.cos(angle_rad)
+    y = distance * math.sin(angle_rad)
+    return x, y
+
+
+def robotref_to_fieldref(points, robot_pos, robot_angle):
+    """convert cartesian coordinates from the robot referential to current field referential
+    in order to draw the point in processing
+    """
+    field_points = []
+    for point in points:
+        x, y = point
+        x_field = x * math.cos(robot_angle) - y * math.sin(robot_angle) + robot_pos[0]
+        y_field = x * math.sin(robot_angle) + y * math.cos(robot_angle) + robot_pos[1]
+        field_points.append((x_field, y_field))
+    return field_points
 
 
 def print_point(point: dict):
