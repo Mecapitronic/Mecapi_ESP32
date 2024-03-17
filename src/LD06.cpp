@@ -111,6 +111,8 @@ boolean LidarLD06::ReadSerial()
             if (cursorTmp == LIDAR_SERIAL_PACKET_SIZE)
             {
                 cursorTmp = 0;
+                // l'analyse du packet devrait être dans l'autre thread je pense
+                // celui-ci est dédié à l'acquisition
                 Analyze();
                 return true;
             }
