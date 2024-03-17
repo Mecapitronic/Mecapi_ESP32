@@ -100,5 +100,6 @@
         "author",
         "brief",
         "date",
-    ]
+    ],
+    "python.analysis.typeCheckingMode": "basic"
 }
