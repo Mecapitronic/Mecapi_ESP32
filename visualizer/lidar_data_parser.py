@@ -4,6 +4,10 @@ from typing import List, Tuple
 
 from serial import Serial
 
+# 47 = 1(Start) + 1(Datalen) + 2(Speed) + 2(StartAngle) + 36(12 * 3 DataByte) + 2(EndAngle) + 2(TimeStamp) + 1(CRC)
+LIDAR_SERIAL_PACKET_SIZE = 47
+LIDAR_DATA_PACKET_SIZE = 12
+
 DATA_FOLDER = Path(__file__).parent.parent / "simulator/LD06"
 
 # data_files = DATA_FOLDER.iterdir()
@@ -20,19 +24,10 @@ def read_file(file: Path) -> List[str]:
 class LidarPacket:
     header: str = "0x56 0x2C"
 
-def parse_lidar_ld06(data: str) -> Tuple[float, float]:
+def parse_lidar_ld06(data: str) -> dict:
     """
     Parse data from the LD06 Lidar sensor
     a packet starts with 0x54 0x2C and is 47 bytes long
-
-    lidarPacket.header = serialBuffer[0];
-    lidarPacket.dataLength = 0x1F & serialBuffer[1];
-    lidarPacket.radarSpeed = serialBuffer[3] << 8 | serialBuffer[2];
-    lidarPacket.startAngle = serialBuffer[5] << 8 | serialBuffer[4];
-
-    lidarPacket.endAngle = serialBuffer[43] << 8 | serialBuffer[42];
-    lidarPacket.timestamp = serialBuffer[45] << 8 | serialBuffer[44];
-    lidarPacket.crcCheck = serialBuffer[46];
     """
 
     serialBuffer_str = data.split(" ")
@@ -51,31 +46,35 @@ def parse_lidar_ld06(data: str) -> Tuple[float, float]:
     lidarPacket["timestamp"] = serialBuffer[45] << 8 | serialBuffer[44]
     lidarPacket["crcCheck"] = serialBuffer[46]
 
-    angleStep = 0
     # fix angle step to negative if we cross 0° during scan
     # which means first angle is bigger than the last one
     # else positive
     if lidarPacket["endAngle"] > lidarPacket["startAngle"]:
-        angleStep = (lidarPacket["endAngle"] - lidarPacket["startAngle"]) / (
-            lidarPacket["dataLength"] - 1
-        )
+        modulo = 0
     else:
-        angleStep = (
-            lidarPacket["endAngle"] + (360 * 100 - lidarPacket["startAngle"])
-        ) / (lidarPacket["dataLength"] - 1)
+        modulo = 360 * 100
 
+    angleStep: float = (
+        lidarPacket["endAngle"] + (modulo - lidarPacket["startAngle"])
+    ) / (lidarPacket["dataLength"] - 1)
+
+    points: List[dict] = []
     # compute lidar result with previously defined angle step
-    for i in range(LIDAR_DATA_PACKET_SIZE):
-        rawDeg = lidarPacket["startAngle"] + i * angleStep + LIDAR_ROBOT_ANGLE_OFFSET
+    for i in range(lidarPacket["dataLength"]):
+        rawDeg = lidarPacket["startAngle"] + i * angleStep
         # Raw angles are inverted
-        lidarPacket["dataPoint"][i]["angle"] = 360 * 100 - (
-            rawDeg if rawDeg <= 360 * 100 else rawDeg - 360 * 100
-        )
-        lidarPacket["dataPoint"][i]["confidence"] = serialBuffer[8 + i * 3]
-        lidarPacket["dataPoint"][i]["distance"] = int(
-            serialBuffer[8 + i * 3 - 1] << 8 | serialBuffer[8 + i * 3 - 2]
+        points.append(
+            {
+                "angle": 360 * 100
+                - (rawDeg if rawDeg <= 360 * 100 else rawDeg - 360 * 100),
+                "confidence": serialBuffer[8 + i * 3],
+                "distance": int(
+                    serialBuffer[8 + i * 3 - 1] << 8 | serialBuffer[8 + i * 3 - 2]
+                ),
+            }
         )
 
+    lidarPacket["dataPoint"] = points
     print(lidarPacket)
     # numbers = [float(x) for x in bytes]
     # angle = numbers[0]
