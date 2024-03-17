@@ -29,17 +29,19 @@ def parse_lidar_ld06(data: str) -> dict:
     """
     Parse data from the LD06 Lidar sensor
     a packet starts with 0x54 0x2C and is 47 bytes long
+
+    returns a dictionary with the points
     """
 
-    serialBuffer_str = data.split(" ")
-    serialBuffer = [int(i, 16) for i in serialBuffer_str]
+    serialBuffer = data.split(" ")
+    # serialBuffer = [int(i, 16) for i in serialBuffer_str]
     # serialBuffer_float = [
     #     struct.unpack("!f", bytes.fromhex(i))[0] for i in serialBuffer_str
     # ]
     lidarPacket = {}  # Initialize the dictionary if it doesn't exist yet
 
     # lidarPacket["header"] = serialBuffer[0]
-    lidarPacket["dataLength"] = 0x1F & serialBuffer[1]
+    lidarPacket["dataLength"] = 0x1F & int(serialBuffer[1], 16)
     lidarPacket["radarSpeed"] = serialBuffer[3] << 8 | serialBuffer[2]
     lidarPacket["timestamp"] = serialBuffer[45] << 8 | serialBuffer[44]
     lidarPacket["crcCheck"] = serialBuffer[46]
@@ -47,6 +49,7 @@ def parse_lidar_ld06(data: str) -> dict:
     startAngle = serialBuffer[5] << 8 | serialBuffer[4]
     endAngle = serialBuffer[43] << 8 | serialBuffer[42]
 
+    print(f"start anglee {startAngle}")
     # fix angle step to negative if we cross 0° during scan
     # which means first angle is bigger than the last one
     # else positive
@@ -62,15 +65,14 @@ def parse_lidar_ld06(data: str) -> dict:
     # compute lidar result with previously defined angle step
     for i in range(lidarPacket["dataLength"]):
         rawDeg = startAngle + i * angleStep
+        angle = 360 * 100 - (rawDeg if rawDeg <= 360 * 100 else rawDeg - 360 * 100)
+        distance = int(serialBuffer[8 + i * 3 - 1] << 8 | serialBuffer[8 + i * 3 - 2])
         # Raw angles are inverted
         points.append(
             {
-                "angle": 360 * 100
-                - (rawDeg if rawDeg <= 360 * 100 else rawDeg - 360 * 100),
+                "angle": angle,
                 "confidence": serialBuffer[8 + i * 3],
-                "distance": int(
-                    serialBuffer[8 + i * 3 - 1] << 8 | serialBuffer[8 + i * 3 - 2]
-                ),
+                "distance": distance,
             }
         )
 
@@ -97,17 +99,17 @@ def polar_to_cartesian(angle, distance):
     return x, y
 
 
-def robotref_to_fieldref(points, robot_pos, robot_angle):
+def robotref_to_fieldref(point, robot_pos):
     """convert cartesian coordinates from the robot referential to current field referential
     in order to draw the point in processing
     """
-    field_points = []
-    for point in points:
-        x, y = point
-        x_field = x * math.cos(robot_angle) - y * math.sin(robot_angle) + robot_pos[0]
-        y_field = x * math.sin(robot_angle) + y * math.cos(robot_angle) + robot_pos[1]
-        field_points.append((x_field, y_field))
-    return field_points
+    x, y = point
+    robot_x, robot_y = robot_pos
+
+    x_field = x + robot_x
+    y_field = y + robot_y
+
+    return x_field, y_field
 
 
 def print_point(point: dict):
@@ -129,8 +131,12 @@ def main(file: Path):
     with open(file, "r") as f:
         lines = f.readlines()
     for line in lines:
-        point = parse_lidar_ld06(line)
-        print_points_in_packet(point)
+        packet = parse_lidar_ld06(line)
+        for point in packet["points"]:
+            point = robotref_to_fieldref(
+                polar_to_cartesian(point["angle"], point["distance"]), (1000, 1000)
+            )
+            # print(point)
 
 
 if __name__ == "__main__":
