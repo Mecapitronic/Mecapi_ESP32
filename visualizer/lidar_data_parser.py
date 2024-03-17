@@ -37,31 +37,30 @@ def parse_lidar_ld06(data: str) -> dict:
     # ]
     lidarPacket = {}  # Initialize the dictionary if it doesn't exist yet
 
-    lidarPacket["header"] = serialBuffer[0]
+    # lidarPacket["header"] = serialBuffer[0]
     lidarPacket["dataLength"] = 0x1F & serialBuffer[1]
     lidarPacket["radarSpeed"] = serialBuffer[3] << 8 | serialBuffer[2]
-    lidarPacket["startAngle"] = serialBuffer[5] << 8 | serialBuffer[4]
-
-    lidarPacket["endAngle"] = serialBuffer[43] << 8 | serialBuffer[42]
     lidarPacket["timestamp"] = serialBuffer[45] << 8 | serialBuffer[44]
     lidarPacket["crcCheck"] = serialBuffer[46]
+
+    startAngle = serialBuffer[5] << 8 | serialBuffer[4]
+    endAngle = serialBuffer[43] << 8 | serialBuffer[42]
 
     # fix angle step to negative if we cross 0° during scan
     # which means first angle is bigger than the last one
     # else positive
-    if lidarPacket["endAngle"] > lidarPacket["startAngle"]:
+    if endAngle > startAngle:
         modulo = 0
     else:
         modulo = 360 * 100
-
-    angleStep: float = (
-        lidarPacket["endAngle"] + (modulo - lidarPacket["startAngle"])
-    ) / (lidarPacket["dataLength"] - 1)
+    angleStep: float = (endAngle + (modulo - startAngle)) / (
+        lidarPacket["dataLength"] - 1
+    )
 
     points: List[dict] = []
     # compute lidar result with previously defined angle step
     for i in range(lidarPacket["dataLength"]):
-        rawDeg = lidarPacket["startAngle"] + i * angleStep
+        rawDeg = startAngle + i * angleStep
         # Raw angles are inverted
         points.append(
             {
@@ -74,13 +73,7 @@ def parse_lidar_ld06(data: str) -> dict:
             }
         )
 
-    lidarPacket["dataPoint"] = points
-    print(lidarPacket)
-    # numbers = [float(x) for x in bytes]
-    # angle = numbers[0]
-    # distance = numbers[1]
-    # return angle, distance
-
+    lidarPacket["points"] = points
     return lidarPacket
 
 
@@ -92,13 +85,19 @@ def read_packet(ld06: Serial) -> Tuple[float, float]:
     return data
 
 
-def print_point(point: Tuple[float, float]):
-    print(f"dist: {point[0]}; angle: {point[1]}")
+def print_point(point: dict):
+    print(f"dist: {point['distance']}; angle: {point['angle']}")
+
+
+def print_points_in_packet(packet: dict):
+    for point in packet["points"]:
+        print_point(point)
+
 
 def print_lidar_packet(lidarPacket: dict):
     print("Packet")
     for i in lidarPacket:
-        print(f"    {lidarPacket[i]}")
+        print(lidarPacket[i])
 
 
 def main(file: Path):
@@ -106,7 +105,7 @@ def main(file: Path):
         lines = f.readlines()
     for line in lines:
         point = parse_lidar_ld06(line)
-        print_lidar_packet(point)
+        print_points_in_packet(point)
 
 
 if __name__ == "__main__":
