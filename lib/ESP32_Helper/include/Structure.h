@@ -9,6 +9,8 @@
 
 #include <Arduino.h>
 
+using namespace std;
+
 #define ENUM_STRING(p) #p
 
 enum Level

@@ -104,7 +104,6 @@
 #include "ESP32_Helper.h"
 #include "frame_struct.h"
 
-using namespace std;
 using namespace Printer;
 
 struct ConfigA010
