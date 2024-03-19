@@ -57,6 +57,7 @@ struct PointAggregation
 {
     PolarPoint data[kMaxPoints];
     uint8_t size = 0;
+    PolarPoint mid;
 };
 
 class LidarLD06

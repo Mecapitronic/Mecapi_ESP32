@@ -298,6 +298,9 @@ void LidarLD06::AggregatePoint(PolarPoint lidar_point, Tracker *tracker, Robot r
         // print("Aggregate : ", lidar_point);
         pointsTmp.data[pointsCounter++] =
             PolarPoint(lidar_point.angle, lidar_point.distance, lidar_point.confidence, point.x, point.y);
+        // recalculate the average point of the batch
+        pointsTmp.mid.angle = (pointsTmp.mid.angle * (pointsCounter - 1) + lidar_point.angle) / pointsCounter;
+        pointsTmp.mid.distance = (pointsTmp.mid.distance * (pointsCounter - 1) + lidar_point.distance) / pointsCounter;
     }
     else
     {
