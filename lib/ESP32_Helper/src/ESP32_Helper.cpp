@@ -13,6 +13,7 @@ char readBuffer[Serial_Read_Buffer];
 Command cmdTmp;
 char tmpChar = '\0';
 std::queue<Command> awaitingCommand;
+Preferences preferences;
 
 void resetVar()
 {
@@ -48,6 +49,13 @@ void ESP32_Helper(int baud_speed, Enable printEnable, Level printLvl, Enable deb
     print(" at ");
     println(__TIME__);
     println();
+
+    preferences.begin("Mecapi", false);
+    unsigned int powerUp = preferences.getUInt("PowerUp", 0);
+    powerUp++;
+    println("Power Up : ", powerUp);
+    preferences.putUInt("PowerUp", powerUp);
+    preferences.end();
 
     Debugger::EnableDebugger(debugEnable);
     Debugger::Initialisation();
