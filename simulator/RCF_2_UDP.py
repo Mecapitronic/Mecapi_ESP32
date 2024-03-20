@@ -10,9 +10,7 @@ from serial import Serial
 import serial
 import socket
 
-teleplot = ("teleplot.fr",51545)
 teleplotLocal = ("localhost",47269)
-loopback = ("127.0.0.1",4000)
 sockUDP = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, 0)
 sockTCP = socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0)
 serialPort = None
@@ -38,12 +36,17 @@ def init_serial(serial_if: str) -> None:
         quit()
 
 
-def send_packet(packet: bytes, serial_if: str) -> None:
+def send_packet(packet: bytes) -> None:
     global serialPort
     serialPort.write(packet)
 
+def packet_available() -> bool:
+    global serialPort
+    if serialPort.in_waiting > 0:
+        return True
+    return False
 
-def get_packet(serial_if: str) -> bytes:
+def get_packet() -> bytes:
     global serialPort
     if serialPort.in_waiting > 0:
         packet = serialPort.readline()
@@ -73,20 +76,18 @@ def packets_from_file(data_file: Path) -> List:
     return data
 
 
-def main(serial_if: str, file: str):
-    print(f"Starting Sensor -> {serial_if}")
-    data_file = Path(__file__).parent / file
+def main(serial_if: str):
+    print(f"Starting listening -> {serial_if}")
     init_serial(serial_if)
-    #sockTCP.connect(loopback)
-    #sockTCP.settimeout(0.1)
-    packets = packets_from_file(Path(data_file))
-    print(f"Sending packets...")
-    for packet in packets:
-        send_packet(bytes.fromhex(packet), serial_if)
-        print(f"{packets.index(packet)}/{len(packets)}", end="\r")
-        time.sleep(0.05)        
-    print("All data sent")
-
+    while True:
+        if packet_available():
+            packet = get_packet()
+            decoded_string = packet.decode("utf-8")
+            if decoded_string.startswith(">"):
+                decoded_string = decoded_string.replace(">","",1)
+            else:
+                decoded_string = decoded_string.replace("\n","|np\n")
+            sockUDP.sendto(decoded_string.encode(), teleplotLocal)
 
 if __name__ == "__main__":
     argParser = argparse.ArgumentParser()
@@ -104,22 +105,7 @@ if __name__ == "__main__":
         nargs="?",
         help="interface where to send packets",
     )
-    argParser.add_argument(
-        "sensor_type",
-        type=str,
-        default='ld06',
-        nargs="?",
-        help="type of sensor to simulate",
-    )
-    argParser.add_argument(
-        "file_number",
-        type=str,
-        default='1',
-        nargs="?",
-        help="number of data file to send",
-    )
     args = argParser.parse_args()
 
     serial_if = which_serial(serial_if=args.interface)
-    file = args.sensor_type + "\\data_" + args.sensor_type + "_" + str(args.file_number) + ".txt"
-    main(serial_if, file)
+    main(serial_if)
