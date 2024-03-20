@@ -328,12 +328,14 @@ namespace Printer
     {
         if (!IsPrintable(level))
             return;
+        if (vec.size() == 0)
+            return;
         SERIAL_DEBUG.print(">" + varName + ":");
         for (uint16_t i = 0; i < vec.size(); i++)
         {
             SERIAL_DEBUG.print(String() + (int)vec[i].angle + ":" + (int)vec[i].distance + ";");
         }
-        SERIAL_DEBUG.println("|ad");
+        SERIAL_DEBUG.println("|td");
     }
 
     void plotScanXY(std::vector<PolarPoint> vec, String varName, Level level)

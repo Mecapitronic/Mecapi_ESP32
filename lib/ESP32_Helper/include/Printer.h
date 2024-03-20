@@ -71,7 +71,7 @@ namespace Printer
      */
     void plotPoint(Point p, Level level = LEVEL_VERBOSE);
 
-    void plotScanAD(std::vector<PolarPoint> vec, String varName, Level level = LEVEL_VERBOSE);
+    void plotScanTD(std::vector<PolarPoint> vec, String varName, Level level = LEVEL_VERBOSE);
     void plotScanXY(std::vector<PolarPoint> vec, String varName, Level level = LEVEL_VERBOSE);
 
     void plotRobot(RobotPosition pos, Level level = LEVEL_VERBOSE);

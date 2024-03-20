@@ -156,6 +156,7 @@ void Task1code(void *pvParameters)
             ld06.Update();
 
             plotScanXY(ld06.scan, "lidar");
+            plotScanTD(ld06.scan, "lidar");
             ld06.scan.clear();
 
             // tracker.sendObstaclesToRobot(robot);
