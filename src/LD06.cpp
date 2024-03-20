@@ -97,11 +97,11 @@ void LidarLD06::Update()
             // Ignore points outside of the table and outside config
             if (IsOutsideTable(lidarPacket.dataPoint[i]))
             {
-                print("Outside table : ", lidarPacket.dataPoint[i]);
+                // print("Outside table : ", lidarPacket.dataPoint[i]);
             }
             else if (IsOutsideConfig(lidarPacket.dataPoint[i]))
             {
-                print("Outside config : ", lidarPacket.dataPoint[i]);
+                // print("Outside config : ", lidarPacket.dataPoint[i]);
             }
             else
             {
@@ -258,14 +258,6 @@ void LidarLD06::AggregatePoint(PolarPoint polarPoint)
         clusterNum++;
     }
 }
-// TODO : the distance point from robot should decide the number min of point,
-// for example : at 300mm we need 20 points, at 1000mm we need 10 points, at 1500mm 5 points
-// Arc Length s = 2 π r(θ / 360°)
-// float s = ((fabsf(cluster.data[0].angle - cluster.data[pointsCounter - 1].angle) / 100) *
-//           (cluster.data[0].distance + cluster.data[pointsCounter - 1].distance) / 2) *
-//          PI / 180;
-// println("Arc length=", s);
-
 // TODO max angle into config = diameter of beacon
 /*
 // Average of the 2 first points
@@ -308,26 +300,65 @@ void LidarLD06::CheckCluster(PolarPoint polarPoint)
         if (angle < 0)
             angle += 360 * 100;
 
+        PolarToCartesian(cluster[i].mid);
+
         if (polarPoint.angle < angle)
         {
             print("Cluster N° ", cluster[i].index);
             println(" with Size ", cluster[i].data.size(), " will be checked");
 
-            // TODO what is an obstacle and what is not ?
-            if (cluster[i].data.size() > obstacleMaxPoints)
+            // Minimum amount of points needed for a 60 mm balise's diameter //TODO var 60
+            float minPoint = ((60 * 180) / (PI * cluster[i].mid.distance)) / 0.8;
+            println("Min point : ", minPoint);
+            // Maximum amount of points needed for a 120 mm balise's diameter //TODO var 120
+            float maxPoint = ((120 * 180) / (PI * cluster[i].mid.distance)) / 0.8;
+            println("Max point : ", maxPoint);
+
+            // Arc Length s = 2 π r(θ / 360°)
+            // TODO check for > 360°
+            float angle = fabsf(cluster[i].data.front().angle - cluster[i].data.back().angle) / 100;
+            float arc = (angle * cluster[i].mid.distance) * PI / 180;
+            println("Arc length : ", arc);
+
+            // At 300mm we need 20 points, at 1000mm we need 10 points, at 1500mm 5 points
+
+            if (cluster[i].data.size() < 2)
+            {
+                println("Absolutely not enough points !");
+            }
+            else if (cluster[i].data.size() > maxPoint)
             {
                 println("Too many points");
             }
-            else if (cluster[i].data.size() < obstacleMinPoints)
+            else if (cluster[i].data.size() < minPoint)
             {
                 println("Not enough points");
             }
             else
             {
-                println("Obstacle Detected : ", cluster[i].data.size());
+                /*
+                float s = (angle * cluster[i].mid.distance) * PI / 180;
+                float theta1 = (60 * 180) / (PI * cluster[i].mid.distance);
+                float theta2 = (80 * 180) / (PI * cluster[i].mid.distance);
+                float theta3 = (100 * 180) / (PI * cluster[i].mid.distance);
+                float theta4 = (110 * 180) / (PI * cluster[i].mid.distance);
+                float theta5 = (120 * 180) / (PI * cluster[i].mid.distance);
+                print("θ1 : ", theta1);
+                println(" points : ", (float)(theta1 / 0.8));
+                print("θ2 : ", theta2);
+                println(" points : ", (float)(theta2 / 0.8));
+                print("θ3 : ", theta3);
+                println(" points : ", (float)(theta3 / 0.8));
+                print("θ4 : ", theta4);
+                println(" points : ", (float)(theta4 / 0.8));
+                print("θ5 : ", theta5);
+                println(" points : ", (float)(theta5 / 0.8));
+                */
+
+                print("Obstacle Detected : ", cluster[i].mid);
                 ObstacleDetected(cluster[i]);
+                plotScanXY(cluster[i].data, "cluster" + String(cluster[i].index));
             }
-            plotScanXY(cluster[i].data, "cluster" + String(cluster[i].index));
             iterators.push_back(cluster.begin() + i);
         }
     }
@@ -341,9 +372,9 @@ void LidarLD06::CheckCluster(PolarPoint polarPoint)
 void LidarLD06::ObstacleDetected(Cluster& c)
 {
     // Point mid = ComputeCenter(cluster);
-    PolarToCartesian(c.mid);
     plotPolarPoint(c.mid, "Mid" + String(c.index));
-    // plotPolarPoints(&cluster.data, cluster.data.size(), "Aggregation");
+    // TODO Add to tracker
+    //  plotPolarPoints(&cluster.data, cluster.data.size(), "Aggregation");
 
     // tracker->track(mid, cluster.data, cluster.size);
 }

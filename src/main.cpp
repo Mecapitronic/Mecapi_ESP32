@@ -155,7 +155,7 @@ void Task1code(void *pvParameters)
             ld06.robotPosition = robot.GetPosition();
             ld06.Update();
 
-            plotScanXY(ld06.scan, "lidar");
+            plotScanXY(ld06.scan, "scan");
             plotScanTD(ld06.scan, "lidar");
             ld06.scan.clear();
 
