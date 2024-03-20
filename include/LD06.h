@@ -50,21 +50,21 @@ struct PacketLidar
 };
 
 /**
- * Represent an obstacle, the topping cylinder on adversary robots
+ * Represent a cluster of points, with the average of all point
  * The maximum points needed to represent a 70mm wide cylinder is 20 (kMaxPoints)
  */
-struct PointAggregation
+struct Cluster
 {
     vector<PolarPoint> data;
-    // PolarPoint data[kMaxPoints];
-    // uint8_t size = 0;
     PolarPoint mid;
+    int index;
 };
 
 class LidarLD06
 {
    public:
     void Initialisation();
+    void Update();
 
     /**
      * @brief Configure lidarConfig local variable with the given values in parameters
@@ -102,6 +102,7 @@ class LidarLD06
      */
     uint32_t GetPWM();
 
+   private:
     /**
      * Read data from serial and put in a buffer if it comes form the LidarLD06 LD06
      */
@@ -119,51 +120,40 @@ class LidarLD06
     boolean CheckContinuity();
 
     /**
-     * Return lidarPacket data
-     */
-    PacketLidar GetData();
-
-    /**
      * convert detected position from polar coordinates to cartesian coordinates
      * according to robot position on the field
      */
-    Point PolarToCartesian(PolarPoint polar_point, Robot robot);
+    void PolarToCartesian(PolarPoint& polarPoint);
 
     /**
      * returns whether or not the given point is outside the table
      * the margin represents the distance between the center of the obstacle
      * and the edges of the table
      */
-    bool IsOutsideTable(Point point);
+    bool IsOutsideTable(PolarPoint polarPoint);
 
     /**
      * returns whether or not the given point is outside the config in distance min and max
      * and quality
      */
-    bool IsOutsideConfig(PolarPoint point);
+    bool IsOutsideConfig(PolarPoint polarPoint);
 
     /**
      * Custom segmentation algorithm to detect cylinders in 2D plan
      * Send data to object tracker that send it to the PIC
      */
-    void AggregatePoint(PolarPoint lidar_point, Robot robot);
+    void AggregatePoint(PolarPoint polarPoint);
 
-    void ObstacleDetected(PointAggregation cluster, Tracker *tracker, Robot robot);
+    void ObstacleDetected(Cluster& c);
 
-    void SortCluster(PolarPoint last_point, Tracker *tracker, Robot robot);
-
-    /**
-     * the limit of passing to new obstacle
-     * compare the difference with the previous point to the defined threshold
-     */
-    bool NewObstacleThreshold(PolarPoint currentPoint);
+    void CheckCluster(PolarPoint polarPoint);
 
     /**
      * Compute the center of the points aggregated
      * computes the mean of all points position to approximate circle center (without offset)
      * based on the fact that it is a cylinder of 70mm diameter
      */
-    Point ComputeCenter(PointAggregation cluster);
+    Point ComputeCenter(Cluster cluster);
 
     /**
      * Find the circle on which the given three points lie
@@ -186,7 +176,7 @@ class LidarLD06
 
     // counter of points while detecting an obstacle from data
     uint16_t pointsCounter = 0;
-    vector<PointAggregation> pointsTmp;
+    vector<Cluster> cluster;
 
     // why are you using uint32 instead of chars?
     uint32_t serialBuffer[LIDAR_SERIAL_PACKET_SIZE] = {0};
@@ -199,5 +189,6 @@ class LidarLD06
    public:
     // Data
     vector<PolarPoint> scan;
+    RobotPosition robotPosition;
 };
 #endif

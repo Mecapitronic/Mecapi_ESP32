@@ -151,25 +151,16 @@ void Task1code(void *pvParameters)
                 robot.Analyze();
                 plotRobot(robot.GetPosition());
             }
-            if (ld06.ReadSerial())
-            {
-                ld06.CheckContinuity();
 
-                int counter = 0;
-                for (int i = 0; i < LIDAR_DATA_PACKET_SIZE; i++)
-                {
-                    ld06.AggregatePoint(ld06.GetData().dataPoint[i], robot);
-                }
+            ld06.robotPosition = robot.GetPosition();
+            ld06.Update();
 
-                ld06.SortCluster(ld06.GetData().dataPoint[LIDAR_DATA_PACKET_SIZE - 1], &tracker, robot);
+            plotScanXY(ld06.scan, "lidar");
+            ld06.scan.clear();
 
-                plotScanXY(ld06.scan, "lidar");
-                ld06.scan.clear();
-                Debugger::WaitForAvailableSteps();
+            // tracker.sendObstaclesToRobot(robot);
+            // tracker.untrackOldObstacles(robot);
 
-                tracker.sendObstaclesToRobot(robot);
-                tracker.untrackOldObstacles(robot);
-            }
 #endif
 
 #ifdef A010
@@ -183,8 +174,7 @@ void Task1code(void *pvParameters)
                 // ! FIXME: n'affiche plus rien
                 for (uint16_t i = 0; i < PICTURE_SIZE; i++)
                 {
-                    String data = "" + String(a010.cloudFrame[i].x) + " " +
-                                  String(a010.cloudFrame[i].y) + " " +
+                    String data = "" + String(a010.cloudFrame[i].x) + " " + String(a010.cloudFrame[i].y) + " " +
                                   String(a010.cloudFrame[i].z) + " " + String("65520");
                     println(data);
                 }

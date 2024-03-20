@@ -293,6 +293,14 @@ namespace Printer
         SERIAL_DEBUG.println(data);
     }
 
+    void plotPolarPoint(PolarPoint p, String varName, Level level)
+    {
+        if (!IsPrintable(level))
+            return;
+        String data = ">" + varName + ":" + (int)p.x + ":" + (int)p.y + "|xy";
+        SERIAL_DEBUG.println(data);
+    }
+
     void plotPolarPoints(PolarPoint polarPoints[], uint16_t size, String varName, Level level)
     {
         if (!IsPrintable(level))
@@ -331,6 +339,8 @@ namespace Printer
     void plotScanXY(std::vector<PolarPoint> vec, String varName, Level level)
     {
         if (!IsPrintable(level))
+            return;
+        if (vec.size() == 0)
             return;
         SERIAL_DEBUG.print(">" + varName + ":");
         for (uint16_t i = 0; i < vec.size(); i++)

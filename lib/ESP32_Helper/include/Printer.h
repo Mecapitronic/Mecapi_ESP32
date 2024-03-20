@@ -59,6 +59,7 @@ namespace Printer
      * send point data to teleplot to trace x and y in a graph
      */
     void plotPoint(Point p, String varName, Level level = LEVEL_VERBOSE);
+    void plotPolarPoint(PolarPoint p, String varName, Level level = LEVEL_VERBOSE);
 
     /**
      * send batch of point data to teleplot to trace x and y in a graph
