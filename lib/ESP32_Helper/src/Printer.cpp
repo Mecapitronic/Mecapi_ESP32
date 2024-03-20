@@ -316,26 +316,26 @@ namespace Printer
         SERIAL_DEBUG.println((int)p.y);
     }
 
-    void plotScanTD(std::vector<PolarPoint> scan, Level level)
+    void plotScanTD(std::vector<PolarPoint> vec, String varName, Level level)
     {
         if (!IsPrintable(level))
             return;
-        SERIAL_DEBUG.print(">lidar:");
-        for (uint16_t i = 0; i < scan.size(); i++)
+        SERIAL_DEBUG.print(">" + varName + ":");
+        for (uint16_t i = 0; i < vec.size(); i++)
         {
-            SERIAL_DEBUG.print(String() + (int)scan[i].angle + ":" + (int)scan[i].distance + ";");
+            SERIAL_DEBUG.print(String() + (int)vec[i].angle + ":" + (int)vec[i].distance + ";");
         }
         SERIAL_DEBUG.println("|ad");
     }
 
-    void plotScanXY(std::vector<PolarPoint> scan, Level level)
+    void plotScanXY(std::vector<PolarPoint> vec, String varName, Level level)
     {
         if (!IsPrintable(level))
             return;
-        SERIAL_DEBUG.print(">lidar:");
-        for (uint16_t i = 0; i < scan.size(); i++)
+        SERIAL_DEBUG.print(">" + varName + ":");
+        for (uint16_t i = 0; i < vec.size(); i++)
         {
-            SERIAL_DEBUG.print(String() + (int)scan[i].x + ":" + (int)scan[i].y + ";");
+            SERIAL_DEBUG.print(String() + (int)vec[i].x + ":" + (int)vec[i].y + ";");
         }
         SERIAL_DEBUG.println("|xy");
     }

@@ -55,134 +55,138 @@ struct PacketLidar
  */
 struct PointAggregation
 {
-    PolarPoint data[kMaxPoints];
-    uint8_t size = 0;
+    vector<PolarPoint> data;
+    // PolarPoint data[kMaxPoints];
+    // uint8_t size = 0;
     PolarPoint mid;
 };
 
 class LidarLD06
 {
+   public:
+    void Initialisation();
 
-    public:
- void Initialisation();
+    /**
+     * @brief Configure lidarConfig local variable with the given values in parameters
+     *
+     * @param min (int) do not detect points closer than min distance (mm)
+     * @param max (int) do not detect points further than max distance (mm)
+     * @param quality (int) minimum confidence required to consider the detected point (%)
+     * @param distance (int) distance threshold (mm)
+     * @param angle (int) angle threshold (°)
+     * @param count (int) count threshold (num)
+     */
+    void Config(int min, int max, int quality, int distance, int angle, int count);
 
- /**
-  * @brief Configure lidarConfig local variable with the given values in parameters
-  *
-  * @param min (int) do not detect points closer than min distance (mm)
-  * @param max (int) do not detect points further than max distance (mm)
-  * @param quality (int) minimum confidence required to consider the detected point (%)
-  * @param distance (int) distance threshold (mm)
-  * @param angle (int) angle threshold (°)
-  * @param count (int) count threshold (num)
-  */
- void Config(int min, int max, int quality, int distance, int angle, int count);
+    /**
+     * Get LidarLD06 Configuration
+     */
+    ConfigLidar GetConfig();
 
- /**
-  * Get LidarLD06 Configuration
-  */
- ConfigLidar GetConfig();
+    /**
+     * @brief Change duty cycle for the PWM
+     *
+     * @param duty_cycle (int) the duty cycle of PWM in percentage (20% to 50%)
+     * @details Scan rate around 5.0  HZ when PWM duty at 21 %
+     * @details Scan rate around 6.1  HZ when PWM duty at 25 %
+     * @details Scan rate around 10.1 HZ when PWM duty at 39 %
+     * @details Scan rate around 13.2 HZ when PWM duty at 50 %
+     *
+     */
+    void ChangePWM(uint32_t duty_cycle);
 
- /**
-  * @brief Change duty cycle for the PWM
-  *
-  * @param duty_cycle (int) the duty cycle of PWM in percentage (20% to 50%)
-  * @details Scan rate around 5.0  HZ when PWM duty at 21 %
-  * @details Scan rate around 6.1  HZ when PWM duty at 25 %
-  * @details Scan rate around 10.1 HZ when PWM duty at 39 %
-  * @details Scan rate around 13.2 HZ when PWM duty at 50 %
-  *
-  */
- void ChangePWM(uint32_t duty_cycle);
+    /**
+     * @brief Return the duty cycle of the PWM
+     *
+     * @return uint32_t the duty cycle
+     */
+    uint32_t GetPWM();
 
- /**
-  * @brief Return the duty cycle of the PWM
-  *
-  * @return uint32_t the duty cycle
-  */
- uint32_t GetPWM();
+    /**
+     * Read data from serial and put in a buffer if it comes form the LidarLD06 LD06
+     */
+    boolean ReadSerial();
 
- /**
-  * Read data from serial and put in a buffer if it comes form the LidarLD06 LD06
-  */
- boolean ReadSerial();
+    /**
+     * Put data from lidar in lidarPacket local variable.
+     * Analyze and fix data according to angle step and out of bound distance
+     */
+    void Analyze();
 
- /**
-  * Put data from lidar in lidarPacket local variable.
-  * Analyze and fix data according to angle step and out of bound distance
-  */
- void Analyze();
+    /**
+     * Check between 2 lidar packet received if there is no packet loss
+     */
+    boolean CheckContinuity();
 
- /**
-  * Check between 2 lidar packet received if there is no packet loss
-  */
- boolean CheckContinuity();
+    /**
+     * Return lidarPacket data
+     */
+    PacketLidar GetData();
 
- /**
-  * Return lidarPacket data
-  */
- PacketLidar GetData();
+    /**
+     * convert detected position from polar coordinates to cartesian coordinates
+     * according to robot position on the field
+     */
+    Point PolarToCartesian(PolarPoint polar_point, Robot robot);
 
- /**
-  * convert detected position from polar coordinates to cartesian coordinates
-  * according to robot position on the field
-  */
- Point PolarToCartesian(PolarPoint polar_point, Robot robot);
+    /**
+     * returns whether or not the given point is outside the table
+     * the margin represents the distance between the center of the obstacle
+     * and the edges of the table
+     */
+    bool IsOutsideTable(Point point);
 
- /**
-  * returns whether or not the given point is outside the table
-  * the margin represents the distance between the center of the obstacle
-  * and the edges of the table
-  */
- bool IsOutsideTable(Point point);
+    /**
+     * returns whether or not the given point is outside the config in distance min and max
+     * and quality
+     */
+    bool IsOutsideConfig(PolarPoint point);
 
- /**
-  * returns whether or not the given point is outside the config in distance min and max
-  * and quality
-  */
- bool IsOutsideConfig(PolarPoint point);
+    /**
+     * Custom segmentation algorithm to detect cylinders in 2D plan
+     * Send data to object tracker that send it to the PIC
+     */
+    void AggregatePoint(PolarPoint lidar_point, Robot robot);
 
- /**
-  * Custom segmentation algorithm to detect cylinders in 2D plan
-  * Send data to object tracker that send it to the PIC
-  */
- void AggregatePoint(PolarPoint lidar_point, Tracker *tracker, Robot robot);
+    void ObstacleDetected(PointAggregation cluster, Tracker *tracker, Robot robot);
 
- void ObstacleDetected(Tracker *tracker, uint8_t size);
+    void SortCluster(PolarPoint last_point, Tracker *tracker, Robot robot);
 
- /**
-  * the limit of passing to new obstacle
-  * compare the difference with the previous point to the defined threshold
-  */
- bool NewObstacleThreshold(PolarPoint currentPoint);
+    /**
+     * the limit of passing to new obstacle
+     * compare the difference with the previous point to the defined threshold
+     */
+    bool NewObstacleThreshold(PolarPoint currentPoint);
 
- /**
-  * Compute the center of the points aggregated
-  * computes the mean of all points position to approximate circle center (without offset)
-  * based on the fact that it is a cylinder of 70mm diameter
-  */
- Point ComputeCenter(PointAggregation points);
+    /**
+     * Compute the center of the points aggregated
+     * computes the mean of all points position to approximate circle center (without offset)
+     * based on the fact that it is a cylinder of 70mm diameter
+     */
+    Point ComputeCenter(PointAggregation cluster);
 
- /**
-  * Find the circle on which the given three points lie
-  */
- Point FindCircle(Point p1, Point p2, Point p3);
+    /**
+     * Find the circle on which the given three points lie
+     */
+    Point FindCircle(Point p1, Point p2, Point p3);
 
- /**
-  * Find the circle on which the given three points coordinates lie
-  */
- Point FindCircle(float x1, float y1, float x2, float y2, float x3, float y3);
+    /**
+     * Find the circle on which the given three points coordinates lie
+     */
+    Point FindCircle(float x1, float y1, float x2, float y2, float x3, float y3);
 
-private:
-    // minimum number of points needed to qualify as an obstacle
-    static const uint8_t obstacleMinPoints = 3;
+   private:
+    // Number of points needed to qualify as an obstacle
+    // TODO remove this : we need to know if obstacle is a beacon, auto calculation
+    static const uint8_t obstacleMinPoints = 4;
+    static const uint8_t obstacleMaxPoints = 25;
 
     // Maximum angle between LidarLD06 packet admissible  = angle * 100
-    static const uint8_t angleMaxDiscontinuity = 160; // TODO move into config ?
+    static const uint8_t angleMaxDiscontinuity = 160;  // TODO move into config ?
 
     // counter of points while detecting an obstacle from data
     uint16_t pointsCounter = 0;
-    PointAggregation pointsTmp;
+    vector<PointAggregation> pointsTmp;
 
     // why are you using uint32 instead of chars?
     uint32_t serialBuffer[LIDAR_SERIAL_PACKET_SIZE] = {0};
@@ -194,6 +198,6 @@ private:
 
    public:
     // Data
-    std::vector<PolarPoint> scan;
+    vector<PolarPoint> scan;
 };
 #endif

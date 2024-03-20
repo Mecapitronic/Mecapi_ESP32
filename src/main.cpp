@@ -158,9 +158,12 @@ void Task1code(void *pvParameters)
                 int counter = 0;
                 for (int i = 0; i < LIDAR_DATA_PACKET_SIZE; i++)
                 {
-                    ld06.AggregatePoint(ld06.GetData().dataPoint[i], &tracker, robot);
+                    ld06.AggregatePoint(ld06.GetData().dataPoint[i], robot);
                 }
-                plotScanXY(ld06.scan);
+
+                ld06.SortCluster(ld06.GetData().dataPoint[LIDAR_DATA_PACKET_SIZE - 1], &tracker, robot);
+
+                plotScanXY(ld06.scan, "lidar");
                 ld06.scan.clear();
                 Debugger::WaitForAvailableSteps();
 

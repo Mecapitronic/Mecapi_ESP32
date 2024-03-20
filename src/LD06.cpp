@@ -8,9 +8,9 @@ void LidarLD06::Initialisation()
     Config(100, 1500, 200, 200, 0.8 * 5, 2);
     SERIAL_LIDAR.begin(230400);
 
-    int pwmChannel = 0;    // Choisit le canal 0
-    int frequence = 30000; // Fréquence PWM de 30 KHz
-    int resolution = 8;    // Résolution de 8 bits, 256 valeurs possibles
+    int pwmChannel = 0;     // Choisit le canal 0
+    int frequence = 30000;  // Fréquence PWM de 30 KHz
+    int resolution = 8;     // Résolution de 8 bits, 256 valeurs possibles
     int pwmPin = 23;
 
     // Configuration du canal 0 avec la fréquence et la résolution choisie
@@ -30,15 +30,13 @@ void LidarLD06::Config(int min = -1, int max = -1, int quality = -1, int distanc
 {
     if (min != -1)
     {
-        print("LidarLD06 Config 'Distance Min' from ", lidarConfig.minDistance, "",
-              LEVEL_INFO);
+        print("LidarLD06 Config 'Distance Min' from ", lidarConfig.minDistance, "", LEVEL_INFO);
         println(" to ", min, "", LEVEL_INFO);
         lidarConfig.minDistance = min;
     }
     if (max != -1)
     {
-        print("LidarLD06 Config 'Distance Max' from ", lidarConfig.maxDistance, "",
-              LEVEL_INFO);
+        print("LidarLD06 Config 'Distance Max' from ", lidarConfig.maxDistance, "", LEVEL_INFO);
         println(" to ", max, "", LEVEL_INFO);
         lidarConfig.maxDistance = max;
     }
@@ -50,8 +48,7 @@ void LidarLD06::Config(int min = -1, int max = -1, int quality = -1, int distanc
     }
     if (distance != -1)
     {
-        print("LidarLD06 Config 'Distance Threshold' from ",
-              lidarConfig.distanceThreshold, "", LEVEL_INFO);
+        print("LidarLD06 Config 'Distance Threshold' from ", lidarConfig.distanceThreshold, "", LEVEL_INFO);
         println(" to ", distance, "", LEVEL_INFO);
         lidarConfig.distanceThreshold = distance;
     }
@@ -205,20 +202,17 @@ bool LidarLD06::IsOutsideTable(Point point)
 
 bool LidarLD06::IsOutsideConfig(PolarPoint point)
 {
-    return (point.distance < lidarConfig.minDistance ||
-            point.distance > lidarConfig.maxDistance ||
+    return (point.distance < lidarConfig.minDistance || point.distance > lidarConfig.maxDistance ||
             point.confidence < lidarConfig.minQuality);
 }
 
-uint8_t thresholdCount = 0;
-void LidarLD06::AggregatePoint(PolarPoint lidar_point, Tracker *tracker, Robot robot)
+void LidarLD06::AggregatePoint(PolarPoint lidar_point, Robot robot)
 {
     boolean aggregate = true;
 
     Point point = PolarToCartesian(lidar_point, robot);
     lidar_point.x = point.x;
     lidar_point.y = point.y;
-    scan.push_back(lidar_point);
 
     // Ignore points outside of the table and outside config
     if (IsOutsideTable(point))
@@ -226,126 +220,175 @@ void LidarLD06::AggregatePoint(PolarPoint lidar_point, Tracker *tracker, Robot r
         print("Outside table : ", lidar_point);
         aggregate = false;
     }
-
-    if (IsOutsideConfig(lidar_point))
+    else if (IsOutsideConfig(lidar_point))
     {
         print("Outside config : ", lidar_point);
         aggregate = false;
     }
-
-    // TODO TEMP FIX TO DETECT ONLY ON FRONT OF THE ROBOT (90°)
-    // if (lidar_point.angle > 4500 && lidar_point.angle < 31500)
-    // {
-    //     // println("Not in front of robot : ", point);
-    //     aggregate = false;
-    // }
-
-    // if we have too much data for this obstacle
-    if (pointsCounter >= kMaxPoints)
-    {
-        // TODO do not take this as obstacle because it's too large (wall, person, ...)
-        // ObstacleDetected(tracker, kMaxPoints);
-
-        // we don't need this point into the batch : overflow of point number
-        aggregate = false;
-
-        // we drop the current batch of point
-        if (NewObstacleThreshold(lidar_point))
-        {
-            println("Drop batch, too much points : ", pointsCounter);
-            pointsCounter = 0;
-            thresholdCount = 0;
-        }
-    }
     else
     {
-        // if we are still under the maximum size of the batch
+        scan.push_back(lidar_point);
+        bool clusterFounded = false;
+        int temp = 0;
+        // println("pointsTmp.size()", pointsTmp.size());
 
-        // Determine if it is a new obstacle
-        if (pointsCounter > 0 && NewObstacleThreshold(lidar_point))
+        for (auto& cluster : pointsTmp)
         {
-            thresholdCount++;
-            println("thresholdCount : ", thresholdCount);
-            if (thresholdCount >= lidarConfig.countThreshold)
+            // println("cluster.data.size()", cluster.data.size());
+            //  cluster empty or lidar_point inside cluster
+            if (cluster.data.size() == 0 ||
+                (abs(cluster.data[cluster.data.size() - 1].distance - lidar_point.distance) <
+                     lidarConfig.distanceThreshold &&
+                 abs((int)(cluster.data[cluster.data.size() - 1].angle)) - abs((int)(lidar_point.angle)) <
+                     lidarConfig.angleThreshold * 100))
             {
-                // TODO : To test countThreshold if accurate
-                // TODO : We need to test if the batch of point is really a beacon
-                thresholdCount = 0;
-
-                //  if we have sufficient data for this obstacle
-                //  we save current batch of points into an obstacle
-                if (pointsCounter >= obstacleMinPoints)
-                {
-                    println("Obstacle Detected : ", pointsCounter);
-                    ObstacleDetected(tracker, pointsCounter);
-
-                    // we start another batch of points
-                    pointsCounter = 0;
-                }
-                else
-                {
-                    // not enough point, we drop the current obstacle
-                    println("Drop batch, not enough point : ", pointsCounter);
-                    pointsCounter = 0;
-                }
+                cluster.data.push_back(lidar_point);
+                // recalculate the average point of the cluster
+                cluster.mid.angle =
+                    (cluster.mid.angle * (cluster.data.size() - 1) + lidar_point.angle) / cluster.data.size();
+                cluster.mid.distance =
+                    (cluster.mid.distance * (cluster.data.size() - 1) + lidar_point.distance) / cluster.data.size();
+                // exist for as we fond which cluster the point is inside
+                clusterFounded = true;
+                break;
             }
+            temp++;
+        }
+
+        if (!clusterFounded)
+        {
+            println("Creating new cluster N°", pointsTmp.size());
+            PointAggregation aggPoint = {{lidar_point}, lidar_point};
+            pointsTmp.push_back(aggPoint);
         }
     }
-    // println("PointsCounter : ", pointsCounter);
-    if (aggregate)
+
+    // TODO : the distance point from robot should decide the number min of point,
+    // for example : at 300mm we need 20 points, at 1000mm we need 10 points, at 1500mm 5 points
+    // Arc Length s = 2 π r(θ / 360°)
+    // float s = ((fabsf(pointsTmp.data[0].angle - pointsTmp.data[pointsCounter - 1].angle) / 100) *
+    //           (pointsTmp.data[0].distance + pointsTmp.data[pointsCounter - 1].distance) / 2) *
+    //          PI / 180;
+    // println("Arc length=", s);
+
+    // TODO max angle into config = diameter of beacon
+    /*
+    // Average of the 2 first points
+    PolarPoint pointStart = PolarPoint((pointsTmp.data[0].angle + pointsTmp.data[1].angle) / 2,
+                                       (pointsTmp.data[0].distance + pointsTmp.data[1].distance) / 2,
+                                       (pointsTmp.data[0].confidence + pointsTmp.data[1].confidence) /
+    2);
+    // Average of the 2 last points
+    PolarPoint pointEnd = PolarPoint(
+        (pointsTmp.data[pointsCounter - 2].angle + pointsTmp.data[pointsCounter - 1].angle) / 2,
+        (pointsTmp.data[pointsCounter - 2].distance + pointsTmp.data[pointsCounter - 1].distance) / 2,
+        (pointsTmp.data[pointsCounter - 2].confidence + pointsTmp.data[pointsCounter - 1].confidence) /
+    2);
+
+    // D12 = sqrt(r1² + r2² - 2*cos(a2 -a1))
+    float distad =
+        sqrt(pow(pointsTmp.data[0].distance, 2) + pow(pointsTmp.data[pointsCounter - 1].distance, 2) -
+             2 * pointsTmp.data[0].distance * pointsTmp.data[pointsCounter - 1].distance *
+                 cos((pointsTmp.data[pointsCounter - 1].angle / 100 - pointsTmp.data[0].angle / 100) *
+    PI / 180));
+    // D12 = sqrt((x2-x1)² + (y2-y1)²)
+    float distxy = sqrt(pow(pointsTmp.data[0].x - pointsTmp.data[pointsCounter - 1].x, 2) +
+                        pow(pointsTmp.data[0].y - pointsTmp.data[pointsCounter - 1].y, 2));
+
+    println("distad : ", distad);
+    println("distxy : ", distxy);
+    */
+}
+
+int clusterNum = 0;
+void LidarLD06::SortCluster(PolarPoint last_point, Tracker* tracker, Robot robot)
+{
+    println("Last Angle : ", last_point.angle);
+    vector<vector<PointAggregation>::iterator> it;
+
+    int index = pointsTmp.size() - 1;
+    for (int i = pointsTmp.size() - 1; i >= 0; i--)
     {
-        // save the coord of current lidar point (a copy is made)
-        // print("Aggregate : ", lidar_point);
-        pointsTmp.data[pointsCounter++] =
-            PolarPoint(lidar_point.angle, lidar_point.distance, lidar_point.confidence, point.x, point.y);
-        // recalculate the average point of the batch
-        pointsTmp.mid.angle = (pointsTmp.mid.angle * (pointsCounter - 1) + lidar_point.angle) / pointsCounter;
-        pointsTmp.mid.distance = (pointsTmp.mid.distance * (pointsCounter - 1) + lidar_point.distance) / pointsCounter;
+        println("Cluster Angle : ", pointsTmp[i].data[pointsTmp[i].data.size() - 1].angle);
+        // the angle are descending
+        float angle = pointsTmp[i].data[pointsTmp[i].data.size() - 1].angle - 10 * 100;
+        if (angle < 0)
+            angle += 360 * 100;
+
+        if (last_point.angle < angle)
+        {
+            // plotPoint(cluster.mid, "cluster.mid");
+            println("Cluster ", i, " will be sorted");
+            println("Size ", pointsTmp[i].data.size());
+            // TODO what is an obstacle and what is not ?
+            if (pointsTmp[i].data.size() > obstacleMaxPoints)
+            {
+                println("Too many points");
+            }
+            else if (pointsTmp[i].data.size() < obstacleMinPoints)
+            {
+                println("Not enough points");
+            }
+            else
+            {
+                println("Obstacle Detected : ", pointsTmp[i].data.size());
+                ObstacleDetected(pointsTmp[i], tracker, robot);
+            }
+            plotScanXY(pointsTmp[i].data, "cluster" + String(clusterNum));
+            clusterNum++;
+            it.push_back(pointsTmp.begin() + i);
+        }
     }
-    else
+
+    for (auto& i : it)
     {
-        // println("Do not Aggregate");
+        pointsTmp.erase(i);
     }
 }
 
-void LidarLD06::ObstacleDetected(Tracker *tracker, uint8_t size)
+void LidarLD06::ObstacleDetected(PointAggregation cluster, Tracker* tracker, Robot robot)
 {
-    // println("Size obs :", size);
-    pointsTmp.size = size;
-    Point mid = ComputeCenter(pointsTmp);
+    // Point mid = ComputeCenter(cluster);
+    Point mid = PolarToCartesian(cluster.mid, robot);
     plotPoint(mid, "Mid");
-    plotPolarPoints(pointsTmp.data, size, "Aggregation");
+    // plotPolarPoints(&cluster.data, cluster.data.size(), "Aggregation");
 
-    tracker->track(mid, pointsTmp.data, pointsTmp.size);
-    // pointsCounter = 0;
+    // tracker->track(mid, cluster.data, pointsTmp.size);
 }
 
 bool LidarLD06::NewObstacleThreshold(PolarPoint currentPoint)
 {
     // TODO recalculate minimum angle threshold, or convert it to distance to have a better threshold config
-    return (abs(pointsTmp.data[pointsCounter - 1].distance - currentPoint.distance) > lidarConfig.distanceThreshold ||
-            abs((int)(pointsTmp.data[pointsCounter - 1].angle)) - abs((int)(currentPoint.angle)) >
-                lidarConfig.angleThreshold * 100);
+    // bool ret =
+    //    (abs(pointsTmp.data[pointsCounter - 1].distance - currentPoint.distance) > lidarConfig.distanceThreshold ||
+    //     abs((int)(pointsTmp.data[pointsCounter - 1].angle)) - abs((int)(currentPoint.angle)) >
+    //         lidarConfig.angleThreshold * 100);
+    /*if (pointsCounter > 1)
+    {
+        bool ret2 =
+            (abs(pointsTmp.data[pointsCounter - 2].distance - currentPoint.distance) > lidarConfig.distanceThreshold ||
+             abs((int)(pointsTmp.data[pointsCounter - 2].angle)) - abs((int)(currentPoint.angle)) >
+                 lidarConfig.angleThreshold * 100);
+        ret = ret && ret2;
+    }*/
+    return false;
 }
 
-Point LidarLD06::ComputeCenter(PointAggregation points)
+Point LidarLD06::ComputeCenter(PointAggregation cluster)
 {
     Point mid = {0, 0};
-    for (int8_t d = 0; d < points.size; d++)
+    for (int8_t d = 0; d < cluster.data.size(); d++)
     {
-        mid.x += points.data[d].x;
-        mid.y += points.data[d].y;
+        mid.x += cluster.data[d].x;
+        mid.y += cluster.data[d].y;
     }
-    mid.x = mid.x / points.size;
-    mid.y = mid.y / points.size;
+    mid.x = mid.x / cluster.data.size();
+    mid.y = mid.y / cluster.data.size();
 
     return mid;
 }
 
-Point LidarLD06::FindCircle(Point p1, Point p2, Point p3)
-{
-    return FindCircle(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
-}
+Point LidarLD06::FindCircle(Point p1, Point p2, Point p3) { return FindCircle(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y); }
 
 Point LidarLD06::FindCircle(float x1, float y1, float x2, float y2, float x3, float y3)
 {
@@ -370,8 +413,10 @@ Point LidarLD06::FindCircle(float x1, float y1, float x2, float y2, float x3, fl
     float sx21 = pow(x2, 2) - pow(x1, 2);
     float sy21 = pow(y2, 2) - pow(y1, 2);
 
-    float f = ((sx13) * (x12) + (sy13) * (x12) + (sx21) * (x13) + (sy21) * (x13)) / (2 * ((y31) * (x12) - (y21) * (x13)));
-    float g = ((sx13) * (y12) + (sy13) * (y12) + (sx21) * (y13) + (sy21) * (y13)) / (2 * ((x31) * (y12) - (x21) * (y13)));
+    float f =
+        ((sx13) * (x12) + (sy13) * (x12) + (sx21) * (x13) + (sy21) * (x13)) / (2 * ((y31) * (x12) - (y21) * (x13)));
+    float g =
+        ((sx13) * (y12) + (sy13) * (y12) + (sx21) * (y13) + (sy21) * (y13)) / (2 * ((x31) * (y12) - (x21) * (y13)));
 
     // float c = -pow(x1, 2) - pow(y1, 2) - 2 * g * x1 - 2 * f * y1;
 
