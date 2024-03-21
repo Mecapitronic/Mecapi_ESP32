@@ -49,27 +49,36 @@ void Robot::SetPosition(int x, int y, int angle)
     robotPosition.angle = angle;
 }
 
+void Robot::Update()
+{
+    if (ReadSerial())
+    {
+        Analyze();
+        plotRobot(GetPosition());
+    }
+}
+
 boolean Robot::ReadSerial()
 {
     if (dsPicSerialStatus != ENABLE_NONE)
-{
-    if (SERIAL_ROBOT.available() > 0)
     {
-        uint32_t tmpInt = SERIAL_ROBOT.read();
-        if (tmpInt == 0x21 && cursorTmp == 0) // 0x21 = '!'
+        if (SERIAL_ROBOT.available() > 0)
         {
-            serialBuffer[cursorTmp++] = tmpInt;
-        }
-        else if (cursorTmp > 0)
-        {
-            serialBuffer[cursorTmp++] = tmpInt;
-
-            if (cursorTmp >= ROBOT_DATA_PACKET_SIZE)
+            uint32_t tmpInt = SERIAL_ROBOT.read();
+            if (tmpInt == 0x21 && cursorTmp == 0)  // 0x21 = '!'
             {
-                cursorTmp = 0;
-                if (serialBuffer[ROBOT_DATA_PACKET_SIZE - 1] == 10)
+                serialBuffer[cursorTmp++] = tmpInt;
+            }
+            else if (cursorTmp > 0)
+            {
+                serialBuffer[cursorTmp++] = tmpInt;
+
+                if (cursorTmp >= ROBOT_DATA_PACKET_SIZE)
                 {
-                    return true;
+                    cursorTmp = 0;
+                    if (serialBuffer[ROBOT_DATA_PACKET_SIZE - 1] == 10)
+                    {
+                        return true;
                     }
                 }
             }
@@ -87,7 +96,7 @@ void Robot::Analyze()
     int8_t footer = serialBuffer[7];
 }
 
-void Robot::WriteSerialdsPic(int n, Point p)
+void Robot::WriteSerial(int n, Point p)
 {
     if (dsPicSerialStatus == ENABLE_TRUE)
     {

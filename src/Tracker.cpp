@@ -100,7 +100,7 @@ void Tracker::sendObstaclesToRobot(Robot robot)
     {
         if (!tracked_points[i].hasBeenSent)
         {
-            robot.WriteSerialdsPic(i, tracked_points[i].point);
+            robot.WriteSerial(i, tracked_points[i].point);
             tracked_points[i].hasBeenSent = true;
             plotPoint(tracked_points[i].point, varName + i);
             plotTrackerPoints(tracked_points[i], tracked_points[i].size, "points");
@@ -117,10 +117,10 @@ void Tracker::untrackOldObstacles(Robot robot)
         if (!PointIsEqual(tracked_points[i].point, {0, 0}) && getTimeNowMs() - tracked_points[i].lastUpdateTime > IS_TOO_OLD)
         {
             tracked_points[i].point = {0, 0};
-            robot.WriteSerialdsPic(i, {0, 0});
+            robot.WriteSerial(i, {0, 0});
 
             plotPoint({0, 0}, varName + i);
-            println("Untracking point: ", i, "");
+            println("Un-tracking point: ", i, "");
         }
     }
 }

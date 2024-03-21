@@ -30,6 +30,7 @@ class Robot  // : public IModule
      * Robot Init : init all variables and serial communication with PIC
      */
     void Initialisation();
+    void Update();
 
     /**
      * Enable/disable communication to dsPIC : used for debug as it re-route serial to PC
@@ -54,14 +55,15 @@ class Robot  // : public IModule
     RobotPosition GetPosition();
 
     /**
-     * Set the robotPosition with the coordinates x, y and angle
+     * Set the robotPosition with the Cartesian coordinates x, y and angle
      */
     void SetPosition(int x, int y, int angle);
 
     /**
-     * Send data to robot PIC: send obstacle position given in args
+     * Send data to robot : send obstacle position given in args
+     * n : number, p : Cartesian Point
      */
-    void WriteSerialdsPic(int n, Point p);
+    void WriteSerial(int n, Point p);
 
    private:
     RobotPosition robotPosition = {0, 0, 0.0};  // x, y, angle

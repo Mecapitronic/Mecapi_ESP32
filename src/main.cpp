@@ -145,12 +145,7 @@ void Task1code(void *pvParameters)
 #endif
 
 #ifdef LD06
-            if (robot.ReadSerial())
-            {
-                // set the new robot position
-                robot.Analyze();
-                plotRobot(robot.GetPosition());
-            }
+            robot.Update();
 
             ld06.robotPosition = robot.GetPosition();
             ld06.Update();
