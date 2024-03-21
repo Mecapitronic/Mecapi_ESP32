@@ -152,7 +152,7 @@ class LidarLD06
      * computes the mean of all points position to approximate circle center (without offset)
      * based on the fact that it is a cylinder of 70mm diameter
      */
-    Point ComputeCenter(Cluster cluster);
+    void ComputeCenter(Cluster& c);
 
     /**
      * Find the circle on which the given three points lie

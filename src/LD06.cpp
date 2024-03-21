@@ -289,15 +289,15 @@ void LidarLD06::CheckCluster(PolarPoint polarPoint)
 
             // At 300mm we need 20 points, at 1000mm we need 10 points, at 1500mm 5 points
 
-            if (cluster[i].data.size() < 2)
+            if (cluster[i].data.size() < 3)
             {
                 println("Absolutely not enough points !");
             }
-            else if (cluster[i].data.size() > maxPoint)
+            else if (cluster[i].data.size() > ceil(maxPoint))
             {
                 println("Too many points");
             }
-            else if (cluster[i].data.size() < minPoint)
+            else if (cluster[i].data.size() < floor(minPoint))
             {
                 println("Not enough points");
             }
@@ -322,7 +322,8 @@ void LidarLD06::CheckCluster(PolarPoint polarPoint)
                 println(" points : ", (float)(theta5 / 0.8));
                 */
 
-                print("Obstacle Detected : ", cluster[i].mid);
+                print("Obstacle Detected mid Polar: ", cluster[i].mid);
+                plotPolarPoint(cluster[i].mid, "MidPolar" + String(cluster[i].index));
                 ObstacleDetected(cluster[i]);
                 plotScanXY(cluster[i].data, "cluster" + String(cluster[i].index));
             }
@@ -338,26 +339,27 @@ void LidarLD06::CheckCluster(PolarPoint polarPoint)
 
 void LidarLD06::ObstacleDetected(Cluster& c)
 {
-    // Point mid = ComputeCenter(cluster);
-    plotPolarPoint(c.mid, "Mid" + String(c.index));
     // TODO Add to tracker
-    //  plotPolarPoints(&cluster.data, cluster.data.size(), "Aggregation");
-
     // tracker->track(mid, cluster.data, cluster.size);
 }
 
-Point LidarLD06::ComputeCenter(Cluster cluster)
+void LidarLD06::ComputeCenter(Cluster& c)
 {
-    Point mid = {0, 0};
-    for (int8_t d = 0; d < cluster.data.size(); d++)
+    for (int8_t d = 0; d < c.data.size(); d++)
     {
-        mid.x += cluster.data[d].x;
-        mid.y += cluster.data[d].y;
-    }
-    mid.x = mid.x / cluster.data.size();
-    mid.y = mid.y / cluster.data.size();
+        // c.mid.angle += c.data[d].angle;
+        // c.mid.distance += c.data[d].distance;
 
-    return mid;
+        // c.mid.x += c.data[d].x;
+        // c.mid.y += c.data[d].y;
+    }
+
+    //c.mid.angle = c.mid.angle / c.data.size();
+    //c.mid.distance = c.mid.distance / c.data.size();
+    //PolarToCartesian(c.mid);
+    
+    // c.mid.x = mid.x / c.data.size();
+    // c.mid.y = mid.y / c.data.size();
 }
 
 Point LidarLD06::FindCircle(Point p1, Point p2, Point p3) { return FindCircle(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y); }
