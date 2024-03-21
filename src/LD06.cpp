@@ -58,12 +58,6 @@ void LidarLD06::Config(int min = -1, int max = -1, int quality = -1, int distanc
         println(" to ", angle, "", LEVEL_INFO);
         lidarConfig.angleThreshold = angle;
     }
-    if (count != -1)
-    {
-        print("LidarLD06 Config 'Count Threshold' from ", lidarConfig.countThreshold, "", LEVEL_INFO);
-        println(" to ", count, "", LEVEL_INFO);
-        lidarConfig.countThreshold = count;
-    }
 }
 
 ConfigLidar LidarLD06::GetConfig() { return lidarConfig; }
@@ -258,33 +252,6 @@ void LidarLD06::AggregatePoint(PolarPoint polarPoint)
         clusterNum++;
     }
 }
-// TODO max angle into config = diameter of beacon
-/*
-// Average of the 2 first points
-PolarPoint pointStart = PolarPoint((cluster.data[0].angle + cluster.data[1].angle) / 2,
-                                   (cluster.data[0].distance + cluster.data[1].distance) / 2,
-                                   (cluster.data[0].confidence + cluster.data[1].confidence) /
-2);
-// Average of the 2 last points
-PolarPoint pointEnd = PolarPoint(
-    (cluster.data[pointsCounter - 2].angle + cluster.data[pointsCounter - 1].angle) / 2,
-    (cluster.data[pointsCounter - 2].distance + cluster.data[pointsCounter - 1].distance) / 2,
-    (cluster.data[pointsCounter - 2].confidence + cluster.data[pointsCounter - 1].confidence) /
-2);
-
-// D12 = sqrt(r1² + r2² - 2*cos(a2 -a1))
-float distad =
-    sqrt(pow(cluster.data[0].distance, 2) + pow(cluster.data[pointsCounter - 1].distance, 2) -
-         2 * cluster.data[0].distance * cluster.data[pointsCounter - 1].distance *
-             cos((cluster.data[pointsCounter - 1].angle / 100 - cluster.data[0].angle / 100) *
-PI / 180));
-// D12 = sqrt((x2-x1)² + (y2-y1)²)
-float distxy = sqrt(pow(cluster.data[0].x - cluster.data[pointsCounter - 1].x, 2) +
-                    pow(cluster.data[0].y - cluster.data[pointsCounter - 1].y, 2));
-
-println("distad : ", distad);
-println("distxy : ", distxy);
-*/
 
 void LidarLD06::CheckCluster(PolarPoint polarPoint)
 {
@@ -378,21 +345,6 @@ void LidarLD06::ObstacleDetected(Cluster& c)
 
     // tracker->track(mid, cluster.data, cluster.size);
 }
-
-// TODO recalculate minimum angle threshold, or convert it to distance to have a better threshold config
-// bool ret =
-//    (abs(cluster.data[pointsCounter - 1].distance - currentPoint.distance) > lidarConfig.distanceThreshold
-//    ||
-//     abs((int)(cluster.data[pointsCounter - 1].angle)) - abs((int)(currentPoint.angle)) >
-//         lidarConfig.angleThreshold * 100);
-/*if (pointsCounter > 1)
-{
-    bool ret2 =
-        (abs(cluster.data[pointsCounter - 2].distance - currentPoint.distance) > lidarConfig.distanceThreshold
-|| abs((int)(cluster.data[pointsCounter - 2].angle)) - abs((int)(currentPoint.angle)) >
-             lidarConfig.angleThreshold * 100);
-    ret = ret && ret2;
-}*/
 
 Point LidarLD06::ComputeCenter(Cluster cluster)
 {

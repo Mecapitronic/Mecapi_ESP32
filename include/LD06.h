@@ -34,7 +34,6 @@ struct ConfigLidar
     int minQuality;         // represents the minimum quality of a point to be accepted as good enough
     int distanceThreshold;  // represents the distance threshold to differentiate two obstacles
     int angleThreshold;     // represents the angle threshold to differentiate two obstacles
-    int countThreshold;     // represents the number of point to pass the threshold
 };
 
 struct PacketLidar
@@ -184,7 +183,7 @@ class LidarLD06
 
     PacketLidar lidarPacket;
     PacketLidar lidarLastPacket;
-    ConfigLidar lidarConfig = {0, 0, 0, 0, 0, 0};
+    ConfigLidar lidarConfig = {0, 0, 0, 0, 0};
 
    public:
     // Data
