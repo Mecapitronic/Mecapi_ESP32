@@ -1,3 +1,5 @@
 # simulator
 matplotlib
 pyserial
+# visualizer
+py5==0.9.1a1

@@ -1,3 +1,4 @@
+
 points = [
     (921.737195124022, 316.56198128600863),
     (515.0020981145655, -209.17434875418445),
@@ -96,18 +97,19 @@ points = [
 ]
 
 
-def setup():
-    global points
-    # size(2000, 2000)
-    drawPoints(points)
-
-
 def drawPoints(pointList):
     # stroke(0)
     for p in pointList:
-        print(p[0])
-        # rect(p[0], p[1], 10, 10)
+        rect(p[0] / 2, p[1] / 2, 10, 10)
 
 
-if __name__ == "__main__":
-    setup()
+def draw_robot():
+    fill(255, 0, 0)
+    ellipse(width / 2, height / 2, 20, 20)
+
+
+def setup():
+    global points
+    size(1000,1000)
+    draw_robot()
+    drawPoints(points)
