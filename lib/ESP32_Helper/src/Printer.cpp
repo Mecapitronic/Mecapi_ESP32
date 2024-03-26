@@ -363,17 +363,11 @@ namespace Printer
         SERIAL_DEBUG.println("|xy");
     }
 
-    void plotTrackerPoints(PointTracker p, int size, String varName, Level level)
+    void plotTrackerPoint(PointTracker p, String varName, Level level)
     {
         if (!IsPrintable(level))
             return;
-        String data = ">" + varName + ":" + (int)(p.data[0].angle) + ":" + (int)p.data[0].distance;
-        String separator = ";";
-
-        for (size_t i = 1; i < size; i++)
-        {
-            data += separator + (int)p.data[i].angle + ":" + (int)p.data[i].distance;
-        }
+        String data = ">" + varName + ":" + (int)(p.point.x) + ":" + (int)(p.point.y);
         data += "|xy";
         SERIAL_DEBUG.println(data);
     }

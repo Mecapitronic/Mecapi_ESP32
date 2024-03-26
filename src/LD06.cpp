@@ -2,8 +2,10 @@
 
 void LidarLD06::Initialisation()
 {
-    println("Init LidarLD06");
+    println("Init LidarLD06", LEVEL_INFO);
     scan.clear();
+    tracker.clear();
+
     // minDistance, maxDistance, minQuality, distanceThreshold, angleThreshold, countThreshold;
     Config(100, 1500, 200, 200, 0.8 * 5, 2);
     SERIAL_LIDAR.begin(230400);
@@ -341,6 +343,7 @@ void LidarLD06::ObstacleDetected(Cluster& c)
 {
     // TODO Add to tracker
     // tracker->track(mid, cluster.data, cluster.size);
+    tracker.push_back(c.mid);
 }
 
 void LidarLD06::ComputeCenter(Cluster& c)

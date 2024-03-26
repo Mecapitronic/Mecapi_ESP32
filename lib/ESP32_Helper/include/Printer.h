@@ -76,7 +76,7 @@ namespace Printer
 
     void plotRobot(RobotPosition pos, Level level = LEVEL_VERBOSE);
 
-    void plotTrackerPoints(PointTracker p, int size, String varName, Level level = LEVEL_VERBOSE);
+    void plotTrackerPoint(PointTracker p, String varName, Level level = LEVEL_VERBOSE);
 
     /**
      * send cloud point data on serial for teleplot to trace 3D shape

@@ -96,7 +96,7 @@ void Robot::Analyze()
     int8_t footer = serialBuffer[7];
 }
 
-void Robot::WriteSerial(int n, Point p)
+void Robot::WriteSerial(int n, PolarPoint p)
 {
     if (dsPicSerialStatus == ENABLE_TRUE)
     {

@@ -63,7 +63,7 @@ class Robot  // : public IModule
      * Send data to robot : send obstacle position given in args
      * n : number, p : Cartesian Point
      */
-    void WriteSerial(int n, Point p);
+    void WriteSerial(int n, PolarPoint p);
 
    private:
     RobotPosition robotPosition = {0, 0, 0.0};  // x, y, angle

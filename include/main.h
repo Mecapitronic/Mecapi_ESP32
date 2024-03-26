@@ -10,12 +10,12 @@ using namespace Printer;
 
 #include "LD06.h"
 #include "Robot.h"
+#include "Tracker.h"
 #include "testModule.h"
 
 LidarLD06 ld06;
 Robot robot;
 Tracker tracker;
-Point obstacle;
 testModule test;
 
 #endif

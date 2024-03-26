@@ -18,7 +18,7 @@ void setup()
     delay(500);
     ld06.Initialisation();
     delay(500);
-    tracker = Tracker();
+    tracker.Initialisation();
     delay(500);
 #endif
 
@@ -154,8 +154,8 @@ void Task1code(void *pvParameters)
             plotScanTD(ld06.scan, "lidar");
             ld06.scan.clear();
 
-            // tracker.sendObstaclesToRobot(robot);
-            // tracker.untrackOldObstacles(robot);
+            tracker.Track(ld06.tracker);
+            tracker.Update();
 
 #endif
 

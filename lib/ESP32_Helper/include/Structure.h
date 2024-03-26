@@ -331,13 +331,11 @@ struct RobotPosition
 struct PointTracker
 {
     // point coordinates beeing tracked
-    Point point;
+    PolarPoint point;
     // timestamp of the last time the tracker has been updated
     int64_t lastUpdateTime;
-    // Polar points that define the mid point
-    PolarPoint data[25];  // TODO kMaxPoints
-    // Size of the polar points array
-    uint8_t size = 0;
+    // index of the point tracked
+    int index;  // TODO remove this index ?
     // avoid to send the same points twice
     bool hasBeenSent = false;
 };

@@ -17,13 +17,9 @@
 // if the lidar and the robot have different origins
 // positive in trigonometric way
 #define LIDAR_ROBOT_ANGLE_OFFSET 0
-
-#define kMaxPoints 25
 #pragma endregion
 
 #include "ESP32_Helper.h"
-#include "Robot.h"
-#include "Tracker.h"
 
 using namespace Printer;
 
@@ -50,7 +46,7 @@ struct PacketLidar
 
 /**
  * Represent a cluster of points, with the average of all point
- * The maximum points needed to represent a 70mm wide cylinder is 20 (kMaxPoints)
+ * The maximum points needed to represent a 70mm wide cylinder is 20
  */
 struct Cluster
 {
@@ -189,5 +185,6 @@ class LidarLD06
     // Data
     vector<PolarPoint> scan;
     RobotPosition robotPosition;
+    vector<PolarPoint> tracker;
 };
 #endif

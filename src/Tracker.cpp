@@ -1,126 +1,117 @@
 #include "Tracker.h"
 
-Tracker::Tracker(float lpf_cutoff_distance, float hpf_cutoff_distance) : lpf_cutoff(lpf_cutoff_distance), hpf_cutoff(hpf_cutoff_distance)
+void Tracker::Initialisation()
 {
     println("Init Tracker", LEVEL_INFO);
-    println("Track new point if nothing close enough: ", lpf_cutoff, " mm", LEVEL_INFO);
-    println("Ignore movements under ", hpf_cutoff, " mm", LEVEL_INFO);
-    for (int i = 0; i < TRACKED_POINTS_SIZE; i++)
-    {
-        tracked_points[i].point = {0, 0};
-        tracked_points[i].hasBeenSent = true;
-        tracked_points[i].lastUpdateTime = 0;
-        tracked_points[i].size = 0;
-        for (int j = 0; j < kMaxPoints; j++)
-        {
-            tracked_points[i].data[j] = {0, 0, 0, 0, 0};
-        }
-    }
-}
-bool Tracker::PointIsEqual(Point a, Point b)
-{
-    return (a.x == b.x && a.y == b.y);
+    Config(DEFAULT_LPF_CUTOFF, DEFAULT_HPF_CUTOFF);
+    trackedPoints.clear();
 }
 
-void Tracker::track(Point newPoint, PolarPoint data[], uint8_t size)
+void Tracker::Config(float lpf_cutoff_distance, float hpf_cutoff_distance)
 {
-    // A point can not be further than 5000.0 as it is the field size
-    float best_match = 5000.0; // hold the closest point to the new one
-    int matching_point_index = -1;
-    int first_available_slot = -1; // free slot to add new point
+    config.lpf_cutoff = lpf_cutoff_distance;
+    config.hpf_cutoff = hpf_cutoff_distance;
 
-    print("Search point:", newPoint);
+    println("Track new point if nothing close enough: ", config.lpf_cutoff, " mm", LEVEL_INFO);
+    println("Ignore movements under ", config.hpf_cutoff, " mm", LEVEL_INFO);
+}
 
-    for (int i = 0; i < TRACKED_POINTS_SIZE; i++)
+bool Tracker::PointIsEqual(PolarPoint a, PolarPoint b) { return (a.x == b.x && a.y == b.y); }
+
+void Tracker::Track(vector<PolarPoint>& newPoints)
+{
+    for (auto& newPoint : newPoints)
     {
-        if (PointIsEqual(tracked_points[i].point, {0, 0}))
+        // A point can not be further than 5000.0 as it is the field size
+        float best_match = 5000.0;  // hold the closest point to the new one
+        int matching_point_index = -1;
+        // int first_available_slot = -1;  // free slot to add new point
+
+        print("Search point:", newPoint);
+
+        int i = 0;
+        for (auto& trackPoint : trackedPoints)
         {
-            if (first_available_slot == -1)
-            {
-                first_available_slot = i;
-            }
-        }
-        else
-        {
-            print("Compare to:", tracked_points[i].point);
+            print("Compare to:", trackPoint.point);
 
             // TODO remove sqrt and use x and y comparison
-            float dist = sqrt(pow(newPoint.x - tracked_points[i].point.x, 2) + pow(newPoint.y - tracked_points[i].point.y, 2));
+            float dist = sqrt(pow(newPoint.x - trackPoint.point.x, 2) + pow(newPoint.y - trackPoint.point.y, 2));
+            println("Distance:", dist);
 
             // If distance is smaller than lpf_cutoff, assume it's the same point
-            if ((dist < lpf_cutoff) && (dist < best_match))
+            if ((dist < config.lpf_cutoff) && (dist < best_match))
             {
                 // found matching point
                 best_match = dist;
                 matching_point_index = i;
             }
+            i++;
+        }
+
+        if (matching_point_index != -1 && best_match < config.hpf_cutoff)
+        {
+            println("This is exactly the same point, update time");
+            trackedPoints[matching_point_index].lastUpdateTime = getTimeNowMs();
+        }
+        else
+        {
+            PointTracker newPointTracker;
+            newPointTracker.point = newPoint;
+            newPointTracker.lastUpdateTime = getTimeNowMs();
+            newPointTracker.hasBeenSent = false;  // not yet sent to robot
+            newPointTracker.index = indexGlobal++;
+
+            if (matching_point_index == -1)
+            {
+                println("New point detected, add to tracked");
+                trackedPoints.push_back(newPointTracker);
+            }
+            else
+            {
+                print("Updating point ", matching_point_index, " ");
+                print("from ", trackedPoints[matching_point_index].point, "");
+                print("  to ", newPointTracker.point, "");
+                trackedPoints[matching_point_index] = newPointTracker;
+            }
         }
     }
-
-    if (best_match < hpf_cutoff)
-    {
-        println("This is exactly the same point; do nothing");
-        tracked_points[matching_point_index].lastUpdateTime = getTimeNowMs();
-        return;
-    }
-
-    // TODO what to do if found nothing and no slot???
-    if (matching_point_index == -1 && first_available_slot == -1)
-    {
-        println("No slot available for new point: drop it");
-        return;
-    }
-
-    if (matching_point_index == -1 && first_available_slot != -1)
-    {
-        matching_point_index = first_available_slot;
-        println("New point detected, add to tracked");
-    }
-
-    PointTracker newPointTracker;
-    newPointTracker.point = newPoint;
-    newPointTracker.lastUpdateTime = getTimeNowMs();
-    newPointTracker.hasBeenSent = false; // not yet sent to robot
-    newPointTracker.size = size;         // Size of the polar points array
-    for (size_t i = 0; i < size; i++)
-    {
-        newPointTracker.data[i] = data[i]; // Polar points associated
-    }
-
-    print("Updating point ", matching_point_index, " ");
-    print("from ", tracked_points[matching_point_index].point, "");
-    print("  to ", newPointTracker.point, "");
-    tracked_points[matching_point_index] = newPointTracker;
+    newPoints.clear();
 }
 
-void Tracker::sendObstaclesToRobot(Robot robot)
+void Tracker::Update()
+{
+    sendObstaclesToRobot();
+    untrackOldObstacles();
+}
+
+void Tracker::sendObstaclesToRobot()
 {
     String varName = "obs";
-    for (int i = 0; i < TRACKED_POINTS_SIZE; i++)
+    for (auto& trackPoint : trackedPoints)
     {
-        if (!tracked_points[i].hasBeenSent)
+        if (!trackPoint.hasBeenSent)
         {
-            robot.WriteSerial(i, tracked_points[i].point);
-            tracked_points[i].hasBeenSent = true;
-            plotPoint(tracked_points[i].point, varName + i);
-            plotTrackerPoints(tracked_points[i], tracked_points[i].size, "points");
+            // robot.WriteSerial(trackPoint.index, trackPoint.point);
+            trackPoint.hasBeenSent = true;
+            plotPolarPoint(trackPoint.point, varName + String(trackPoint.index));
+            plotTrackerPoint(trackPoint, "TrackPoint" + String(trackPoint.index));
         }
     }
 }
 
-void Tracker::untrackOldObstacles(Robot robot)
+void Tracker::untrackOldObstacles()
 {
     String varName = "obs";
     // iterate to find matching point to the predicate
-    for (int i = 0; i < TRACKED_POINTS_SIZE; i++)
+    for (auto& trackPoint : trackedPoints)
     {
-        if (!PointIsEqual(tracked_points[i].point, {0, 0}) && getTimeNowMs() - tracked_points[i].lastUpdateTime > IS_TOO_OLD)
+        if (!PointIsEqual(trackPoint.point, {0, 0}) && getTimeNowMs() - trackPoint.lastUpdateTime > IS_TOO_OLD)
         {
-            tracked_points[i].point = {0, 0};
-            robot.WriteSerial(i, {0, 0});
+            trackPoint.point = {0, 0};
+            // robot.WriteSerial(trackPoint.index, {0, 0});
 
-            plotPoint({0, 0}, varName + i);
-            println("Un-tracking point: ", i, "");
+            plotPoint({0, 0}, varName + trackPoint.index);
+            println("Un-tracking point: ", trackPoint.index, "");
         }
     }
 }
