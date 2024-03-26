@@ -3,17 +3,19 @@
 void Tracker::Initialisation()
 {
     println("Init Tracker", LEVEL_INFO);
-    Config(DEFAULT_LPF_CUTOFF, DEFAULT_HPF_CUTOFF);
+    Config(DEFAULT_LPF_CUTOFF, DEFAULT_HPF_CUTOFF, CONFIDENCE_TRIGGER);
     trackedPoints.clear();
 }
 
-void Tracker::Config(float lpf_cutoff_distance, float hpf_cutoff_distance)
+void Tracker::Config(float lpf_cutoff_distance, float hpf_cutoff_distance, int confidence)
 {
     config.lpf_cutoff = lpf_cutoff_distance;
     config.hpf_cutoff = hpf_cutoff_distance;
+    config.confidence = confidence;
 
     println("Track new point if nothing close enough: ", config.lpf_cutoff, " mm", LEVEL_INFO);
     println("Ignore movements under ", config.hpf_cutoff, " mm", LEVEL_INFO);
+    println("Confidence trigger for sending tracking point to robot: ", config.confidence, " times", LEVEL_INFO);
 }
 
 bool Tracker::PointIsEqual(PolarPoint a, PolarPoint b) { return (a.x == b.x && a.y == b.y); }
@@ -48,30 +50,41 @@ void Tracker::Track(vector<PolarPoint>& newPoints)
             i++;
         }
 
-        if (matching_point_index != -1 && best_match < config.hpf_cutoff)
-        {
-            println("This is exactly the same point, update time");
-            trackedPoints[matching_point_index].lastUpdateTime = getTimeNowMs();
-        }
-        else
+        if (matching_point_index == -1)
         {
             PointTracker newPointTracker;
             newPointTracker.point = newPoint;
             newPointTracker.lastUpdateTime = getTimeNowMs();
             newPointTracker.hasBeenSent = false;  // not yet sent to robot
-            newPointTracker.index = indexGlobal++;
+            newPointTracker.confidence = 1;
+            println("New point detected, add to tracked");
+            trackedPoints.push_back(newPointTracker);
 
-            if (matching_point_index == -1)
+            continue;
+        }
+
+        // TODO implémenter un poids par point en fonction du nombre de fois où on le voit
+        // dans la limite entre 3 et 5 fois max par seconde
+        if (best_match < config.hpf_cutoff)
+        {
+            println("This is exactly the same point, update only time");
+            trackedPoints[matching_point_index].lastUpdateTime = getTimeNowMs();
+            if (trackedPoints[matching_point_index].confidence < config.confidence)  // TODO param max confidence
             {
-                println("New point detected, add to tracked");
-                trackedPoints.push_back(newPointTracker);
+                trackedPoints[matching_point_index].confidence++;
             }
-            else
+        }
+        else
+        {
+            print("Updating point ", matching_point_index, " ");
+            print("from ", trackedPoints[matching_point_index].point, "");
+            print("  to ", newPoint, "");
+            trackedPoints[matching_point_index].point = newPoint;
+            trackedPoints[matching_point_index].hasBeenSent = false;
+            trackedPoints[matching_point_index].lastUpdateTime = getTimeNowMs();
+            if (trackedPoints[matching_point_index].confidence < config.confidence)
             {
-                print("Updating point ", matching_point_index, " ");
-                print("from ", trackedPoints[matching_point_index].point, "");
-                print("  to ", newPointTracker.point, "");
-                trackedPoints[matching_point_index] = newPointTracker;
+                trackedPoints[matching_point_index].confidence++;
             }
         }
     }
@@ -88,12 +101,12 @@ void Tracker::sendObstaclesToRobot()
     String varName = "obs";
     for (auto& trackPoint : trackedPoints)
     {
-        if (!trackPoint.hasBeenSent)
+        if (!trackPoint.hasBeenSent && trackPoint.confidence > config.confidence)
         {
             // robot.WriteSerial(trackPoint.index, trackPoint.point);
             trackPoint.hasBeenSent = true;
-            plotPolarPoint(trackPoint.point, varName + String(trackPoint.index));
-            plotTrackerPoint(trackPoint, "TrackPoint" + String(trackPoint.index));
+            // plotPolarPoint(trackPoint.point, varName + String(trackPoint.index));
+            // print("TrackPoint: ", trackPoint);
         }
     }
 }
@@ -106,11 +119,15 @@ void Tracker::untrackOldObstacles()
     {
         if (!PointIsEqual(trackPoint.point, {0, 0}) && getTimeNowMs() - trackPoint.lastUpdateTime > IS_TOO_OLD)
         {
-            trackPoint.point = {0, 0};
-            // robot.WriteSerial(trackPoint.index, {0, 0});
+            // TODO decrement confidence when the point has not been seen for a long time
+            // decrement should be faster then increment
+            // e.g -2 every 300ms
+            // trackPoint.point = {0, 0};
+            //  TODO Remove from vector if confidence is dropped too low
+            //   robot.WriteSerial(trackPoint.index, {0, 0});
 
-            plotPoint({0, 0}, varName + trackPoint.index);
-            println("Un-tracking point: ", trackPoint.index, "");
+            // plotPoint({0, 0}, varName + trackPoint.index);
+            print("Un-tracking point: ", trackPoint.point);
         }
     }
 }

@@ -12,6 +12,9 @@ using namespace Printer;
 // minimum movement needed to update position of tracked point
 #define DEFAULT_HPF_CUTOFF 50.0  // 5 cm
 
+// number of time a point has been seen before trigger sending point to robot
+#define CONFIDENCE_TRIGGER 5
+
 /**
  * amount of time needed to delete a point from tracker
  * if it is not detected in this term
@@ -33,6 +36,12 @@ struct ConfigTracker
      * this covers the false positives due to lidar lack of precision
      */
     float hpf_cutoff;
+
+    /**
+     * @brief confidence number of time a point has been seen
+     * before trigger sending point to robot
+     */
+    int confidence;
 };
 
 /**
@@ -47,12 +56,11 @@ class Tracker
     /**
      * @brief Configure a new Tracker object with settings for filters
      *
-     * @param lpf_cutoff_distance maximal distance between to points to match them as the same point; default
-     * DEFAULT_LPF_CUTOFF
-     * @param hpf_cutoff_distance minimum movement needed to update position of tracked point; default
-     * DEFAULT_HPF_CUTOFF
+     * @param lpf_cutoff_distance maximal distance between to points to match them as the same point
+     * @param hpf_cutoff_distance minimum movement needed to update position of tracked point
+     * @param confidence number of time a point has been seen before trigger sending point to robot
      */
-    void Config(float lpf_cutoff_distance, float hpf_cutoff_distance);
+    void Config(float lpf_cutoff_distance, float hpf_cutoff_distance, int confidence);
 
     /**
      * @brief send new point to tracker
@@ -109,7 +117,7 @@ class Tracker
      * and cleaned up if some points are not updated for a long time
      */
     vector<PointTracker> trackedPoints;
-    ConfigTracker config = {0, 0};
-    int indexGlobal = 0;
+
+    ConfigTracker config = {0, 0, 0};
 };
-#endif
+#endif  // TRACKER_H

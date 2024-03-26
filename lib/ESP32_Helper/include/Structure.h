@@ -322,8 +322,10 @@ struct PointTracker
     PolarPoint point;
     // timestamp of the last time the tracker has been updated
     int64_t lastUpdateTime;
-    // index of the point tracked
-    int index;  // TODO remove this index ?
+    // express the confidence we have in the obstacle position based on how much time we've seen it.
+    // It is increased it at every detection up to 4 times.
+    // This is used as a trigger to send the obstacle to the robot (only when we are confident enough)
+    int confidence;
     // avoid to send the same points twice
     bool hasBeenSent = false;
 };
