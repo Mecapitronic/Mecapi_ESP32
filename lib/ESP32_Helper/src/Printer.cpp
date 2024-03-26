@@ -218,22 +218,6 @@ namespace Printer
             SERIAL_DEBUG.println();
     }
 
-    void print(String prefix, RobotPosition data, String suffix, Level level, boolean lineFeed)
-    {
-        if (!IsPrintable(level))
-            return;
-        SERIAL_DEBUG.print(prefix);
-        SERIAL_DEBUG.print("x: ");
-        SERIAL_DEBUG.print(data.x);
-        SERIAL_DEBUG.print(" y: ");
-        SERIAL_DEBUG.print(data.y);
-        SERIAL_DEBUG.print(" angle: ");
-        SERIAL_DEBUG.print(data.angle / 100);
-        SERIAL_DEBUG.print(suffix);
-        if (lineFeed)
-            SERIAL_DEBUG.println();
-    }
-
     void print(String prefix, Command cmd, String suffix, Level level, boolean lineFeed)
     {
         if (!IsPrintable(level))
@@ -352,7 +336,7 @@ namespace Printer
         SERIAL_DEBUG.println("|xy");
     }
 
-    void plotRobot(RobotPosition pos, Level level)
+    void plotRobot(PolarPoint pos, Level level)
     {
         if (!IsPrintable(level))
             return;

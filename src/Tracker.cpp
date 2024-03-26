@@ -75,7 +75,6 @@ void Tracker::Track(vector<PolarPoint>& newPoints)
             }
         }
     }
-    newPoints.clear();
 }
 
 void Tracker::Update()

@@ -45,8 +45,6 @@ namespace Printer
     void print(String prefix, Point4D data, String suffix = "", Level level = LEVEL_VERBOSE, boolean lineFeed = true);
     void print(String prefix, PolarPoint data, String suffix = "", Level level = LEVEL_VERBOSE,
                boolean lineFeed = true);
-    void print(String prefix, RobotPosition data, String suffix = "", Level level = LEVEL_VERBOSE,
-               boolean lineFeed = true);
     void print(String prefix, Command cmd, String suffix = "", Level level = LEVEL_VERBOSE, boolean lineFeed = true);
 
     // bool needs to be the last because it overrides all functions
@@ -74,7 +72,7 @@ namespace Printer
     void plotScanTD(std::vector<PolarPoint> vec, String varName, Level level = LEVEL_VERBOSE);
     void plotScanXY(std::vector<PolarPoint> vec, String varName, Level level = LEVEL_VERBOSE);
 
-    void plotRobot(RobotPosition pos, Level level = LEVEL_VERBOSE);
+    void plotRobot(PolarPoint pos, Level level = LEVEL_VERBOSE);
 
     void plotTrackerPoint(PointTracker p, String varName, Level level = LEVEL_VERBOSE);
 

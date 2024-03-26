@@ -67,4 +67,4 @@ TaskHandle_t Task2;
 QueueHandle_t myQueue;
 int queueSize = 500;
 
-#endif
+#endif  // MAIN_H

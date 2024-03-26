@@ -96,6 +96,7 @@ class LidarLD06
      * @return uint32_t the duty cycle
      */
     uint32_t GetPWM();
+    void SetRobotPosition(PolarPoint robot);
 
    private:
     /**
@@ -184,7 +185,7 @@ class LidarLD06
    public:
     // Data
     vector<PolarPoint> scan;
-    RobotPosition robotPosition;
+    PolarPoint robotPosition;
     vector<PolarPoint> tracker;
 };
-#endif
+#endif  // LD06_H

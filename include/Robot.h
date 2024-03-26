@@ -52,7 +52,7 @@ class Robot  // : public IModule
     /**
      * Return robotPosition: last known robot position
      */
-    RobotPosition GetPosition();
+    PolarPoint GetPosition();
 
     /**
      * Set the robotPosition with the Cartesian coordinates x, y and angle
@@ -66,10 +66,10 @@ class Robot  // : public IModule
     void WriteSerial(int n, PolarPoint p);
 
    private:
-    RobotPosition robotPosition = {0, 0, 0.0};  // x, y, angle
+    PolarPoint position = {0.0, 0, 0, 0.0, 0.0};
     uint32_t serialBuffer[ROBOT_SERIAL_PACKET_SIZE] = {0};
     uint8_t cursorTmp = 0;
     Enable dsPicSerialStatus = ENABLE_TRUE;
 };
 
-#endif
+#endif  // ROBOT_H

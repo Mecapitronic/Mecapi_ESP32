@@ -81,8 +81,11 @@ void LidarLD06::ChangePWM(uint32_t duty_cycle)
 
 uint32_t LidarLD06::GetPWM() { return ledcRead(0) * 100 / ((1 << 8) - 1); }
 
+void LidarLD06::SetRobotPosition(PolarPoint robot) { robotPosition = robot; }
+
 void LidarLD06::Update()
 {
+    tracker.clear();
     if (ReadSerial())
     {
         Analyze();

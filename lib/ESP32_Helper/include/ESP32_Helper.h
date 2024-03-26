@@ -7,7 +7,6 @@
 #ifndef ESP32_HELPER_H
 #define ESP32_HELPER_H
 
-#include <queue>
 #include "Structure.h"
 #include "Printer.h"
 #include "Debugger.h"
@@ -35,4 +34,4 @@ bool HasWaitingCommand();
 Command GetCommand();
 
 }  // namespace ESP32_Helper
-#endif
+#endif// ESP32_HELPER_H

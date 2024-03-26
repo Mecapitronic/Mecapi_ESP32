@@ -147,7 +147,7 @@ void Task1code(void *pvParameters)
 #ifdef LD06
             robot.Update();
 
-            ld06.robotPosition = robot.GetPosition();
+            ld06.SetRobotPosition(robot.GetPosition());
             ld06.Update();
 
             plotScanXY(ld06.scan, "scan");
@@ -210,7 +210,6 @@ void Task2code(void *pvParameters)
 
     PolarPoint turn[queueSize];
     PolarPoint point;
-    RobotPosition data;
     while (1)
     {
         try

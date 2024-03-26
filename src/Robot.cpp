@@ -5,8 +5,8 @@ void Robot::Initialisation()
     println("Init Robot");
 
     //! TODO put robot in middle of map at start ?
-    robotPosition = {0, 0, 0.0};
-    print("Robot Position : ", robotPosition, "", LEVEL_INFO);
+    position = {0.0, 0, 0, 0.0, 0.0};
+    print("Robot Position : ", position, "", LEVEL_INFO);
     cursorTmp = 0;
     for (size_t i = 0; i < ROBOT_SERIAL_PACKET_SIZE; i++)
     {
@@ -40,13 +40,13 @@ void Robot::dsPicSerial(Enable enable)
 }
 Enable Robot::dsPicSerial() { return dsPicSerialStatus; }
 
-RobotPosition Robot::GetPosition() { return robotPosition; }
+PolarPoint Robot::GetPosition() { return position; }
 
 void Robot::SetPosition(int x, int y, int angle)
 {
-    robotPosition.x = x;
-    robotPosition.y = y;
-    robotPosition.angle = angle;
+    position.x = x;
+    position.y = y;
+    position.angle = angle;
 }
 
 void Robot::Update()
@@ -90,9 +90,9 @@ boolean Robot::ReadSerial()
 void Robot::Analyze()
 {
     int8_t header = serialBuffer[0];
-    robotPosition.x = serialBuffer[2] << 8 | serialBuffer[1];
-    robotPosition.y = serialBuffer[4] << 8 | serialBuffer[3];
-    robotPosition.angle = serialBuffer[6] << 8 | serialBuffer[5];
+    position.x = serialBuffer[2] << 8 | serialBuffer[1];
+    position.y = serialBuffer[4] << 8 | serialBuffer[3];
+    position.angle = serialBuffer[6] << 8 | serialBuffer[5];
     int8_t footer = serialBuffer[7];
 }
 

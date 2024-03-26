@@ -8,6 +8,7 @@
 #define STRUCTURE_H
 
 #include <Arduino.h>
+#include <queue>
 
 using namespace std;
 
@@ -313,19 +314,6 @@ struct PolarPoint
         x = 0;
         y = 0;
     }
-};
-
-/**
- * @brief Position of robot on the table
- * @param x int mm
- * @param y int mm
- * @param angle float Degree
- */
-struct RobotPosition
-{
-    int x;
-    int y;
-    float angle;
 };
 
 struct PointTracker
