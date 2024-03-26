@@ -76,10 +76,12 @@ def read_packet(ld06: Serial) -> Tuple[float, float]:
     return data
 
 
-def polar_to_cartesian(angle, distance):
+def polar_to_cartesian(angle, distance) -> Tuple[int, int]:
     """
     Convert polar coordinates to cartesian.
     Angle is expected in degrees.
+
+    returns carteisan coordinates x and y ast tuple
     """
     angle_rad = math.radians(angle)  # Convert angle from degrees to radians
     x = distance * math.cos(angle_rad)
@@ -126,6 +128,16 @@ def main(file: Path):
             )
             # print(point)
 
+def get_lidar_point():
+    with open(data_file, "r") as f:
+        lines = f.readlines()
+    for line in lines:
+        packet = parse_lidar_ld06(line)
+        for point in packet["dataPoint"]:
+            point = robotref_to_fieldref(
+                polar_to_cartesian(point["angle"], point["distance"]), (1000, 1000)
+            )
+            yield point
 
 if __name__ == "__main__":
     main(data_file)
