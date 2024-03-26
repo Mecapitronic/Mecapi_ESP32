@@ -154,7 +154,7 @@ void Task1code(void *pvParameters)
             plotScanTD(ld06.scan, "lidar");
             ld06.scan.clear();
 
-            tracker.Track(ld06.tracker);
+            tracker.Track(ld06.clusterCenterPoints);
             tracker.Update();
 
 #endif

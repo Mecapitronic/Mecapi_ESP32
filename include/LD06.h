@@ -12,6 +12,8 @@
 // 47 = 1(Start) + 1(Datalen) + 2(Speed) + 2(StartAngle) + 36(12 * 3 DataByte) + 2(EndAngle) + 2(TimeStamp) + 1(CRC)
 #define LIDAR_SERIAL_PACKET_SIZE 47
 #define LIDAR_DATA_PACKET_SIZE 12
+// Maximum angle between Lidar LD06 packet admissible = angle * 100
+#define ANGLE_MAX_DISCONTINUITY 160
 
 // angular offset between robot and lidar
 // if the lidar and the robot have different origins
@@ -162,16 +164,7 @@ class LidarLD06
     Point FindCircle(float x1, float y1, float x2, float y2, float x3, float y3);
 
    private:
-    // Number of points needed to qualify as an obstacle
-    // TODO remove this : we need to know if obstacle is a beacon, auto calculation
-    static const uint8_t obstacleMinPoints = 4;
-    static const uint8_t obstacleMaxPoints = 25;
-
-    // Maximum angle between LidarLD06 packet admissible  = angle * 100
-    static const uint8_t angleMaxDiscontinuity = 160;  // TODO move into config ?
-
     // counter of points while detecting an obstacle from data
-    uint16_t pointsCounter = 0;
     vector<Cluster> cluster;
 
     // why are you using uint32 instead of chars?
@@ -186,6 +179,6 @@ class LidarLD06
     // Data
     vector<PolarPoint> scan;
     PolarPoint robotPosition;
-    vector<PolarPoint> tracker;
+    vector<PolarPoint> clusterCenterPoints;
 };
 #endif  // LD06_H

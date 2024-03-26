@@ -4,7 +4,7 @@ void LidarLD06::Initialisation()
 {
     println("Init LidarLD06", LEVEL_INFO);
     scan.clear();
-    tracker.clear();
+    clusterCenterPoints.clear();
 
     // minDistance, maxDistance, minQuality, distanceThreshold, angleThreshold, countThreshold;
     Config(100, 1500, 200, 200, 0.8 * 5, 2);
@@ -85,7 +85,7 @@ void LidarLD06::SetRobotPosition(PolarPoint robot) { robotPosition = robot; }
 
 void LidarLD06::Update()
 {
-    tracker.clear();
+    clusterCenterPoints.clear();
     if (ReadSerial())
     {
         Analyze();
@@ -193,7 +193,7 @@ boolean LidarLD06::CheckContinuity()
     // save the last point to compare to the next packet's first point
     lidarLastPacket = lidarPacket;
 
-    if (delta > angleMaxDiscontinuity)
+    if (delta > ANGLE_MAX_DISCONTINUITY)
     {
         println("Discontinuity : ", (float)delta / 100, " deg", LEVEL_WARN);
         return false;
@@ -342,12 +342,7 @@ void LidarLD06::CheckCluster(PolarPoint polarPoint)
     }
 }
 
-void LidarLD06::ObstacleDetected(Cluster& c)
-{
-    // TODO Add to tracker
-    // tracker->track(mid, cluster.data, cluster.size);
-    tracker.push_back(c.mid);
-}
+void LidarLD06::ObstacleDetected(Cluster& c) { clusterCenterPoints.push_back(c.mid); }
 
 void LidarLD06::ComputeCenter(Cluster& c)
 {
