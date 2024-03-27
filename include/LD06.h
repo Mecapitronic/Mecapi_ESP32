@@ -153,16 +153,6 @@ class LidarLD06
      */
     void ComputeCenter(Cluster& c);
 
-    /**
-     * Find the circle on which the given three points lie
-     */
-    Point FindCircle(Point p1, Point p2, Point p3);
-
-    /**
-     * Find the circle on which the given three points coordinates lie
-     */
-    Point FindCircle(float x1, float y1, float x2, float y2, float x3, float y3);
-
    private:
     // counter of points while detecting an obstacle from data
     vector<Cluster> cluster;
