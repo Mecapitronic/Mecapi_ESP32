@@ -153,4 +153,23 @@ Command GetCommand()
     return cmd;
 }
 
+int64_t GetTimeNowMs()
+{
+    micros();
+    struct timeval tv_now;
+    gettimeofday(&tv_now, NULL);
+
+    int64_t time_ms = (int64_t)tv_now.tv_sec * 1000 + ((int64_t)tv_now.tv_usec / 1000);
+    return time_ms;
+}
+
+int64_t GetTimeNowUs()
+{
+    struct timeval tv_now;
+    gettimeofday(&tv_now, NULL);
+
+    int64_t time_us = (int64_t)tv_now.tv_sec * 1000000L + (int64_t)tv_now.tv_usec;
+    return time_us;
+}
+
 }  // namespace ESP32_Helper

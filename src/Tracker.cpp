@@ -54,7 +54,7 @@ void Tracker::Track(vector<PolarPoint>& newPoints)
         {
             PointTracker newPointTracker;
             newPointTracker.point = newPoint;
-            newPointTracker.lastUpdateTime = getTimeNowMs();
+            newPointTracker.lastUpdateTime = millis();
             newPointTracker.hasBeenSent = false;  // not yet sent to robot
             newPointTracker.confidence = 1;
             println("New point detected, add to tracked");
@@ -68,7 +68,7 @@ void Tracker::Track(vector<PolarPoint>& newPoints)
         if (best_match < config.hpf_cutoff)
         {
             println("This is exactly the same point, update only time");
-            trackedPoints[matching_point_index].lastUpdateTime = getTimeNowMs();
+            trackedPoints[matching_point_index].lastUpdateTime = millis();
             if (trackedPoints[matching_point_index].confidence < config.confidence)  // TODO param max confidence
             {
                 trackedPoints[matching_point_index].confidence++;
@@ -81,7 +81,7 @@ void Tracker::Track(vector<PolarPoint>& newPoints)
             print("  to ", newPoint, "");
             trackedPoints[matching_point_index].point = newPoint;
             trackedPoints[matching_point_index].hasBeenSent = false;
-            trackedPoints[matching_point_index].lastUpdateTime = getTimeNowMs();
+            trackedPoints[matching_point_index].lastUpdateTime = millis();
             if (trackedPoints[matching_point_index].confidence < config.confidence)
             {
                 trackedPoints[matching_point_index].confidence++;
@@ -130,22 +130,4 @@ void Tracker::untrackOldObstacles()
             print("Un-tracking point: ", trackPoint.point);
         }
     }
-}
-
-int64_t Tracker::getTimeNowMs()
-{
-    struct timeval tv_now;
-    gettimeofday(&tv_now, NULL);
-
-    int64_t time_ms = (int64_t)tv_now.tv_sec * 1000 + ((int64_t)tv_now.tv_usec / 1000);
-    return time_ms;
-}
-
-int64_t Tracker::getTimeNowUs()
-{
-    struct timeval tv_now;
-    gettimeofday(&tv_now, NULL);
-
-    int64_t time_us = (int64_t)tv_now.tv_sec * 1000000L + (int64_t)tv_now.tv_usec;
-    return time_us;
 }

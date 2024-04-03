@@ -94,20 +94,6 @@ class Tracker
      */
     void untrackOldObstacles();
 
-    /**
-     * @brief Get the current time with miliseconds precision
-     *
-     * @return int64_t current time in miliseconds
-     */
-    int64_t getTimeNowMs();
-
-    /**
-     * @brief Get the current time with microsecond precision
-     *
-     * @return int64_t current time in microseconds
-     */
-    int64_t getTimeNowUs();
-
     bool PointIsEqual(PolarPoint a, PolarPoint b);
 
    private:

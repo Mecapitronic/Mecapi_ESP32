@@ -33,5 +33,19 @@ void UpdateSerial();
 bool HasWaitingCommand();
 Command GetCommand();
 
+/**
+ * @brief Get the current time with miliseconds precision
+ *
+ * @return int64_t current time in miliseconds
+ */
+int64_t GetTimeNowMs();
+
+/**
+ * @brief Get the current time with microsecond precision
+ *
+ * @return int64_t current time in microseconds
+ */
+int64_t GetTimeNowUs();
+
 }  // namespace ESP32_Helper
 #endif// ESP32_HELPER_H
