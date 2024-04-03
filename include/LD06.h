@@ -7,6 +7,7 @@
 #define LD06_H
 
 #pragma region DEFINE
+#define PWM_PIN 23
 // Serial 2 : U2TX = GPIO17 (Not Used for LidarLD06 LD06); U2RX = GPIO16
 #define SERIAL_LIDAR Serial2
 // 47 = 1(Start) + 1(Datalen) + 2(Speed) + 2(StartAngle) + 36(12 * 3 DataByte) + 2(EndAngle) + 2(TimeStamp) + 1(CRC)

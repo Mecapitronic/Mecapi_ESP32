@@ -13,7 +13,7 @@ void LidarLD06::Initialisation()
     int pwmChannel = 0;     // Choisit le canal 0
     int frequence = 30000;  // Fréquence PWM de 30 KHz
     int resolution = 8;     // Résolution de 8 bits, 256 valeurs possibles
-    int pwmPin = 23;
+    int pwmPin = PWM_PIN;
 
     // Configuration du canal 0 avec la fréquence et la résolution choisie
     ledcSetup(pwmChannel, frequence, resolution);
