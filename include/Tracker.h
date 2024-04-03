@@ -6,21 +6,21 @@
 
 using namespace Printer;
 
-// maximal distance between to points to match them as the same point
-#define DEFAULT_LPF_CUTOFF 300.0  // a robot diameter ish~
+// maximal distance between to points to match them as the same cluster : a robot diameter ish~
+#define DEFAULT_LPF_CUTOFF 300.0
 
-// minimum movement needed to update position of tracked point
-#define DEFAULT_HPF_CUTOFF 50.0  // 5 cm
+// minimum movement needed to update position of tracked point : 5 cm
+#define DEFAULT_HPF_CUTOFF 50.0
 
 // number of time a point has been seen before trigger sending point to robot
 #define CONFIDENCE_TRIGGER 5
 
 /**
- * amount of time needed to delete a point from tracker
- * if it is not detected in this term
- * we choose 3 seconds, therefore 3000 miliseconds
+ * amount of time needed to decrement the confidence of a point from tracker
+ * if it is not detected in this time
+ * we make 10 turns each second, 1 turn every 100ms
  */
-#define IS_TOO_OLD 3000
+#define IS_TOO_OLD 3000  // TODO : adjust this to 200 ?
 
 struct ConfigTracker
 {
@@ -38,7 +38,7 @@ struct ConfigTracker
     float hpf_cutoff;
 
     /**
-     * @brief confidence number of time a point has been seen
+     * @brief Confidence : number of time a point has been seen
      * before trigger sending point to robot
      */
     int confidence;
@@ -68,31 +68,6 @@ class Tracker
      * in that case add it to list of tracked points
      */
     void Track(vector<PolarPoint>& newPoints);
-
-    /**
-     * @brief filter (low pass) the given point to search if it is already tracked
-     * search for the closest point: we assume it's the same point
-     * if the distance between a tracked point and newPoint is smaller than lpf_cutoff,
-     *
-     * @param newPoint
-     * @return int index of the matching point if the point is already tracked;
-     *  -1 if the point is not already tracked;
-     *  -2 if the point is tracked but shouldn't be updated
-     */
-    int findMatchingPoint(PolarPoint newPoint);
-
-    /**
-     * @brief send all tracked obstacles to robot
-     * TODO reduce amount of data sent by filtering not big enough changes
-     * TODO detect big changes not to send too much data
-     */
-    void sendObstaclesToRobot();
-
-    /**
-     * @brief Delete old obstacles from tracked list
-     * if the object has not been updated for IS_TOO_OLD time we should stop tracking it
-     */
-    void untrackOldObstacles();
 
     bool PointIsEqual(PolarPoint a, PolarPoint b);
 

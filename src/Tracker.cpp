@@ -69,7 +69,7 @@ void Tracker::Track(vector<PolarPoint>& newPoints)
         {
             println("This is exactly the same point, update only time");
             trackedPoints[matching_point_index].lastUpdateTime = millis();
-            if (trackedPoints[matching_point_index].confidence < config.confidence)  // TODO param max confidence
+            if (trackedPoints[matching_point_index].confidence < 20)  // TODO param max confidence
             {
                 trackedPoints[matching_point_index].confidence++;
             }
@@ -82,7 +82,7 @@ void Tracker::Track(vector<PolarPoint>& newPoints)
             trackedPoints[matching_point_index].point = newPoint;
             trackedPoints[matching_point_index].hasBeenSent = false;
             trackedPoints[matching_point_index].lastUpdateTime = millis();
-            if (trackedPoints[matching_point_index].confidence < config.confidence)
+            if (trackedPoints[matching_point_index].confidence < 20)  // TODO param max confidence
             {
                 trackedPoints[matching_point_index].confidence++;
             }
@@ -90,44 +90,33 @@ void Tracker::Track(vector<PolarPoint>& newPoints)
     }
 }
 
+bool confidenceCompare(PointTracker p1, PointTracker p2) { return (p1.confidence < p2.confidence); }
+
 void Tracker::Update()
 {
-    sendObstaclesToRobot();
-    untrackOldObstacles();
-}
+    for (auto& trackPoint : trackedPoints)
+    {
+        if (millis() - trackPoint.lastUpdateTime > IS_TOO_OLD)
+        {
+            // decrement is faster then increment
+            trackPoint.confidence -= 2;
+            // update the time to not decrement to fast
+            trackPoint.lastUpdateTime = millis();
+        }
+    }
+    // Reorder with the max confidence at first
+    // sort(trackedPoints.begin(), trackedPoints.end(), confidenceCompare);
 
-void Tracker::sendObstaclesToRobot()
-{
-    String varName = "obs";
+    // int index = 0;
     for (auto& trackPoint : trackedPoints)
     {
         if (!trackPoint.hasBeenSent && trackPoint.confidence > config.confidence)
         {
-            // robot.WriteSerial(trackPoint.index, trackPoint.point);
+            // robot.WriteSerial(index, trackPoint.point);
             trackPoint.hasBeenSent = true;
-            // plotPolarPoint(trackPoint.point, varName + String(trackPoint.index));
+            plotPolarPoint(trackPoint.point, "obs" /* + String(index)*/, LEVEL_WARN);
             // print("TrackPoint: ", trackPoint);
-        }
-    }
-}
-
-void Tracker::untrackOldObstacles()
-{
-    String varName = "obs";
-    // iterate to find matching point to the predicate
-    for (auto& trackPoint : trackedPoints)
-    {
-        if (!PointIsEqual(trackPoint.point, {0, 0}) && getTimeNowMs() - trackPoint.lastUpdateTime > IS_TOO_OLD)
-        {
-            // TODO decrement confidence when the point has not been seen for a long time
-            // decrement should be faster then increment
-            // e.g -2 every 300ms
-            // trackPoint.point = {0, 0};
-            //  TODO Remove from vector if confidence is dropped too low
-            //   robot.WriteSerial(trackPoint.index, {0, 0});
-
-            // plotPoint({0, 0}, varName + trackPoint.index);
-            print("Un-tracking point: ", trackPoint.point);
+            // index++;
         }
     }
 }

@@ -5,6 +5,8 @@ void setup()
     // put your setup code here, to run once:
     ESP32_Helper::ESP32_Helper();
 
+    Printer::PrintLevel(LEVEL_WARN);
+
     // myQueue = xQueueCreate(queueSize, sizeof(PolarPoint));
     myQueue = xQueueCreate(queueSize, sizeof(uint8_t));
 
@@ -90,6 +92,31 @@ void loop()
     delay(1000);
 }
 
+void functionChrono(int nbrLoop)
+{
+    unsigned long startChrono = micros();
+    for (int i = 0; i < nbrLoop; i++)
+    {
+        // function or code to loop
+    }
+    unsigned long endChrono = micros();
+    unsigned long deltaChrono = endChrono - startChrono;
+
+    unsigned long chrono = deltaChrono / nbrLoop;
+    Serial.print("Chrono from ");
+    Serial.print(nbrLoop);
+    Serial.print(" loop is : ");
+    Serial.print(deltaChrono);
+    Serial.print(" µs total or ");
+    Serial.print(deltaChrono / 1000);
+    Serial.print(" ms total.    ");
+    Serial.print(chrono);
+    Serial.print(" µs/func or ");
+    Serial.print(chrono / 1000);
+    Serial.print(" ms/func.");
+    Serial.println();
+}
+
 // Note the 1 Tick delay, this is need so the watchdog doesn't get confused
 void Task1code(void *pvParameters)
 {
@@ -150,8 +177,8 @@ void Task1code(void *pvParameters)
             ld06.SetRobotPosition(robot.GetPosition());
             ld06.Update();
 
-            plotScanXY(ld06.scan, "scan");
-            plotScanTD(ld06.scan, "lidar");
+            plotScanXY(ld06.scan, "scan", LEVEL_WARN);
+            //plotScanTD(ld06.scan, "lidar");
             ld06.scan.clear();
 
             tracker.Track(ld06.clusterCenterPoints);

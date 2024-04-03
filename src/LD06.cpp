@@ -330,7 +330,7 @@ void LidarLD06::CheckCluster(PolarPoint polarPoint)
                 print("Obstacle Detected mid Polar: ", cluster[i].mid);
                 plotPolarPoint(cluster[i].mid, "MidPolar" + String(cluster[i].index));
                 ObstacleDetected(cluster[i]);
-                plotScanXY(cluster[i].data, "cluster" + String(cluster[i].index));
+                plotScanXY(cluster[i].data, "cluster", LEVEL_WARN);
             }
             iterators.push_back(cluster.begin() + i);
         }
