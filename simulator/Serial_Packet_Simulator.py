@@ -80,12 +80,16 @@ def main(serial_if: str, file: str):
     #sockTCP.connect(loopback)
     #sockTCP.settimeout(0.1)
     packets = packets_from_file(Path(data_file))
+    packetNum=0
     print(f"Sending packets...")
     for packet in packets:
         send_packet(bytes.fromhex(packet), serial_if)
         print(f"{packets.index(packet)}/{len(packets)}", end="\r")
-        time.sleep(0.04)
-        # 1s / (360°/0.8°/12) = 0,026
+        time.sleep(0.026)
+        packetNum=packetNum+1
+        # 1s / (360°/0.8°/12points) = 1s / 37.5 packets = 0,026 s/packet
+        if packetNum >37:
+            packetNum = 0 #put breakpoint here to send 1 complete turn
     print("All data sent")
 
 
