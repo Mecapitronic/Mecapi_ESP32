@@ -15,6 +15,9 @@ using namespace Printer;
 // number of time a point has been seen before trigger sending point to robot
 #define CONFIDENCE_TRIGGER 5
 
+// maximum number of time a point has been seen
+#define CONFIDENCE_MAXIMUM 50
+
 /**
  * amount of time needed to decrement the confidence of a point from tracker
  * if it is not detected in this time
@@ -38,10 +41,15 @@ struct ConfigTracker
     float hpf_cutoff;
 
     /**
-     * @brief Confidence : number of time a point has been seen
+     * @brief ConfidenceTrigger : number of time a point has been seen
      * before trigger sending point to robot
      */
-    int confidence;
+    int confidenceTrigger;
+
+    /**
+     * @brief Confidence Maximum : Maximum number of time a point has been seen
+     */
+    int confidenceMax;
 };
 
 /**
@@ -58,9 +66,10 @@ class Tracker
      *
      * @param lpf_cutoff_distance maximal distance between to points to match them as the same point
      * @param hpf_cutoff_distance minimum movement needed to update position of tracked point
-     * @param confidence number of time a point has been seen before trigger sending point to robot
+     * @param confidenceTrigger number of time a point has been seen before trigger sending point to robot
+     * @param confidenceMax maximum number of time a point has been seen
      */
-    void Config(float lpf_cutoff_distance, float hpf_cutoff_distance, int confidence);
+    void Config(float lpf_cutoff_distance, float hpf_cutoff_distance, int confidenceTrigger, int confidenceMax);
 
     /**
      * @brief send new point to tracker
@@ -79,6 +88,6 @@ class Tracker
      */
     vector<PointTracker> trackedPoints;
 
-    ConfigTracker config = {0, 0, 0};
+    ConfigTracker config = {0, 0, 0, 0};
 };
 #endif  // TRACKER_H

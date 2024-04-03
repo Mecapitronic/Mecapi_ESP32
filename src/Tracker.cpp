@@ -3,19 +3,21 @@
 void Tracker::Initialisation()
 {
     println("Init Tracker", LEVEL_INFO);
-    Config(DEFAULT_LPF_CUTOFF, DEFAULT_HPF_CUTOFF, CONFIDENCE_TRIGGER);
+    Config(DEFAULT_LPF_CUTOFF, DEFAULT_HPF_CUTOFF, CONFIDENCE_TRIGGER, CONFIDENCE_MAXIMUM);
     trackedPoints.clear();
 }
 
-void Tracker::Config(float lpf_cutoff_distance, float hpf_cutoff_distance, int confidence)
+void Tracker::Config(float lpf_cutoff_distance, float hpf_cutoff_distance, int confidenceTrigger, int confidenceMax)
 {
     config.lpf_cutoff = lpf_cutoff_distance;
     config.hpf_cutoff = hpf_cutoff_distance;
-    config.confidence = confidence;
+    config.confidenceTrigger = confidenceTrigger;
+    config.confidenceMax = confidenceMax;
 
     println("Track new point if nothing close enough: ", config.lpf_cutoff, " mm", LEVEL_INFO);
     println("Ignore movements under ", config.hpf_cutoff, " mm", LEVEL_INFO);
-    println("Confidence trigger for sending tracking point to robot: ", config.confidence, " times", LEVEL_INFO);
+    println("Confidence trigger for sending tracking point to robot: ", config.confidenceTrigger, " times", LEVEL_INFO);
+    println("Confidence Maximum: ", config.confidenceMax, "", LEVEL_INFO);
 }
 
 bool Tracker::PointIsEqual(PolarPoint a, PolarPoint b) { return (a.x == b.x && a.y == b.y); }
@@ -69,7 +71,7 @@ void Tracker::Track(vector<PolarPoint>& newPoints)
         {
             println("This is exactly the same point, update only time");
             trackedPoints[matching_point_index].lastUpdateTime = millis();
-            if (trackedPoints[matching_point_index].confidence < 20)  // TODO param max confidence
+            if (trackedPoints[matching_point_index].confidence < config.confidenceMax)
             {
                 trackedPoints[matching_point_index].confidence++;
             }
@@ -82,7 +84,7 @@ void Tracker::Track(vector<PolarPoint>& newPoints)
             trackedPoints[matching_point_index].point = newPoint;
             trackedPoints[matching_point_index].hasBeenSent = false;
             trackedPoints[matching_point_index].lastUpdateTime = millis();
-            if (trackedPoints[matching_point_index].confidence < 20)  // TODO param max confidence
+            if (trackedPoints[matching_point_index].confidence < config.confidenceMax)
             {
                 trackedPoints[matching_point_index].confidence++;
             }
@@ -110,7 +112,7 @@ void Tracker::Update()
     // int index = 0;
     for (auto& trackPoint : trackedPoints)
     {
-        if (!trackPoint.hasBeenSent && trackPoint.confidence > config.confidence)
+        if (!trackPoint.hasBeenSent && trackPoint.confidence > config.confidenceTrigger)
         {
             // robot.WriteSerial(index, trackPoint.point);
             trackPoint.hasBeenSent = true;
