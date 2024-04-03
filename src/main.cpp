@@ -5,7 +5,7 @@ void setup()
     // put your setup code here, to run once:
     ESP32_Helper::ESP32_Helper();
 
-    Printer::PrintLevel(LEVEL_WARN);
+    Printer::PrintLevel();
 
     // myQueue = xQueueCreate(queueSize, sizeof(PolarPoint));
     myQueue = xQueueCreate(queueSize, sizeof(uint8_t));
