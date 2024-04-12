@@ -7,7 +7,7 @@ void LidarLD06::Initialisation()
     clusterCenterPoints.clear();
 
     // minDistance, maxDistance, minQuality, distanceThreshold, angleThreshold
-    Config(100, 1500, 200, 200, 0.8 * 5);
+    Config(50, 2500, 200, 100, 0.8 * 5);
     SERIAL_LIDAR.begin(230400);
 
     int pwmChannel = 0;     // Choisit le canal 0
@@ -236,15 +236,24 @@ void LidarLD06::AggregatePoint(PolarPoint polarPoint)
     for (auto& c : cluster)
     {
         //  cluster empty or polarPoint inside cluster
-        if (c.data.size() == 0 ||
-            (abs(c.data.back().distance - polarPoint.distance) < lidarConfig.distanceThreshold &&
-             abs((int)(c.data.back().angle)) - abs((int)(polarPoint.angle)) < lidarConfig.angleThreshold * 100))
+
+        float angle = 0;
+        if (c.data.back().angle >= polarPoint.angle)
+            angle = fabsf(c.data.back().angle - polarPoint.angle);
+        else
+            angle = fabsf(c.data.back().angle + 360 * 100 - polarPoint.angle);
+
+        if (c.data.size() == 0 || (abs(c.data.back().distance - polarPoint.distance) < lidarConfig.distanceThreshold &&
+                                   (int)(angle) < lidarConfig.angleThreshold * 100))
         {
             c.data.push_back(polarPoint);
             // recalculate the average point of the cluster
-            c.mid.angle = (c.mid.angle * (c.data.size() - 1) + polarPoint.angle) / c.data.size();
+            // CAN'T GET ANGLE AVERAGE WITH CLUSTER START BEFORE 360° AND FINISH AFTER 0°
+            // c.mid.angle = (c.mid.angle * (c.data.size() - 1) + polarPoint.angle) / c.data.size();
             c.mid.distance = (c.mid.distance * (c.data.size() - 1) + polarPoint.distance) / c.data.size();
-            // exist for as we fond which cluster the point is inside
+            c.mid.x = (c.mid.x * (c.data.size() - 1) + polarPoint.x) / c.data.size();
+            c.mid.y = (c.mid.y * (c.data.size() - 1) + polarPoint.y) / c.data.size();
+            // exit as we found which cluster the point is inside
             clusterFounded = true;
             break;
         }
@@ -262,60 +271,81 @@ void LidarLD06::AggregatePoint(PolarPoint polarPoint)
 void LidarLD06::CheckCluster(PolarPoint polarPoint)
 {
     println("Last Angle : ", polarPoint.angle);
-    vector<vector<Cluster>::iterator> iterators;
 
     // TODO to be replaced by : for (auto& c : cluster)
-    for (int i = cluster.size() - 1; i >= 0; i--)
+    int i = 0;
+    for (auto& c : cluster)
     {
-        println("Cluster Angle : ", cluster[i].data[cluster[i].data.size() - 1].angle);
+        println("Cluster Angle : ", c.data.back().angle);
         // the angle are descending
-        float angle = cluster[i].data[cluster[i].data.size() - 1].angle - 10 * 100;
-        if (angle < 0)
-            angle += 360 * 100;
 
-        PolarToCartesian(cluster[i].mid);
+        float angle = 0;
+        if (c.data.back().angle >= polarPoint.angle)
+            angle = fabsf(c.data.back().angle - polarPoint.angle);
+        else
+            angle = fabsf(c.data.back().angle + 360 * 100 - polarPoint.angle);
 
-        if (polarPoint.angle < angle)
+        // Do we consider this cluster finished ?
+        if ((int)(angle) > lidarConfig.angleThreshold * 100 * 2)  // TODO : put this into config ?
         {
-            print("Cluster N° ", cluster[i].index);
-            println(" with Size ", cluster[i].data.size(), " will be checked");
+            print("Cluster N° ", c.index);
+            println(" with Size ", c.data.size(), " will be checked");
 
-            // Minimum amount of points needed for a 60 mm balise's diameter //TODO var 60
-            float minPoint = ((60 * 180) / (PI * cluster[i].mid.distance)) / 0.8;
-            println("Min point : ", minPoint);
-            // Maximum amount of points needed for a 120 mm balise's diameter //TODO var 120
-            float maxPoint = ((120 * 180) / (PI * cluster[i].mid.distance)) / 0.8;
-            println("Max point : ", maxPoint);
+            // Minimum amount of points needed for a 60 mm balise's diameter //TODO var 60 too permissive ?
+            float minPoint = ((70 * 180) / (PI * c.mid.distance)) / 0.8;
+            // Maximum amount of points needed for a 120 mm balise's diameter //TODO var 120 too permissive ?
+            float maxPoint = ((100 * 180) / (PI * c.mid.distance)) / 0.8;
 
             // Arc Length s = 2 π r(θ / 360°)
-            // TODO check for > 360°
-            float angle = fabsf(cluster[i].data.front().angle - cluster[i].data.back().angle) / 100;
-            float arc = (angle * cluster[i].mid.distance) * PI / 180;
-            println("Arc length : ", arc);
+            float angle = 0;
+            if (c.data.front().angle >= c.data.back().angle)
+                angle = fabsf(c.data.front().angle - c.data.back().angle) / 100;
+            else
+                angle = fabsf(c.data.front().angle + 360 * 100 - c.data.back().angle) / 100;
+            float arc = (angle * c.mid.distance) * PI / 180;
 
             // At 300mm we need 20 points, at 1000mm we need 10 points, at 1500mm 5 points
 
-            if (cluster[i].data.size() < 3)
+            if (c.data.size() < 3)
             {
                 println("Absolutely not enough points !");
             }
-            else if (cluster[i].data.size() > ceil(maxPoint))
+            else if (c.data.size() > ceil(maxPoint))
             {
-                println("Too many points");
+                println("Too many points : ", c.data.size(), "", LEVEL_WARN);
+                println(">distance:", c.mid.distance, "", LEVEL_WARN);
+                println(">Min_point:", minPoint, "", LEVEL_WARN);
+                println(">Max_point:", maxPoint, "", LEVEL_WARN);
+                println(">Arc_length:", arc, "", LEVEL_WARN);
+                println(">front:", c.data.front().angle, "", LEVEL_WARN);
+                println(">back:", c.data.back().angle, "", LEVEL_WARN);
             }
-            else if (cluster[i].data.size() < floor(minPoint))
+            else if (c.data.size() < floor(minPoint))
             {
-                println("Not enough points");
+                println("Not enough points : ", c.data.size(), "", LEVEL_WARN);
+                println(">distance:", c.mid.distance, "", LEVEL_WARN);
+                println(">Min_point:", minPoint, "", LEVEL_WARN);
+                println(">Max_point:", maxPoint, "", LEVEL_WARN);
+                println(">Arc_length:", arc, "", LEVEL_WARN);
+                println(">front:", c.data.front().angle, "", LEVEL_WARN);
+                println(">back:", c.data.back().angle, "", LEVEL_WARN);
             }
             else
             {
+                println(">distance:", c.mid.distance, "", LEVEL_WARN);
+                println(">Min_point:", minPoint, "", LEVEL_WARN);
+                println(">Max_point:", maxPoint, "", LEVEL_WARN);
+                println(">size:", c.data.size(), "", LEVEL_WARN);
+                println(">Arc_length:", arc, "", LEVEL_WARN);
+                println(">front:", c.data.front().angle, "", LEVEL_WARN);
+                println(">back:", c.data.back().angle, "", LEVEL_WARN);
                 /*
-                float s = (angle * cluster[i].mid.distance) * PI / 180;
-                float theta1 = (60 * 180) / (PI * cluster[i].mid.distance);
-                float theta2 = (80 * 180) / (PI * cluster[i].mid.distance);
-                float theta3 = (100 * 180) / (PI * cluster[i].mid.distance);
-                float theta4 = (110 * 180) / (PI * cluster[i].mid.distance);
-                float theta5 = (120 * 180) / (PI * cluster[i].mid.distance);
+                float s = (angle * c.mid.distance) * PI / 180;
+                float theta1 = (60 * 180) / (PI * c.mid.distance);
+                float theta2 = (80 * 180) / (PI * c.mid.distance);
+                float theta3 = (100 * 180) / (PI * c.mid.distance);
+                float theta4 = (110 * 180) / (PI * c.mid.distance);
+                float theta5 = (120 * 180) / (PI * c.mid.distance);
                 print("θ1 : ", theta1);
                 println(" points : ", (float)(theta1 / 0.8));
                 print("θ2 : ", theta2);
@@ -328,19 +358,20 @@ void LidarLD06::CheckCluster(PolarPoint polarPoint)
                 println(" points : ", (float)(theta5 / 0.8));
                 */
 
-                print("Obstacle Detected mid Polar: ", cluster[i].mid);
-                plotPolarPoint(cluster[i].mid, "Mid", LEVEL_WARN);
-                ObstacleDetected(cluster[i]);
-                plotScanXY(cluster[i].data, "cluster", LEVEL_WARN);
+                print("Obstacle Detected mid Polar: ", c.mid);
+                plotPolarPoint(c.mid, "Mid", LEVEL_WARN);
+                ObstacleDetected(c);
+                plotScanXY(c.data, "cluster", LEVEL_WARN);
             }
-            iterators.push_back(cluster.begin() + i);
+            // Zeroing the mid point to remove this cluster later
+            c.mid = {0, 0};
         }
+        i++;
     }
-
-    for (auto& it : iterators)
-    {
-        cluster.erase(it);
-    }
+    // Removing the cluster checked
+    cluster.erase(
+        remove_if(cluster.begin(), cluster.end(), [](Cluster const& c) { return (c.mid.x == 0 && c.mid.y == 0); }),
+        cluster.end());
 }
 
 void LidarLD06::ObstacleDetected(Cluster& c) { clusterCenterPoints.push_back(c.mid); }

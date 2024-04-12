@@ -18,6 +18,8 @@ Robot robot;
 Tracker tracker;
 testModule test;
 
+PolarPoint MapBoundaries[] = {{0, 0}, {0, 2000}, {3000, 2000}, {3000, 0}};
+
 #endif
 
 #ifdef A010

@@ -22,6 +22,10 @@ void setup()
     delay(500);
     tracker.Initialisation();
     delay(500);
+
+    plotRobot(robot.GetPosition(), LEVEL_WARN);
+    plotPolarPoints(MapBoundaries, 4, "MapBoundaries", LEVEL_WARN);
+
 #endif
 
 #ifdef A010
@@ -118,7 +122,6 @@ void functionChrono(int nbrLoop)
 }
 
 int64_t lastSendTime = millis();
-PolarPoint fixeScale[] = {{0, 0}, {0, 2000}, {3000, 2000}, {3000, 0}};
 // Note the 1 Tick delay, this is need so the watchdog doesn't get confused
 void Task1code(void *pvParameters)
 {
@@ -186,10 +189,10 @@ void Task1code(void *pvParameters)
             tracker.Track(ld06.clusterCenterPoints);
             tracker.Update();
 
-            if (millis() - lastSendTime > 10000)
+            if (millis() - lastSendTime > 30000)
             {
                 lastSendTime = millis();
-                plotPolarPoints(fixeScale, 4, "fixeScale", LEVEL_WARN);
+                plotPolarPoints(MapBoundaries, 4, "fixeScale", LEVEL_WARN);
                 plotRobot(robot.GetPosition(), LEVEL_WARN);
             }
 #endif
@@ -231,8 +234,8 @@ void Task1code(void *pvParameters)
         }
         catch (std::exception const &e)
         {
-            print("error : ");
-            println(e.what());
+            print("error : ", LEVEL_ERROR);
+            println(e.what(), LEVEL_ERROR);
         }
         vTaskDelay(1);
     }
@@ -294,7 +297,18 @@ void Task2code(void *pvParameters)
                         // TODO : make a function for reading commands
                     */
                 }
-                else if (cmd.cmd.startsWith("A010"))
+                else if (cmd.cmd == ("RobotPosition"))
+                {
+                    plotRobot(robot.GetPosition(), LEVEL_WARN);
+                }
+                else if (cmd.cmd == ("MapBoundaries"))
+                {
+                    plotPolarPoints(MapBoundaries, 4, "MapBoundaries", LEVEL_WARN);
+                }
+#endif
+
+#ifdef A010
+                if (cmd.cmd.startsWith("A010"))
                 {
                     // a010.HandleCommand(cmd);
                     //  String s = cmd.cmd;
@@ -306,8 +320,8 @@ void Task2code(void *pvParameters)
         }
         catch (std::exception const &e)
         {
-            print("error : ");
-            println(e.what());
+            print("error : ", LEVEL_ERROR);
+            println(e.what(), LEVEL_ERROR);
         }
         vTaskDelay(1);
     }

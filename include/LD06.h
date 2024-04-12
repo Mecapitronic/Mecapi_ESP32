@@ -69,9 +69,9 @@ class LidarLD06
      *
      * @param min (int) do not detect points closer than min distance (mm)
      * @param max (int) do not detect points further than max distance (mm)
-     * @param quality (int) minimum confidence required to consider the detected point (%)
-     * @param distance (int) distance threshold (mm)
-     * @param angle (int) angle threshold (°)
+     * @param quality (int) minimum confidence required to consider the detected point (0-255)
+     * @param distance (int) distance threshold (mm) to change cluster
+     * @param angle (int) angle threshold (°) to change cluster
      */
     void Config(int min, int max, int quality, int distance, int angle);
 
