@@ -271,7 +271,7 @@ void Task2code(void *pvParameters)
                 }
                 else if (cmd.cmd == ("RobotXYA"))
                 {
-                    // RobotXYA:0000;0000;00000
+                    // RobotXYA:1000;1500;00000
                     robot.SetPosition(cmd.data[0], cmd.data[1], cmd.data[2]);
                     print("Robot Position : ", robot.GetPosition());
                 }

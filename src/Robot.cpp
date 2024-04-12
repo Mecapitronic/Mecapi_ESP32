@@ -4,8 +4,7 @@ void Robot::Initialisation()
 {
     println("Init Robot");
 
-    //! TODO put robot in middle of map at start ?
-    position = {0.0, 0, 0, 0.0, 0.0};
+    position = {0.0, 0, 0, 1500.0, 1000.0};
     print("Robot Position : ", position, "", LEVEL_INFO);
     cursorTmp = 0;
     for (size_t i = 0; i < ROBOT_SERIAL_PACKET_SIZE; i++)

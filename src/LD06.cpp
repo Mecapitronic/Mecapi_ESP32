@@ -214,12 +214,13 @@ void LidarLD06::PolarToCartesian(PolarPoint& polarPoint)
 
 bool LidarLD06::IsOutsideTable(PolarPoint polarPoint)
 {
-    // the margin represents the distance between the center of the obstacle
-    // and the edges of the table (which is 3000mm long and 2000mm large)
-    const float table_margin = 100;
-    //! TODO : Remove -5000 (it's for test) and put correct map boundaries
-    return (polarPoint.x < -5000 + table_margin || polarPoint.x > 5000 - table_margin ||
-            polarPoint.y < -5000 + table_margin || polarPoint.y > 5000 - table_margin);
+    // margin is positive : we can see until the wall minus the margin distance inside the map
+    // margin is 0 : we see points until the walls
+    // margin is negative : we can see up to the wall plus the margin distance outside the map
+    // (ex : for fixed beacon)
+    const float table_margin = 0;
+    return (polarPoint.x < 0 + table_margin || polarPoint.x > 3000 - table_margin || polarPoint.y < 0 + table_margin ||
+            polarPoint.y > 2000 - table_margin);
 }
 
 bool LidarLD06::IsOutsideConfig(PolarPoint polarPoint)
