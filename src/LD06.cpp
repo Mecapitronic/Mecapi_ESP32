@@ -6,8 +6,8 @@ void LidarLD06::Initialisation()
     scan.clear();
     clusterCenterPoints.clear();
 
-    // minDistance, maxDistance, minQuality, distanceThreshold, angleThreshold, countThreshold;
-    Config(100, 1500, 200, 200, 0.8 * 5, 2);
+    // minDistance, maxDistance, minQuality, distanceThreshold, angleThreshold
+    Config(100, 1500, 200, 200, 0.8 * 5);
     SERIAL_LIDAR.begin(230400);
 
     int pwmChannel = 0;     // Choisit le canal 0
@@ -28,7 +28,7 @@ void LidarLD06::Initialisation()
     ledcWrite(pwmChannel, duty);
 }
 
-void LidarLD06::Config(int min = -1, int max = -1, int quality = -1, int distance = -1, int angle = -1, int count = -1)
+void LidarLD06::Config(int min = -1, int max = -1, int quality = -1, int distance = -1, int angle = -1)
 {
     if (min != -1)
     {

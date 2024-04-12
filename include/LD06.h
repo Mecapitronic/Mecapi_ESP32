@@ -49,7 +49,7 @@ struct PacketLidar
 
 /**
  * Represent a cluster of points, with the average of all point
- * The maximum points needed to represent a 70mm wide cylinder is 20
+ * The maximum points needed to represent a 80mm wide cylinder is 20
  */
 struct Cluster
 {
@@ -72,9 +72,8 @@ class LidarLD06
      * @param quality (int) minimum confidence required to consider the detected point (%)
      * @param distance (int) distance threshold (mm)
      * @param angle (int) angle threshold (°)
-     * @param count (int) count threshold (num)
      */
-    void Config(int min, int max, int quality, int distance, int angle, int count);
+    void Config(int min, int max, int quality, int distance, int angle);
 
     /**
      * Get LidarLD06 Configuration
@@ -150,7 +149,7 @@ class LidarLD06
     /**
      * Compute the center of the points aggregated
      * computes the mean of all points position to approximate circle center (without offset)
-     * based on the fact that it is a cylinder of 70mm diameter
+     * based on the fact that it is a cylinder of 80mm diameter
      */
     void ComputeCenter(Cluster& c);
 
