@@ -1,0 +1,177 @@
+{
+   "widgets": [
+      {
+         "type": "chart",
+         "gridPos": {
+            "h": 12,
+            "w": 6,
+            "x": 0,
+            "y": 0
+         },
+         "series": [
+            {
+               "name": "cluster",
+               "sourceNames": [
+                  "cluster"
+               ],
+               "formula": "",
+               "options": {
+                  "_serie": "cluster",
+                  "stroke": "rgba(231,76,60,1)",
+                  "fill": "rgba(231,76,60,0.1)"
+               },
+               "type": "xy"
+            },
+            {
+               "name": "Mid",
+               "sourceNames": [
+                  "Mid"
+               ],
+               "formula": "",
+               "options": {
+                  "_serie": "Mid",
+                  "stroke": "rgba(52,152,219,1)",
+                  "fill": "rgba(52,152,219,0.1)"
+               },
+               "type": "xy"
+            }
+         ]
+      },
+      {
+         "type": "chart",
+         "gridPos": {
+            "h": 6,
+            "w": 6,
+            "x": 0,
+            "y": 0
+         },
+         "series": [
+            {
+               "name": "distance",
+               "sourceNames": [
+                  "distance"
+               ],
+               "formula": "",
+               "options": {
+                  "_serie": "distance",
+                  "stroke": "rgba(231,76,60,1)",
+                  "fill": "rgba(231,76,60,0.1)"
+               },
+               "type": "number"
+            }
+         ]
+      },
+      {
+         "type": "chart",
+         "gridPos": {
+            "h": 6,
+            "w": 6,
+            "x": 0,
+            "y": 0
+         },
+         "series": [
+            {
+               "name": "Min_point",
+               "sourceNames": [
+                  "Min_point"
+               ],
+               "formula": "",
+               "options": {
+                  "_serie": "Min_point",
+                  "stroke": "rgba(231,76,60,1)",
+                  "fill": "rgba(231,76,60,0.1)"
+               },
+               "type": "number"
+            },
+            {
+               "name": "Max_point",
+               "sourceNames": [
+                  "Max_point"
+               ],
+               "formula": "",
+               "options": {
+                  "_serie": "Max_point",
+                  "stroke": "rgba(52,152,219,1)",
+                  "fill": "rgba(52,152,219,0.1)"
+               },
+               "type": "number"
+            },
+            {
+               "name": "size",
+               "sourceNames": [
+                  "size"
+               ],
+               "formula": "",
+               "options": {
+                  "_serie": "size",
+                  "stroke": "rgba(46,204,113,1)",
+                  "fill": "rgba(46,204,113,0.1)"
+               },
+               "type": "number"
+            }
+         ]
+      },
+      {
+         "type": "chart",
+         "gridPos": {
+            "h": 6,
+            "w": 6,
+            "x": 0,
+            "y": 0
+         },
+         "series": [
+            {
+               "name": "Arc_length",
+               "sourceNames": [
+                  "Arc_length"
+               ],
+               "formula": "",
+               "options": {
+                  "_serie": "Arc_length",
+                  "stroke": "rgba(231,76,60,1)",
+                  "fill": "rgba(231,76,60,0.1)"
+               },
+               "type": "number"
+            }
+         ]
+      },
+      {
+         "type": "chart",
+         "gridPos": {
+            "h": 6,
+            "w": 6,
+            "x": 0,
+            "y": 0
+         },
+         "series": [
+            {
+               "name": "front",
+               "sourceNames": [
+                  "front"
+               ],
+               "formula": "",
+               "options": {
+                  "_serie": "front",
+                  "stroke": "rgba(231,76,60,1)",
+                  "fill": "rgba(231,76,60,0.1)"
+               },
+               "type": "number"
+            },
+            {
+               "name": "back",
+               "sourceNames": [
+                  "back"
+               ],
+               "formula": "",
+               "options": {
+                  "_serie": "back",
+                  "stroke": "rgba(52,152,219,1)",
+                  "fill": "rgba(52,152,219,0.1)"
+               },
+               "type": "number"
+            }
+         ]
+      }
+   ],
+   "viewDuration": "1"
+}

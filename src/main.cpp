@@ -5,7 +5,7 @@ void setup()
     // put your setup code here, to run once:
     ESP32_Helper::ESP32_Helper();
 
-    Printer::PrintLevel();
+    Printer::PrintLevel(LEVEL_WARN);
 
     // myQueue = xQueueCreate(queueSize, sizeof(PolarPoint));
     myQueue = xQueueCreate(queueSize, sizeof(uint8_t));
@@ -117,6 +117,8 @@ void functionChrono(int nbrLoop)
     Serial.println();
 }
 
+int64_t lastSendTime = millis();
+PolarPoint fixeScale[] = {{0, 0}, {0, 2000}, {3000, 2000}, {3000, 0}};
 // Note the 1 Tick delay, this is need so the watchdog doesn't get confused
 void Task1code(void *pvParameters)
 {
@@ -184,6 +186,12 @@ void Task1code(void *pvParameters)
             tracker.Track(ld06.clusterCenterPoints);
             tracker.Update();
 
+            if (millis() - lastSendTime > 10000)
+            {
+                lastSendTime = millis();
+                plotPolarPoints(fixeScale, 4, "fixeScale", LEVEL_WARN);
+                plotRobot(robot.GetPosition(), LEVEL_WARN);
+            }
 #endif
 
 #ifdef A010
