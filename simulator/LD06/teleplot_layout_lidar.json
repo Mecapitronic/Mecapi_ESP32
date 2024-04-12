@@ -34,6 +34,32 @@
                   "fill": "rgba(52,152,219,0.1)"
                },
                "type": "xy"
+            },
+            {
+               "name": "MapBoundaries",
+               "sourceNames": [
+                  "MapBoundaries"
+               ],
+               "formula": "",
+               "options": {
+                  "_serie": "MapBoundaries",
+                  "stroke": "rgba(46,204,113,1)",
+                  "fill": "rgba(46,204,113,0.1)"
+               },
+               "type": "xy"
+            },
+            {
+               "name": "robot",
+               "sourceNames": [
+                  "robot"
+               ],
+               "formula": "",
+               "options": {
+                  "_serie": "robot",
+                  "stroke": "rgba(155,89,182,1)",
+                  "fill": "rgba(155,89,182,0.1)"
+               },
+               "type": "xy"
             }
          ]
       },
