@@ -92,15 +92,12 @@ void Tracker::Track(vector<PolarPoint>& newPoints)
     }
 }
 
-bool confidenceCompare(PointTracker p1, PointTracker p2) { return (p1.confidence < p2.confidence); }
-
 void Tracker::Update()
 {
-    vector<vector<PointTracker>::iterator> iterators;
     int index = 0;
     for (auto& trackPoint : trackedPoints)
     {
-        // TODO plutôt que de faire avec le temps, faire avec le nombre de tours du lidar
+        // TODO plutôt que de faire avec le temps, faire avec le nombre de tours du lidar ?
         if (millis() - trackPoint.lastUpdateTime > IS_TOO_OLD)
         {
             // decrement is faster then increment
@@ -112,21 +109,18 @@ void Tracker::Update()
             }
             else
             {
-                iterators.push_back(trackedPoints.begin() + index);
+                // Will be removed later
             }
         }
         index++;
     }
 
-    for (auto& it : iterators)
-    {
-        trackedPoints.erase(it);
-        print("Remove Point ", it->point);
-    }
-    // Reorder with the max confidence at first
-    // sort(trackedPoints.begin(), trackedPoints.end(), confidenceCompare);
+    // Removing the cluster checked
+    trackedPoints.erase(remove_if(trackedPoints.begin(), trackedPoints.end(),
+                                  [](PointTracker const& pt) { return (pt.confidence < 0); }),
+                        trackedPoints.end());
 
-    // int index = 0;
+    index = 0;
     for (auto& trackPoint : trackedPoints)
     {
         if (!trackPoint.hasBeenSent && trackPoint.confidence > config.confidenceTrigger)
@@ -134,8 +128,8 @@ void Tracker::Update()
             // robot.WriteSerial(index, trackPoint.point);
             trackPoint.hasBeenSent = true;
             plotPolarPoint(trackPoint.point, "obs", LEVEL_WARN);
-            print("Send to Robot : ", trackPoint.point);
-            // index++;
+            print("Send N°" + String(index) + " to Robot : ", trackPoint.point, "", LEVEL_WARN);
         }
+        index++;
     }
 }

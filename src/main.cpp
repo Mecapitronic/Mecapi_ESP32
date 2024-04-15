@@ -22,10 +22,6 @@ void setup()
     delay(500);
     tracker.Initialisation();
     delay(500);
-
-    plotRobot(robot.GetPosition(), LEVEL_WARN);
-    plotPolarPoints(MapBoundaries, 4, "MapBoundaries", LEVEL_WARN);
-
 #endif
 
 #ifdef A010
@@ -192,7 +188,7 @@ void Task1code(void *pvParameters)
             if (millis() - lastSendTime > 30000)
             {
                 lastSendTime = millis();
-                plotPolarPoints(MapBoundaries, 4, "fixeScale", LEVEL_WARN);
+                plotPolarPoints(MapBoundaries, 4, "MapBoundaries", LEVEL_WARN);
                 plotRobot(robot.GetPosition(), LEVEL_WARN);
             }
 #endif

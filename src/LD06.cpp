@@ -312,23 +312,24 @@ void LidarLD06::CheckCluster(PolarPoint polarPoint)
             }
             else if (c.data.size() > ceil(maxPoint))
             {
+                /*
                 println("Too many points : ", c.data.size(), "", LEVEL_WARN);
                 println(">distance:", c.mid.distance, "", LEVEL_WARN);
                 println(">Min_point:", minPoint, "", LEVEL_WARN);
                 println(">Max_point:", maxPoint, "", LEVEL_WARN);
                 println(">Arc_length:", arc, "", LEVEL_WARN);
                 println(">front:", c.data.front().angle, "", LEVEL_WARN);
-                println(">back:", c.data.back().angle, "", LEVEL_WARN);
+                println(">back:", c.data.back().angle, "", LEVEL_WARN);*/
             }
             else if (c.data.size() < floor(minPoint))
-            {
-                println("Not enough points : ", c.data.size(), "", LEVEL_WARN);
-                println(">distance:", c.mid.distance, "", LEVEL_WARN);
-                println(">Min_point:", minPoint, "", LEVEL_WARN);
-                println(">Max_point:", maxPoint, "", LEVEL_WARN);
-                println(">Arc_length:", arc, "", LEVEL_WARN);
-                println(">front:", c.data.front().angle, "", LEVEL_WARN);
-                println(">back:", c.data.back().angle, "", LEVEL_WARN);
+            { /*
+                 println("Not enough points : ", c.data.size(), "", LEVEL_WARN);
+                 println(">distance:", c.mid.distance, "", LEVEL_WARN);
+                 println(">Min_point:", minPoint, "", LEVEL_WARN);
+                 println(">Max_point:", maxPoint, "", LEVEL_WARN);
+                 println(">Arc_length:", arc, "", LEVEL_WARN);
+                 println(">front:", c.data.front().angle, "", LEVEL_WARN);
+                 println(">back:", c.data.back().angle, "", LEVEL_WARN);*/
             }
             else
             {
