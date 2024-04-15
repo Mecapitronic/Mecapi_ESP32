@@ -40,15 +40,7 @@ void ESP32_Helper(int baud_speed, Enable printEnable, Level printLvl, Enable deb
     Printer::PrintEnable(printEnable);
     Printer::PrintLevel(printLvl);
 
-    println();
-    println("|--------------|");
-    println("  MECAPITRONIC  ");
-    println("|--------------|");
-    println();
-    print(__DATE__);
-    print(" at ");
-    println(__TIME__);
-    println();
+    printHeader();
 
     preferences.begin("Mecapi", false);
     unsigned int powerUp = preferences.getUInt("PowerUp", 0);
@@ -61,6 +53,19 @@ void ESP32_Helper(int baud_speed, Enable printEnable, Level printLvl, Enable deb
     Debugger::Initialisation();
 
     resetVar();
+}
+
+void printHeader()
+{
+    println();
+    println("┌──────────────┐");
+    println("├ MECAPITRONIC ┤");
+    println("└──────────────┘");
+    println();
+    print(__DATE__);
+    print(" at ");
+    println(__TIME__);
+    println();
 }
 
 void UpdateSerial()

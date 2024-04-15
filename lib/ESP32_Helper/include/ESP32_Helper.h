@@ -26,6 +26,8 @@ namespace ESP32_Helper
 void ESP32_Helper(int baud_speed = 921600, Enable printEnable = ENABLE_TRUE,
                   Level printLvl = LEVEL_VERBOSE, Enable debugEnable = ENABLE_FALSE);
 
+void printHeader();
+
 /**
  * Check for commands send on debugging serial plugged to a computer
  */
