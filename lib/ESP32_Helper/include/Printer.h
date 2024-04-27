@@ -16,8 +16,11 @@
 
 namespace Printer
 {
-    // static bool printEnable = false;
-    // Level printLevel = LEVEL_NONE;
+    namespace
+    {
+        Level printLevel = LEVEL_VERBOSE;
+        Enable printEnable = ENABLE_NONE;
+    }  // namespace
 
     void PrintLevel(Level level);
     Level PrintLevel();
@@ -27,16 +30,22 @@ namespace Printer
     bool IsPrintable();
 
     void println(Level level = LEVEL_VERBOSE);
+
     void print(String prefix, String suffix = "", Level level = LEVEL_VERBOSE);
     void println(String prefix, String suffix = "", Level level = LEVEL_VERBOSE);
+
     void print(String prefix, int data, String suffix = "", Level level = LEVEL_VERBOSE);
     void println(String prefix, int data, String suffix = "", Level level = LEVEL_VERBOSE);
+
     void print(String prefix, uint data, String suffix = "", Level level = LEVEL_VERBOSE);
     void println(String prefix, uint data, String suffix = "", Level level = LEVEL_VERBOSE);
+
     void print(String prefix, char data, String suffix = "", Level level = LEVEL_VERBOSE);
     void println(String prefix, char data, String suffix = "", Level level = LEVEL_VERBOSE);
+
     void print(String prefix, float data, String suffix = "", Level level = LEVEL_VERBOSE);
     void println(String prefix, float data, String suffix = "", Level level = LEVEL_VERBOSE);
+
     void print(String prefix, String data, String suffix = "", Level level = LEVEL_VERBOSE);
     void println(String prefix, String data, String suffix = "", Level level = LEVEL_VERBOSE);
 
@@ -54,32 +63,19 @@ namespace Printer
                     Level level = LEVEL_VERBOSE);
 
     /**
-     * send point data to teleplot to trace x and y in a graph
+     * Send data to be viewed on teleplot, eg: trace x and y in a graph
      */
-    void plotPoint(Point p, String varName, Level level = LEVEL_VERBOSE);
-    void plotPolarPoint(PolarPoint p, String varName, Level level = LEVEL_VERBOSE);
+    void teleplot(String varName, Point point, Level level = LEVEL_VERBOSE);
+    void teleplot(String varName, Point points[], uint16_t size, Level level = LEVEL_VERBOSE);
 
-    /**
-     * send batch of point data to teleplot to trace x and y in a graph
-     */
-    void plotPolarPoints(PolarPoint polarPoints[], uint16_t size, String varName, Level level = LEVEL_VERBOSE);
-
-    /**
-     * send point data on serial for teleplot to trace x and y as two separate graphs
-     */
-    void plotPoint(Point p, Level level = LEVEL_VERBOSE);
-
-    void plotScanTD(std::vector<PolarPoint> vec, String varName, Level level = LEVEL_VERBOSE);
-    void plotScanXY(std::vector<PolarPoint> vec, String varName, Level level = LEVEL_VERBOSE);
-
-    void plotRobot(PolarPoint pos, Level level = LEVEL_VERBOSE);
-
-    void plotTrackerPoint(PointTracker p, String varName, Level level = LEVEL_VERBOSE);
+    void teleplot(String varName, PolarPoint polarPoint, Level level = LEVEL_VERBOSE);
+    void teleplot(String varName, PolarPoint polarPoints[], uint16_t size, Level level = LEVEL_VERBOSE);
+    void teleplot(String varName, vector<PolarPoint> vec, Level level = LEVEL_VERBOSE);
 
     /**
      * send cloud point data on serial for teleplot to trace 3D shape
      */
-    void plot3D(Point3D p, String varName);
+    void plot3D(String varName, Point3D p);
     void plot3Dpy(Point3D p);
 };  // namespace Printer
 #endif

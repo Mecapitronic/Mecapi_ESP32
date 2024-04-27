@@ -53,7 +53,7 @@ void Robot::Update()
     if (ReadSerial())
     {
         Analyze();
-        plotRobot(GetPosition());
+        teleplot("Robot", GetPosition());
     }
 }
 

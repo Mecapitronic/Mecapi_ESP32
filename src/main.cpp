@@ -177,9 +177,8 @@ void Task1code(void *pvParameters)
 
             ld06.SetRobotPosition(robot.GetPosition());
             ld06.Update();
-
-            plotScanXY(ld06.scan, "scan", LEVEL_WARN);
-            //plotScanTD(ld06.scan, "lidar");
+            if (ld06.scan.size() > 0)
+                teleplot("scan", ld06.scan, LEVEL_WARN);
             ld06.scan.clear();
 
             tracker.Track(ld06.clusterCenterPoints);
@@ -188,8 +187,8 @@ void Task1code(void *pvParameters)
             if (millis() - lastSendTime > 30000)
             {
                 lastSendTime = millis();
-                plotPolarPoints(MapBoundaries, 4, "MapBoundaries", LEVEL_WARN);
-                plotRobot(robot.GetPosition(), LEVEL_WARN);
+                teleplot("mapBoundaries", MapBoundaries, 4, LEVEL_WARN);
+                teleplot("robot", robot.GetPosition(), LEVEL_WARN);
             }
 #endif
 
@@ -295,11 +294,11 @@ void Task2code(void *pvParameters)
                 }
                 else if (cmd.cmd == ("RobotPosition"))
                 {
-                    plotRobot(robot.GetPosition(), LEVEL_WARN);
+                    teleplot("robot", robot.GetPosition(), LEVEL_WARN);
                 }
                 else if (cmd.cmd == ("MapBoundaries"))
                 {
-                    plotPolarPoints(MapBoundaries, 4, "MapBoundaries", LEVEL_WARN);
+                    teleplot("mapBoundaries", MapBoundaries, 4, LEVEL_WARN);
                 }
 #endif
 

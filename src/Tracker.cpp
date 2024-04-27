@@ -127,7 +127,7 @@ void Tracker::Update()
         {
             // robot.WriteSerial(index, trackPoint.point);
             trackPoint.hasBeenSent = true;
-            plotPolarPoint(trackPoint.point, "obs", LEVEL_WARN);
+            teleplot("obs", trackPoint.point, LEVEL_WARN);
             print("Send N°" + String(index) + " to Robot : ", trackPoint.point, "", LEVEL_WARN);
         }
         index++;

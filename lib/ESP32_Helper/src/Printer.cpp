@@ -2,12 +2,6 @@
 
 namespace Printer
 {
-    namespace
-    {
-        Level printLevel = LEVEL_VERBOSE;
-        Enable printEnable = ENABLE_NONE;
-    }  // namespace
-
     void PrintLevel(Level level)
     {
         printLevel = level;
@@ -269,23 +263,36 @@ namespace Printer
         SERIAL_DEBUG.println(suffix);
     }
 
-    void plotPoint(Point p, String varName, Level level)
+    void teleplot(String varName, Point point, Level level)
     {
         if (!IsPrintable(level))
             return;
-        String data = ">" + varName + ":" + (int)p.x + ":" + (int)p.y + "|xy";
+        String data = ">" + varName + ":" + (int)point.x + ":" + (int)point.y + "|xy";
         SERIAL_DEBUG.println(data);
     }
 
-    void plotPolarPoint(PolarPoint p, String varName, Level level)
+    void teleplot(String varName, Point points[], uint16_t size, Level level)
     {
         if (!IsPrintable(level))
             return;
-        String data = ">" + varName + ":" + (int)p.x + ":" + (int)p.y + "|xy";
+        String data = ">" + varName + ":";
+        for (uint16_t i = 0; i < size; i++)
+        {
+            data += String() + (int)(points[i].x) + ":" + (int)(points[i].y) + ";";
+        }
+        data += "|xy";
         SERIAL_DEBUG.println(data);
     }
 
-    void plotPolarPoints(PolarPoint polarPoints[], uint16_t size, String varName, Level level)
+    void teleplot(String varName, PolarPoint polarPoint, Level level)
+    {
+        if (!IsPrintable(level))
+            return;
+        String data = ">" + varName + ":" + (int)polarPoint.x + ":" + (int)polarPoint.y + "|xy";
+        SERIAL_DEBUG.println(data);
+    }
+
+    void teleplot(String varName, PolarPoint polarPoints[], uint16_t size, Level level)
     {
         if (!IsPrintable(level))
             return;
@@ -298,62 +305,18 @@ namespace Printer
         SERIAL_DEBUG.println(data);
     }
 
-    void plotPoint(Point p, Level level)
+    void teleplot(String varName, vector<PolarPoint> vec, Level level)
     {
         if (!IsPrintable(level))
             return;
-        SERIAL_DEBUG.print(">x:");
-        SERIAL_DEBUG.println((int)p.x);
-        SERIAL_DEBUG.print(">y:");
-        SERIAL_DEBUG.println((int)p.y);
-    }
-
-    void plotScanTD(std::vector<PolarPoint> vec, String varName, Level level)
-    {
-        if (!IsPrintable(level))
-            return;
-        if (vec.size() == 0)
-            return;
+        // if (vec.size() == 0)
+        //     return;
         SERIAL_DEBUG.print(">" + varName + ":");
-        for (uint16_t i = 0; i < vec.size(); i++)
+        for (auto &v : vec)
         {
-            SERIAL_DEBUG.print(String() + (int)vec[i].angle + ":" + (int)vec[i].distance + ";");
-        }
-        SERIAL_DEBUG.println("|td");
-    }
-
-    void plotScanXY(std::vector<PolarPoint> vec, String varName, Level level)
-    {
-        if (!IsPrintable(level))
-            return;
-        if (vec.size() == 0)
-            return;
-        SERIAL_DEBUG.print(">" + varName + ":");
-        for (uint16_t i = 0; i < vec.size(); i++)
-        {
-            SERIAL_DEBUG.print(String() + (int)vec[i].x + ":" + (int)vec[i].y + ";");
+            SERIAL_DEBUG.print(String() + (int)v.x + ":" + (int)v.y + ";");
         }
         SERIAL_DEBUG.println("|xy");
-    }
-
-    void plotRobot(PolarPoint pos, Level level)
-    {
-        if (!IsPrintable(level))
-            return;
-        if (!IsPrintable(level))
-            return;
-        SERIAL_DEBUG.print(">robot:");
-        SERIAL_DEBUG.print(String() + pos.x + ":" + pos.y + ";");
-        SERIAL_DEBUG.println("|xy");
-    }
-
-    void plotTrackerPoint(PointTracker p, String varName, Level level)
-    {
-        if (!IsPrintable(level))
-            return;
-        String data = ">" + varName + ":" + (int)(p.point.x) + ":" + (int)(p.point.y);
-        data += "|xy";
-        SERIAL_DEBUG.println(data);
     }
 
     void plot3D(Point3D p, String varName)

@@ -360,9 +360,9 @@ void LidarLD06::CheckCluster(PolarPoint polarPoint)
                 */
 
                 print("Obstacle Detected mid Polar: ", c.mid);
-                plotPolarPoint(c.mid, "Mid", LEVEL_WARN);
+                teleplot("mid", c.mid, LEVEL_WARN);
                 ObstacleDetected(c);
-                plotScanXY(c.data, "cluster", LEVEL_WARN);
+                teleplot("cluster", c.data, LEVEL_WARN);
             }
             // Zeroing the mid point to remove this cluster later
             c.mid = {0, 0};
