@@ -101,7 +101,7 @@ void Tracker::Update()
         if (millis() - trackPoint.lastUpdateTime > IS_TOO_OLD)
         {
             // decrement is faster then increment
-            if (trackPoint.confidence > 0)
+            if (trackPoint.confidence >= 0)
             {
                 trackPoint.confidence -= 2;
                 // update the time to not decrement to fast
@@ -119,17 +119,67 @@ void Tracker::Update()
     trackedPoints.erase(remove_if(trackedPoints.begin(), trackedPoints.end(),
                                   [](PointTracker const& pt) { return (pt.confidence < 0); }),
                         trackedPoints.end());
+}
 
-    index = 0;
-    for (auto& trackPoint : trackedPoints)
+void Tracker::SendToRobot()
+{
+    int index = 0;
+    PolarPoint zero = {0, 0, 0, 0, 0};
+
+    for (int index = 0; index < 5; index++)
     {
-        if (!trackPoint.hasBeenSent && trackPoint.confidence > config.confidenceTrigger)
+        if (trackedPoints.size() > index && trackedPoints[index].confidence > config.confidenceTrigger)
         {
-            // robot.WriteSerial(index, trackPoint.point);
-            trackPoint.hasBeenSent = true;
-            teleplot("obs", trackPoint.point, LEVEL_WARN);
-            print("Send N°" + String(index) + " to Robot : ", trackPoint.point, "", LEVEL_WARN);
+            robot.WriteSerial(index, trackedPoints[index].point);
+            // teleplot("obs", trackedPoints[index].point, index, LEVEL_WARN);
         }
-        index++;
+        else
+        {
+            robot.WriteSerial(index, zero);
+            // teleplot("obs", zero, index, LEVEL_WARN);
+        }
     }
+    /*
+        for (auto& trackPoint : trackedPoints)
+        {
+            if (index < 5 && !trackPoint.hasBeenSent && trackPoint.confidence > config.confidenceTrigger)
+            {
+                robot.WriteSerial(index, trackPoint.point);
+                trackPoint.hasBeenSent = true;
+                teleplot("obs", trackPoint.point, index, LEVEL_WARN);
+                // print("Send N°" + String(index) + " to Robot : ", trackPoint.point, "", LEVEL_WARN);
+            }
+            index++;
+        }
+    */
+}
+
+PolarPoint lastSend[5] = {{0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}};
+void Tracker::Teleplot(bool all)
+{
+    int index = 0;
+    PolarPoint zero = {0, 0, 0, 0, 0};
+
+    for (int index = 0; index < 5; index++)
+    {
+        if (trackedPoints.size() > index && trackedPoints[index].confidence > config.confidenceTrigger)
+        {
+            if (lastSend[index].x != trackedPoints[index].point.x ||
+                lastSend[index].y != trackedPoints[index].point.y || all)
+            {
+                teleplot("obs", trackedPoints[index].point, index, LEVEL_WARN);
+            }
+            lastSend[index] = trackedPoints[index].point;
+        }
+        else
+        {
+            if (lastSend[index].x != zero.x || lastSend[index].y != zero.y || all)
+            {
+                teleplot("obs", zero, index, LEVEL_WARN);
+            }
+            lastSend[index] = zero;
+        }
+    }
+    // teleplot("mapBoundaries", MapBoundaries, 4, LEVEL_WARN);
+    // teleplot("robot", robot.GetPosition(), LEVEL_WARN);
 }

@@ -22,8 +22,9 @@ void LidarLD06::Initialisation()
     ledcAttachPin(pwmPin, pwmChannel);
 
     // Créer le rapport cyclique en fonction de la résolution
+    uint32_t pwm = 40;
     uint32_t max_duty = (1 << resolution) - 1;
-    uint32_t duty = max_duty * 25 / 100;
+    uint32_t duty = max_duty * pwm / 100;
 
     ledcWrite(pwmChannel, duty);
 }
@@ -218,7 +219,7 @@ bool LidarLD06::IsOutsideTable(PolarPoint polarPoint)
     // margin is 0 : we see points until the walls
     // margin is negative : we can see up to the wall plus the margin distance outside the map
     // (ex : for fixed beacon)
-    const float table_margin = 0;
+    const float table_margin = 80;
     return (polarPoint.x < 0 + table_margin || polarPoint.x > 3000 - table_margin || polarPoint.y < 0 + table_margin ||
             polarPoint.y > 2000 - table_margin);
 }
@@ -333,13 +334,14 @@ void LidarLD06::CheckCluster(PolarPoint polarPoint)
             }
             else
             {
+                /*
                 println(">distance:", c.mid.distance, "", LEVEL_WARN);
                 println(">Min_point:", minPoint, "", LEVEL_WARN);
                 println(">Max_point:", maxPoint, "", LEVEL_WARN);
                 println(">size:", c.data.size(), "", LEVEL_WARN);
                 println(">Arc_length:", arc, "", LEVEL_WARN);
                 println(">front:", c.data.front().angle, "", LEVEL_WARN);
-                println(">back:", c.data.back().angle, "", LEVEL_WARN);
+                println(">back:", c.data.back().angle, "", LEVEL_WARN);*/
                 /*
                 float s = (angle * c.mid.distance) * PI / 180;
                 float theta1 = (60 * 180) / (PI * c.mid.distance);
@@ -360,9 +362,9 @@ void LidarLD06::CheckCluster(PolarPoint polarPoint)
                 */
 
                 print("Obstacle Detected mid Polar: ", c.mid);
-                teleplot("mid", c.mid, LEVEL_WARN);
+                // teleplot("mid", c.mid, LEVEL_WARN);
                 ObstacleDetected(c);
-                teleplot("cluster", c.data, LEVEL_WARN);
+                // teleplot("cluster", c.data, LEVEL_WARN);
             }
             // Zeroing the mid point to remove this cluster later
             c.mid = {0, 0};

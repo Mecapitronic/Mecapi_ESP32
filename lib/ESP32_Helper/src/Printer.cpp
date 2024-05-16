@@ -1,5 +1,8 @@
 #include "Printer.h"
 
+#ifdef WITH_WIFI
+WiFiClient client;
+#endif
 namespace Printer
 {
     void PrintLevel(Level level)
@@ -216,7 +219,7 @@ namespace Printer
     {
         if (!IsPrintable(level))
             return;
-        print("Command => " + prefix);
+        SERIAL_DEBUG.print(prefix);
         print(" Cmd=" + cmd.cmd);
         print(" Size=", cmd.size);
         print(" Data=", cmd.data[0]);
@@ -289,6 +292,14 @@ namespace Printer
         if (!IsPrintable(level))
             return;
         String data = ">" + varName + ":" + (int)polarPoint.x + ":" + (int)polarPoint.y + "|xy";
+        SERIAL_DEBUG.println(data);
+    }
+
+    void teleplot(String varName, PolarPoint polarPoint, int timeStamp, Level level)
+    {
+        if (!IsPrintable(level))
+            return;
+        String data = ">" + varName + ":" + (int)polarPoint.x + ":" + (int)polarPoint.y + ":" + (int)timeStamp + "|xy";
         SERIAL_DEBUG.println(data);
     }
 

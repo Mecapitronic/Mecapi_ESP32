@@ -3,6 +3,7 @@
 
 #include "ESP32_Helper.h"
 #include "Robot.h"
+extern Robot robot;
 
 using namespace Printer;
 
@@ -16,14 +17,14 @@ using namespace Printer;
 #define CONFIDENCE_TRIGGER 5
 
 // maximum number of time a point has been seen
-#define CONFIDENCE_MAXIMUM 50
+#define CONFIDENCE_MAXIMUM 30
 
 /**
  * amount of time needed to decrement the confidence of a point from tracker
  * if it is not detected in this time
  * we make 10 turns each second, 1 turn every 100ms
  */
-#define IS_TOO_OLD 3000  // TODO : adjust this to 200 ?
+#define IS_TOO_OLD 200  // TODO : adjust this to 200 ?
 
 struct ConfigTracker
 {
@@ -60,6 +61,8 @@ class Tracker
    public:
     void Initialisation();
     void Update();
+    void SendToRobot();
+    void Teleplot(bool all);
 
     /**
      * @brief Configure a new Tracker object with settings for filters

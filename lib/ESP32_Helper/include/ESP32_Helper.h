@@ -7,15 +7,31 @@
 #ifndef ESP32_HELPER_H
 #define ESP32_HELPER_H
 
+
+#ifdef WITH_WIFI
+#include <WiFi.h>
+extern WiFiClient client;
+#define SERIAL_DEBUG client
+#endif
+
+#ifdef NO_WIFI
+#define SERIAL_DEBUG Serial
+#endif
+
+#ifndef SERIAL_DEBUG
+    #define SERIAL_DEBUG Serial
+#endif
+
 #include "Structure.h"
 #include "Printer.h"
 #include "Debugger.h"
 #include "Preferences.h"
 
-#define SERIAL_DEBUG Serial
-
 namespace ESP32_Helper
 {
+
+const String wifi_ssid = "Mecapitronic";
+const String wifi_password = "Geoffroy";
 // ESP32 Serial Bauds rates
 // static const unsigned long default_rates[] = {300, 600, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 74880,
 // 115200, 230400, 256000, 460800, 921600, 1843200, 3686400};
@@ -49,5 +65,9 @@ int64_t GetTimeNowMs();
  */
 int64_t GetTimeNowUs();
 
-}  // namespace ESP32_Helper
-#endif// ESP32_HELPER_H
+
+int GetFromPreference(String pref, int defValue=0);
+void SaveToPreference(String pref, int value);
+
+}
+#endif

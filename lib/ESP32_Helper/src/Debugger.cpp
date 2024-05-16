@@ -7,7 +7,7 @@ namespace  // anonymous nested namespace, cannot access outside this file
 QueueHandle_t queueSteps = nullptr;
 const uint16_t queueStepsSize = 100;
 Enable debuggerEnable = ENABLE_NONE;
-}  // namespace
+}
 
 void EnableDebugger(Enable enable)
 {
@@ -84,4 +84,4 @@ bool WaitForAvailableSteps()
         Printer::println("Adding ", steps, " steps to Debugger.");
     }
 
-}  // namespace Debugger
+}

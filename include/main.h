@@ -13,12 +13,7 @@ using namespace Printer;
 #include "Tracker.h"
 #include "testModule.h"
 
-LidarLD06 ld06;
-Robot robot;
-Tracker tracker;
-testModule test;
-
-PolarPoint MapBoundaries[] = {{0, 0}, {0, 2000}, {3000, 2000}, {3000, 0}};
+extern Robot robot;
 
 #endif
 
@@ -65,8 +60,5 @@ void Task2code(void *pvParameters);
 
 TaskHandle_t Task1;
 TaskHandle_t Task2;
-
-QueueHandle_t myQueue;
-int queueSize = 500;
 
 #endif  // MAIN_H

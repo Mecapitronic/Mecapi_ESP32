@@ -11,8 +11,8 @@ uint16_t indexSeparator = 0;
 const int Serial_Read_Buffer = 64;
 char readBuffer[Serial_Read_Buffer];
 Command cmdTmp;
-char tmpChar = '\0';
-std::queue<Command> awaitingCommand;
+// std::queue<Command> awaitingCommand;
+QueueHandle_t awaitingCommand = NULL;
 Preferences preferences;
 
 void resetVar()
@@ -26,29 +26,109 @@ void resetVar()
         cmdTmp.data[i] = 0;
     }
 }
+// converts character array
+// to string and returns it
+String convertToString(char* a, int size)
+{
+    int i;
+    String s = "";
+    for (i = 0; i < size; i++)
+    {
+        s = s + a[i];
+    }
+    return s;
+}
+
+#ifdef WITH_WIFI
+
+void WiFiStationConnected(WiFiEvent_t event, WiFiEventInfo_t info)
+{
+    Serial.println("Connected to " + WiFi.SSID() + " successfully!");
+}
+
+void WiFiStationDisconnected(WiFiEvent_t event, WiFiEventInfo_t info)
+{
+    Serial.print("WiFi lost connection : ");
+    Serial.println((wifi_err_reason_t)info.wifi_sta_disconnected.reason);
+}
+#endif
 }  // namespace
 
 void ESP32_Helper(int baud_speed, Enable printEnable, Level printLvl, Enable debugEnable)
 {
-    SERIAL_DEBUG.begin(baud_speed);
-    if (SERIAL_DEBUG.available() > 0)
+#ifdef WITH_WIFI
+    WiFi.mode(WIFI_STA);
+
+    Serial.print("AP MAC : ");
+    Serial.println(WiFi.softAPmacAddress());
+    Serial.print("Wifi MAC : ");
+    Serial.println(WiFi.macAddress());
+
+    // Set your Static IP address
+    IPAddress local_IP(192, 168, 137, 110);
+    // Set your Gateway IP address
+    IPAddress gateway(192, 168, 137, 1);
+
+    IPAddress subnet(255, 255, 255, 0);
+    // IPAddress primaryDNS(8, 8, 8, 8);   //optional
+    // IPAddress secondaryDNS(8, 8, 4, 4); //optional
+
+    // Configures static IP address
+    if (!WiFi.config(local_IP, gateway, subnet))  //, primaryDNS, secondaryDNS))
     {
-        SERIAL_DEBUG.flush();
+        Serial.println("STA Failed to configure");
     }
-    SERIAL_DEBUG.println();
+
+    // delete old config
+    WiFi.disconnect(true);
+
+    // Events callback (to reconnect)
+    WiFi.onEvent(WiFiStationConnected, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_CONNECTED);
+    WiFi.onEvent(WiFiStationDisconnected, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_DISCONNECTED);
+
+    // Begin WiFi
+    WiFi.begin(wifi_ssid, wifi_password);
+
+    // time to connect to wifi
+    delay(2000);
+
+    // time to connect to server
+
+    if (client.connect("192.168.137.1", 20240))
+    {
+        Serial.println("Connected to server !");
+    }
+    else
+    {
+        Serial.println("Connection to server failed");
+    }
+#endif
+
+    awaitingCommand = xQueueCreate(100, sizeof(Command));
+
+    if (awaitingCommand == NULL)
+    {
+        Serial.println("Error creating the queue : awaitingCommand");
+    }
+    // SERIAL_DEBUG.begin(baud_speed);
+    // if (SERIAL_DEBUG.available() > 0)
+    //{
+    //     SERIAL_DEBUG.flush();
+    // }
+    Serial.println();
 
     Printer::PrintEnable(printEnable);
     Printer::PrintLevel(printLvl);
 
     printHeader();
-
-    preferences.begin("Mecapi", false);
-    unsigned int powerUp = preferences.getUInt("PowerUp", 0);
-    powerUp++;
-    println("Power Up : ", powerUp);
-    preferences.putUInt("PowerUp", powerUp);
-    preferences.end();
-
+    /*
+        preferences.begin("Mecapi", false);
+        unsigned int powerUp = preferences.getUInt("PowerUp", 0);
+        powerUp++;
+        println("Power Up : ", powerUp);
+        preferences.putUInt("PowerUp", powerUp);
+        preferences.end();
+    */
     Debugger::EnableDebugger(debugEnable);
     Debugger::Initialisation();
 
@@ -72,7 +152,7 @@ void UpdateSerial()
 {
     while (SERIAL_DEBUG.available() > 0)
     {
-        tmpChar = SERIAL_DEBUG.read();
+        char tmpChar = SERIAL_DEBUG.read();
         if (indexBuffer < Serial_Read_Buffer)
         {
             readBuffer[indexBuffer++] = tmpChar;
@@ -101,8 +181,10 @@ void UpdateSerial()
                         index1 = i + 1;
                     }
                 }
+                Serial.print("Received : ");
+                Serial.println(cmdTmp.cmd);
 
-                print("Received", cmdTmp);
+                // print("Received", cmdTmp);
 
                 // We first handle if the command is for the Lib
                 if (cmdTmp.cmd == "DebugSteps")
@@ -128,7 +210,8 @@ void UpdateSerial()
                 else
                 {
                     // If command is not for Lib, we sent it to the main
-                    awaitingCommand.push(cmdTmp);
+                    xQueueSend(awaitingCommand, &cmdTmp, 0);
+                    // awaitingCommand.push(cmdTmp);
                 }
                 resetVar();
             }
@@ -137,13 +220,13 @@ void UpdateSerial()
         {
             SERIAL_DEBUG.print("Read Buffer Overflow : ");
             SERIAL_DEBUG.println(indexBuffer);
-            SERIAL_DEBUG.flush();
+            // SERIAL_DEBUG.flush();
             resetVar();
         }
     }
 }
 
-bool HasWaitingCommand() { return awaitingCommand.size() > 0; }
+bool HasWaitingCommand() { return uxQueueMessagesWaiting(awaitingCommand) > 0; }
 
 Command GetCommand()
 {
@@ -151,9 +234,17 @@ Command GetCommand()
     cmd.cmd = "";
     if (HasWaitingCommand())
     {
-        cmd = awaitingCommand.front();
-        awaitingCommand.pop();
-        print("POP", cmd);
+        if (xQueueReceive(awaitingCommand, &cmd, portTICK_PERIOD_MS * 0))
+        {
+            return cmd;
+        }
+        else
+        {
+            cmd.cmd = "";
+        }
+        // cmd = awaitingCommand.front();
+        // awaitingCommand.pop();
+        // print("POP", cmd);
     }
     return cmd;
 }
@@ -175,6 +266,23 @@ int64_t GetTimeNowUs()
 
     int64_t time_us = (int64_t)tv_now.tv_sec * 1000000L + (int64_t)tv_now.tv_usec;
     return time_us;
+}
+
+int GetFromPreference(String pref, int defValue)
+{
+    preferences.begin("Mecapi", true);
+    int value = preferences.getInt(pref.c_str(), defValue);
+    print("Preferences ");
+    println(pref, value);
+    preferences.end();
+    return value;
+}
+
+void SaveToPreference(String pref, int value)
+{
+    preferences.begin("Mecapi", false);
+    preferences.putInt(pref.c_str(), value);
+    preferences.end();
 }
 
 }  // namespace ESP32_Helper

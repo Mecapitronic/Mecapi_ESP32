@@ -8,6 +8,10 @@
 #define PRINTER_H
 
 #include "ESP32_Helper.h"
+#ifdef WITH_WIFI
+#include <WiFi.h>
+extern WiFiClient client;
+#endif
 
 #define ENUM_PRINT(p)             \
     case (p):                     \
@@ -69,6 +73,8 @@ namespace Printer
     void teleplot(String varName, Point points[], uint16_t size, Level level = LEVEL_VERBOSE);
 
     void teleplot(String varName, PolarPoint polarPoint, Level level = LEVEL_VERBOSE);
+    void teleplot(String varName, PolarPoint polarPoint, int timeStamp, Level level = LEVEL_VERBOSE);
+
     void teleplot(String varName, PolarPoint polarPoints[], uint16_t size, Level level = LEVEL_VERBOSE);
     void teleplot(String varName, vector<PolarPoint> vec, Level level = LEVEL_VERBOSE);
 
@@ -77,5 +83,5 @@ namespace Printer
      */
     void plot3D(String varName, Point3D p);
     void plot3Dpy(Point3D p);
-};  // namespace Printer
+}  // namespace Printer
 #endif

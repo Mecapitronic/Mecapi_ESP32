@@ -1,19 +1,23 @@
 #include "main.h"
 
+LidarLD06 ld06;
+Robot robot;
+Tracker tracker;
+testModule test;
+
+PolarPoint MapBoundaries[] = {{0, 0}, {0, 2000}, {3000, 2000}, {3000, 0}};
+
 void setup()
 {
+    Serial.end();
+    Serial.begin(921600);
+    delay(1000);
+    Serial.println();
+    Serial.println("LiDAR Firmware");
     // put your setup code here, to run once:
     ESP32_Helper::ESP32_Helper();
 
-    Printer::PrintLevel(LEVEL_WARN);
-
-    // myQueue = xQueueCreate(queueSize, sizeof(PolarPoint));
-    myQueue = xQueueCreate(queueSize, sizeof(uint8_t));
-
-    if (myQueue == NULL)
-    {
-        println("Error creating the queue", LEVEL_ERROR);
-    }
+    Printer::PrintLevel(LEVEL_INFO);
 
 #ifdef LD06
     robot.Initialisation();
@@ -117,7 +121,10 @@ void functionChrono(int nbrLoop)
     Serial.println();
 }
 
-int64_t lastSendTime = millis();
+int64_t lastSendRobotTime = millis();
+PolarPoint lastPosition = {0, 0, 0, 0, 0};
+PolarPoint lastTrackerSend[5] = {{0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}};
+
 // Note the 1 Tick delay, this is need so the watchdog doesn't get confused
 void Task1code(void *pvParameters)
 {
@@ -177,18 +184,17 @@ void Task1code(void *pvParameters)
 
             ld06.SetRobotPosition(robot.GetPosition());
             ld06.Update();
-            if (ld06.scan.size() > 0)
-                teleplot("scan", ld06.scan, LEVEL_WARN);
+            // if (ld06.scan.size() > 0)
+            //     teleplot("scan", ld06.scan, LEVEL_WARN);
             ld06.scan.clear();
 
             tracker.Track(ld06.clusterCenterPoints);
             tracker.Update();
 
-            if (millis() - lastSendTime > 30000)
+            if (millis() - lastSendRobotTime > 200)
             {
-                lastSendTime = millis();
-                teleplot("mapBoundaries", MapBoundaries, 4, LEVEL_WARN);
-                teleplot("robot", robot.GetPosition(), LEVEL_WARN);
+                lastSendRobotTime = millis();
+                tracker.SendToRobot();
             }
 #endif
 
@@ -236,29 +242,71 @@ void Task1code(void *pvParameters)
     }
 }
 
+unsigned long previousMillisWifi = 0;
+unsigned long previousMillisServer = 0;
+unsigned long intervalWifi = 5000;
+unsigned long intervalServer = 5000;
+unsigned long currentMillisWifi = 0;
+unsigned long currentMillisServer = 0;
+
+int64_t lastSendSerialTime = millis();
+
 // Note the 1 Tick delay, this is need so the watchdog doesn't get confused
 void Task2code(void *pvParameters)
 {
     println("Start Task2code");
 
-    PolarPoint turn[queueSize];
     PolarPoint point;
     while (1)
     {
         try
         {
-            if (uxQueueMessagesWaiting(myQueue) > 0)
-            {
-                if (xQueueReceive(myQueue, &point, portTICK_PERIOD_MS * 0))
-                {
-                    // ld06.AggregatePoint(point, &tracker, robot);
-                }
-            }
-            // tracker.sendObstaclesToRobot(robot);
-            // tracker.untrackOldObstacles(robot);
-
             // Check if we get commands from operator via debug serial
             ESP32_Helper::UpdateSerial();
+
+            if (millis() - lastSendSerialTime > 100)
+            {
+                lastSendSerialTime = millis();
+                tracker.Teleplot(false);
+
+                if ((int)lastPosition.x != (int)robot.GetPosition().x ||
+                    (int)lastPosition.y != (int)robot.GetPosition().y ||
+                    (int)(lastPosition.angle / 100) != (int)(robot.GetPosition().angle / 100))
+                {
+                    teleplot("robot", robot.GetPosition(), robot.GetPosition().angle, LEVEL_WARN);
+                    lastPosition = robot.GetPosition();
+                }
+                // teleplot("mapBoundaries", MapBoundaries, 4, LEVEL_WARN);
+                // teleplot("robot", robot.GetPosition(), LEVEL_WARN);
+            }
+
+            currentMillisWifi = millis();
+            // if WiFi is down, try reconnecting every CHECK_WIFI_TIME seconds
+            if ((WiFi.status() != WL_CONNECTED) && (currentMillisWifi - previousMillisWifi >= intervalWifi))
+            {
+                Serial.println("Reconnecting to WiFi...");
+                // WiFi.disconnect();
+                WiFi.reconnect();
+                previousMillisWifi = currentMillisWifi;
+            }
+
+            currentMillisServer = millis();
+            if (WiFi.status() == WL_CONNECTED)
+            {
+                if (!client.connected() && (currentMillisServer - previousMillisServer >= intervalServer))
+                {
+                    client.stop();
+                    if (client.connect("192.168.137.1", 20240))
+                    {
+                        Serial.println("Connected to server !");
+                    }
+                    else
+                    {
+                        Serial.println("Connection to server failed");
+                    }
+                    previousMillisServer = currentMillisServer;
+                }
+            }
 
             if (ESP32_Helper::HasWaitingCommand())
             {
@@ -294,11 +342,15 @@ void Task2code(void *pvParameters)
                 }
                 else if (cmd.cmd == ("RobotPosition"))
                 {
-                    teleplot("robot", robot.GetPosition(), LEVEL_WARN);
+                    teleplot("robot", robot.GetPosition(), robot.GetPosition().angle, LEVEL_WARN);
                 }
                 else if (cmd.cmd == ("MapBoundaries"))
                 {
                     teleplot("mapBoundaries", MapBoundaries, 4, LEVEL_WARN);
+                }
+                else if (cmd.cmd == ("Tracker"))
+                {
+                    tracker.Teleplot(true);
                 }
 #endif
 

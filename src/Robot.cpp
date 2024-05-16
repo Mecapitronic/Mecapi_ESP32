@@ -53,7 +53,6 @@ void Robot::Update()
     if (ReadSerial())
     {
         Analyze();
-        teleplot("Robot", GetPosition());
     }
 }
 
@@ -61,7 +60,7 @@ boolean Robot::ReadSerial()
 {
     if (dsPicSerialStatus != ENABLE_NONE)
     {
-        if (SERIAL_ROBOT.available() > 0)
+        while (SERIAL_ROBOT.available() > 0)
         {
             uint32_t tmpInt = SERIAL_ROBOT.read();
             if (tmpInt == 0x21 && cursorTmp == 0)  // 0x21 = '!'
