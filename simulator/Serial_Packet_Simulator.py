@@ -19,7 +19,7 @@ serialPort = None
 
 FILE = "data_ld06_3.txt"
 
-BAUDRATE = 230400
+BAUDRATE = 921600
 SERIAL_LNX = "/dev/ttyUSB"
 SERIAL_WIN = "COM"
 

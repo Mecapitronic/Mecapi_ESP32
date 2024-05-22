@@ -127,6 +127,7 @@ class MetaSenseA010
      * @param discontinuity (int) the max delta in frame we can lost
      */
     void Config(int min, int max, int discontinuity);
+    void Update();
 
     /**
      * Read data from serial and put in a buffer if it comes from the MetaSenseA010

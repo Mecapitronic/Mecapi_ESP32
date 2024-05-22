@@ -23,9 +23,6 @@ extern Robot robot;
 #include "A010.h"
 #include "DBSCAN.h"
 
-MetaSenseA010 a010;
-Dbscan dbscan;
-
 #endif
 
 #ifdef VL53

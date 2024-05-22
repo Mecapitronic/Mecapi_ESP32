@@ -330,6 +330,14 @@ namespace Printer
         SERIAL_DEBUG.println("|xy");
     }
 
+    void teleplot(String varName, Point4D point, Level level)
+    {
+        if (!IsPrintable(level))
+            return;
+        String data = ">" + varName + ":" + (int)point.x + ":" + (int)point.y + "|xy";
+        SERIAL_DEBUG.println(data);
+    }
+
     void plot3D(Point3D p, String varName)
     {
         // 3D|A:B:C|E

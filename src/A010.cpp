@@ -73,6 +73,28 @@ void MetaSenseA010::Config(int min = -1, int max = -1, int discontinuity = -1)
         a010Config.IDMaxDiscontinuity = discontinuity;
     }
 }
+
+void MetaSenseA010::Update()
+{
+    if (ReadSerial())
+    {
+        println("New frame");
+        CheckContinuity();
+
+        // ! FIXME: n'affiche plus rien
+        for (uint16_t i = 0; i < PICTURE_SIZE; i++)
+        {
+            // Point4D p = {a010.cloudFrame[i].x, 10};
+            teleplot("3D", cloudFrame[i]);
+
+            // String data = "" + String(a010.cloudFrame[i].x) + " " + String(a010.cloudFrame[i].y) + " " +
+            //               String(a010.cloudFrame[i].z) + " " + String("65520");
+            // println(data);
+        }
+        // Do stuff
+    }
+}
+
 bool waitEndOfPacket = true;
 
 boolean MetaSenseA010::ReadSerial()

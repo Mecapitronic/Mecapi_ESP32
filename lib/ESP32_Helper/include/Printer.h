@@ -78,6 +78,8 @@ namespace Printer
     void teleplot(String varName, PolarPoint polarPoints[], uint16_t size, Level level = LEVEL_VERBOSE);
     void teleplot(String varName, vector<PolarPoint> vec, Level level = LEVEL_VERBOSE);
 
+    void teleplot(String varName, Point4D point, Level level = LEVEL_VERBOSE);
+
     /**
      * send cloud point data on serial for teleplot to trace 3D shape
      */

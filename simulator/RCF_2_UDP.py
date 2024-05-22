@@ -15,9 +15,7 @@ sockUDP = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, 0)
 sockTCP = socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0)
 serialPort = None
 
-FILE = "data_ld06_3.txt"
-
-BAUDRATE = 230400
+BAUDRATE = 921600
 SERIAL_LNX = "/dev/ttyUSB"
 SERIAL_WIN = "COM"
 

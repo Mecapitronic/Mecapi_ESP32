@@ -1,9 +1,16 @@
 #include "main.h"
 
+#ifdef LD06
 LidarLD06 ld06;
 Robot robot;
 Tracker tracker;
 testModule test;
+#endif
+
+#ifdef A010
+MetaSenseA010 a010;
+Dbscan dbscan;
+#endif
 
 PolarPoint MapBoundaries[] = {{0, 0}, {0, 2000}, {3000, 2000}, {3000, 0}};
 
@@ -13,11 +20,11 @@ void setup()
     Serial.begin(921600);
     delay(1000);
     Serial.println();
-    Serial.println("LiDAR Firmware");
+    Serial.println("ESP32 Firmware");
     // put your setup code here, to run once:
     ESP32_Helper::ESP32_Helper();
 
-    Printer::PrintLevel(LEVEL_INFO);
+    Printer::PrintLevel(LEVEL_VERBOSE);
 
 #ifdef LD06
     robot.Initialisation();
@@ -31,8 +38,8 @@ void setup()
 #ifdef A010
     a010.Initialisation();
     delay(500);
-    dbscan.Initialisation();
-    delay(500);
+    // dbscan.Initialisation();
+    // delay(500);
 #endif
 
 #ifdef VL53
@@ -78,6 +85,7 @@ void setup()
     measurementStartTime = millis();
 #endif
 
+    Serial.println("Creating Tasks");
     /* Task function. */
     /* name of task. */
     /* Stack size of task */
@@ -91,9 +99,10 @@ void setup()
 
 void loop()
 {
+    a010.Update();
     // Do not put code in the loop() when using freeRTOS.
     // loop() is the only task that is guaranteed to not be ran per tasking iteration.
-    delay(1000);
+    // delay(1000);
 }
 
 void functionChrono(int nbrLoop)
@@ -121,14 +130,16 @@ void functionChrono(int nbrLoop)
     Serial.println();
 }
 
+#ifdef LD06
 int64_t lastSendRobotTime = millis();
 PolarPoint lastPosition = {0, 0, 0, 0, 0};
 PolarPoint lastTrackerSend[5] = {{0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}};
+#endif
 
 // Note the 1 Tick delay, this is need so the watchdog doesn't get confused
 void Task1code(void *pvParameters)
 {
-    println("Start Task1code");
+    Serial.println("Start Task1code");
 
     while (1)
     {
@@ -199,38 +210,20 @@ void Task1code(void *pvParameters)
 #endif
 
 #ifdef A010
-            // we enter once we have the complete frame
-            if (a010.ReadSerial())
+
+                        // Erasing all previous _clusters
+
+            /*for (size_t i = 0; i < _clusters.size(); i++)
             {
-                // a010.CheckContinuity();
-
-                println("***");
-
-                // ! FIXME: n'affiche plus rien
-                for (uint16_t i = 0; i < PICTURE_SIZE; i++)
-                {
-                    String data = "" + String(a010.cloudFrame[i].x) + " " + String(a010.cloudFrame[i].y) + " " +
-                                  String(a010.cloudFrame[i].z) + " " + String("65520");
-                    println(data);
-                }
-                println("---");
-                println();
-
-                // Erasing all previous _clusters
-
-                /*for (size_t i = 0; i < _clusters.size(); i++)
-                {
-                    _clusters[i].clear();
-                }
-                _clusters.clear();
-                println("Dbscan Process");*/
-
-                //_clusters = dbscan.Process((Dbscan::Point3D *)&(a010.cloudFrame));
-                //_clusters = dbscan.Process((Point4D *)&(a010.cloudFrame));
-                // dbscan.displayStats();
-
-                // xQueueSend(myQueue, &a010Packet, 0);
+                _clusters[i].clear();
             }
+            _clusters.clear();
+            println("Dbscan Process");*/
+
+            //_clusters = dbscan.Process((Dbscan::Point3D *)&(a010.cloudFrame));
+            //_clusters = dbscan.Process((Point4D *)&(a010.cloudFrame));
+            // dbscan.displayStats();
+
 #endif
         }
         catch (std::exception const &e)
@@ -242,12 +235,14 @@ void Task1code(void *pvParameters)
     }
 }
 
+#ifdef WITH_WIFI
 unsigned long previousMillisWifi = 0;
 unsigned long previousMillisServer = 0;
 unsigned long intervalWifi = 5000;
 unsigned long intervalServer = 5000;
 unsigned long currentMillisWifi = 0;
 unsigned long currentMillisServer = 0;
+#endif
 
 int64_t lastSendSerialTime = millis();
 
@@ -264,6 +259,7 @@ void Task2code(void *pvParameters)
             // Check if we get commands from operator via debug serial
             ESP32_Helper::UpdateSerial();
 
+#ifdef LD06
             if (millis() - lastSendSerialTime > 100)
             {
                 lastSendSerialTime = millis();
@@ -279,7 +275,9 @@ void Task2code(void *pvParameters)
                 // teleplot("mapBoundaries", MapBoundaries, 4, LEVEL_WARN);
                 // teleplot("robot", robot.GetPosition(), LEVEL_WARN);
             }
+#endif
 
+#ifdef WITH_WIFI
             currentMillisWifi = millis();
             // if WiFi is down, try reconnecting every CHECK_WIFI_TIME seconds
             if ((WiFi.status() != WL_CONNECTED) && (currentMillisWifi - previousMillisWifi >= intervalWifi))
@@ -307,15 +305,19 @@ void Task2code(void *pvParameters)
                     previousMillisServer = currentMillisServer;
                 }
             }
+#endif
 
             if (ESP32_Helper::HasWaitingCommand())
             {
                 Command cmd = ESP32_Helper::GetCommand();
 
+#ifdef VL53
                 if (cmd.cmd.startsWith("VL53"))
                 {
                     println("VL53 : ", cmd.size, "");
                 }
+#endif
+
 #ifdef LD06
                 if (cmd.cmd == ("LD06PWM"))
                 {
