@@ -12,7 +12,7 @@ void MetaSenseA010::Initialisation()
     delay(1000);
 
     // pre-computing of coefficient to convert depth data to cartesian coordinate point
-    ComputeCartesianCoefficient(PICTURE_RES, PICTURE_RES, FOV_HOR, FOV_VER, 0, 0);
+    ComputeCartesianCoefficient(PICTURE_RES, PICTURE_RES, FOV_HOR, FOV_VER, 0, INCLINAISON_CAM);
     // logCartesianCoefficient();
 
     // AT commands configuration
@@ -78,20 +78,150 @@ void MetaSenseA010::Update()
 {
     if (ReadSerial())
     {
-        println("New frame");
+        println("New frame: distance");
         CheckContinuity();
 
-        // ! FIXME: n'affiche plus rien
+        String data = "";
+        uint16_t col = 0;  // plan horizontal => curseur
+        uint16_t row = 0;  // plan vertical => numéro de ligne
+
+        // parcourir image
         for (uint16_t i = 0; i < PICTURE_SIZE; i++)
         {
             // Point4D p = {a010.cloudFrame[i].x, 10};
-            teleplot("3D", cloudFrame[i]);
+            // teleplot("3D", cloudFrame[i]);
 
             // String data = "" + String(a010.cloudFrame[i].x) + " " + String(a010.cloudFrame[i].y) + " " +
             //               String(a010.cloudFrame[i].z) + " " + String("65520");
             // println(data);
+
+            col = i % PICTURE_RES;  // plan horizontal => curseur
+            row = i / PICTURE_RES;  // plan vertical => numéro de ligne
+
+            /*if (col >= 0 && col < PICTURE_RES && row >= 0 && row < PICTURE_RES)
+            {
+
+                cloudFrame[i].w = a010Packet.payload[i];  // * QUANTIZATION_MM;  // distance en mm
+            }*/
+
+            // *************** test algo filtrage ********************
+            /*if ((d < 100) || (d > 1000))  // garder entre 10cm et 1m
+            {
+                d = 0;
+            }*/
+
+            //**** Fonction pour appliquer le filtre médian 3x3 ****
+            // Parcourir chaque pixel de l'image (sauf les bords)
+            if ((col > 0) && (col < (PICTURE_RES - 1)) && (row > 0) && (row < (PICTURE_RES - 1)))
+            { /* // filtre median par tri
+                 int8_t window[9];
+
+                 // Remplir la fenêtre 3x3
+                 window[0] = a010Packet.payload[i - PICTURE_RES - 1];
+                 window[1] = a010Packet.payload[i - PICTURE_RES];
+                 window[2] = a010Packet.payload[i - PICTURE_RES + 1];
+                 window[3] = a010Packet.payload[i - 1];
+                 window[4] = a010Packet.payload[i];
+                 window[5] = a010Packet.payload[i + 1];
+                 window[6] = a010Packet.payload[i + PICTURE_RES - 1];
+                 window[7] = a010Packet.payload[i + PICTURE_RES];
+                 window[8] = a010Packet.payload[i + PICTURE_RES + 1];
+
+                // Trier la fenêtre pour trouver la médiane
+                for (int k = 0; k < 8; k++)
+                {
+                    for (int j = 0; j < 8 - k; j++)
+                    {
+                        if (window[j] > window[j + 1])
+                        {
+                            int8_t temp = window[j];
+                            window[j] = window[j + 1];
+                            window[j + 1] = temp;
+                        }
+                    }
+                }
+                // Assigner la médiane au pixel de sortie
+                cloudFrame[i].w = window[4];*/
+
+                // filtre median par histogramme (a priori plus rapide)
+                int8_t histogram[255] = {0};
+                // Remplir l'histogramme sur la fenêtre 3x3
+                histogram[a010Packet.payload[i - PICTURE_RES - 1]]++;
+                histogram[a010Packet.payload[i - PICTURE_RES]]++;
+                histogram[a010Packet.payload[i - PICTURE_RES + 1]]++;
+                histogram[a010Packet.payload[i - 1]]++;
+                histogram[a010Packet.payload[i]]++;
+                histogram[a010Packet.payload[i + 1]]++;
+                histogram[a010Packet.payload[i + PICTURE_RES - 1]]++;
+                histogram[a010Packet.payload[i + PICTURE_RES]]++;
+                histogram[a010Packet.payload[i + PICTURE_RES + 1]]++;
+
+                // Trouver la médiane à partir de l'histogramme
+                int count = 0;
+                for (int h = 0; h < 255; h++)
+                {
+                    count += histogram[h];
+                    if (count >= 5)
+                    {
+                        cloudFrame[i].w = h;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                cloudFrame[i].w = 255;  // bords de l'image
+            }
+            // ***********************************
+
+            // cartesian coordinate
+            float tmpF = cloudFrame[i].w;
+            cloudFrame[i].x = tmpF * coefX[col];
+            cloudFrame[i].y = tmpF * coefY[col];
+            cloudFrame[i].z = tmpF * coefZ[row] + OFFSET_Z;
+
+            uint16_t d = cloudFrame[i].w * QUANTIZATION_MM;
+
+            // affichage en CSV
+            if (col == (PICTURE_RES - 1))
+            {
+                data += String(d);  // end of line
+                println(data);
+                data = "";
+                vTaskDelay(1);
+            }
+            else
+            {
+                data += String(d) + ";";
+            }
         }
         // Do stuff
+
+        println("Same frame: z coordinate");
+
+        data = "";
+        col = 0;  // plan horizontal => curseur
+        row = 0;  // plan vertical => numéro de ligne
+
+        // parcourir image
+        for (uint16_t i = 0; i < PICTURE_SIZE; i++)
+        {
+            col = i % PICTURE_RES;  // plan horizontal => curseur
+            row = i / PICTURE_RES;  // plan vertical => numéro de ligne
+
+            // affichage en CSV
+            if (col == (PICTURE_RES - 1))
+            {
+                data += String(cloudFrame[i].z);  // end of line
+                println(data);
+                vTaskDelay(1);
+                data = "";
+            }
+            else
+            {
+                data += String(cloudFrame[i].z) + ";";
+            }
+        }
     }
 }
 
@@ -118,23 +248,8 @@ boolean MetaSenseA010::ReadSerial()
         {
             if (cursorTmp < packetSize + 4)
             {
-                if (indexTmp >= 0 && indexTmp < PICTURE_SIZE)
-                {
-                    uint16_t col = indexTmp % PICTURE_RES;  // plan horizontal => curseur
-                    uint16_t row = indexTmp / PICTURE_RES;  // plan vertical => numéro de ligne
-                    a010Packet.payload[indexTmp] = tmpInt;
-
-                    if (col >= 0 && col < PICTURE_RES && row >= 0 && row < PICTURE_RES)
-                    {
-                        float tmpF = tmpInt;
-                        cloudFrame[indexTmp].x = tmpF * coefX[col];
-                        cloudFrame[indexTmp].y = tmpF * coefY[col];
-                        cloudFrame[indexTmp].z = tmpF * coefZ[row];
-                        cloudFrame[indexTmp].w = tmpInt;
-                    }
-                }
+                a010Packet.payload[cursorTmp - 20] = tmpInt;
                 cursorTmp++;
-                indexTmp++;
             }
             else if (cursorTmp == packetSize + 4)
             {
@@ -143,18 +258,18 @@ boolean MetaSenseA010::ReadSerial()
                 checksum -= tmpInt;
                 if (checksum == a010Packet.frame_tail.checksum)
                 {
-                    // Serial.println("Checksum OK !");
+                    Serial.println("Checksum OK !");
                 }
                 else
                 {
-                    // Serial.println();
-                    // Serial.print("Checksum ");
-                    // Serial.print(a010Packet.frame_tail.checksum);
-                    // Serial.print(" - Calculated ");
-                    // Serial.print(checksum);
-                    // Serial.println();
-                    // Serial.printf("'%X\n", checksum);
-                    // Serial.println(SERIAL_A010.available());
+                    Serial.println();
+                    Serial.print("Checksum NOK !");
+                    Serial.print(a010Packet.frame_tail.checksum);
+                    Serial.print(" - Calculated ");
+                    Serial.print(checksum);
+                    Serial.println();
+                    Serial.printf("'%X\n", checksum);
+                    Serial.println(SERIAL_A010.available());
                     waitEndOfPacket = true;
                     InitTmpVariables();
                 }
@@ -302,7 +417,7 @@ boolean MetaSenseA010::ReadSerial()
             a010Packet.frame_head.reserved3 = tmpInt;
             cursorTmp++;
             indexTmp = 0;
-            // logHeader();
+            logHeader();
         }
         else
         {

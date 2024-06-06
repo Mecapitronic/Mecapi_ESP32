@@ -47,17 +47,24 @@
 #define TX1 4
 
 // Increase the buffer serial to avoid loss packet, 256 by default, should not be under 128
-#define SERIAL_SIZE_RX 4096
+#define SERIAL_SIZE_RX 16384//4096
 
 /***************** Configuration : REBOOT CAMERA AFTER !! *****************/
-#define BINNING_SIZE 4      // pixel binning : 1=1x1 (100x100), 2=2x2 (50x50), 4=4x4 (25x25)
-#define QUANTIZATION_MM 5   // depth data resolution in mm (1 to 9)
-#define FRAME_PER_SECOND 6  // Frame per second, FPS from 1 to 20 (30?)
-#define BAUD_RATE_STATE 5   // 0=9.600 1=57.600 2=115.200 3=230.400  4=460.800 5=921.600 6=1.000.000 7=2.000.000 8=3.000.000
+#define BINNING_SIZE 1
+// pixel binning : 1=1x1 (100x100), 2=2x2 (50x50), 4=4x4 (25x25)
+// FIXME: ne fonctionne pas en 100x100
+#define QUANTIZATION_MM 5
+// depth data resolution in mm (1 to 9)
+#define FRAME_PER_SECOND 2
+// Frame per second, FPS from 1 to 20 (30?)
+#define BAUD_RATE_STATE 5
+// 0=9.600 1=57.600 2=115.200 3=230.400  4=460.800 5=921.600 6=1.000.000 7=2.000.000 8=3.000.000
 /************************************************/
 
 #define FOV_HOR 70
 #define FOV_VER 60
+#define OFFSET_Z 165  // hauteur de la caméra en mm
+#define INCLINAISON_CAM -27 // inclinaison en deg
 
 #if BINNING_SIZE == 4
 #define PICTURE_SIZE 625

@@ -9,7 +9,7 @@ testModule test;
 
 #ifdef A010
 MetaSenseA010 a010;
-Dbscan dbscan;
+// Dbscan dbscan;
 #endif
 
 PolarPoint MapBoundaries[] = {{0, 0}, {0, 2000}, {3000, 2000}, {3000, 0}};
@@ -99,10 +99,12 @@ void setup()
 
 void loop()
 {
+    //  Do not put code in the loop() when using freeRTOS.
+    //  loop() is the only task that is guaranteed to not be ran per tasking iteration.
+    //  delay(1000);
+#ifdef A010
     a010.Update();
-    // Do not put code in the loop() when using freeRTOS.
-    // loop() is the only task that is guaranteed to not be ran per tasking iteration.
-    // delay(1000);
+#endif
 }
 
 void functionChrono(int nbrLoop)
