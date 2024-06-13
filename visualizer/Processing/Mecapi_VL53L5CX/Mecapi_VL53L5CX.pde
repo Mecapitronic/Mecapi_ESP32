@@ -25,6 +25,8 @@ import processing.serial.*;
 
 // Serial Port Variables
 Serial port; // Initialize Serial object
+String comPort = "COM4"; // Serial com port number
+
 String buff = ""; // Create a serial buffer
 int[] depths = new int[64]; // Create a list to parse serial into 
 
@@ -45,8 +47,12 @@ float yRotOffset = 0; // Temporary y rotational offset (relevant during mouse dr
 float yRotPos = 0; // Y rotational position
 float zRotOffset = 0; // Temporary z rotational offset (relevant during mouse drag)
 float zRotPos = 0; // Z rotational position
+float transX = 0;
+float transY = 0;
+float transXpos = 0;
+float transYpos = 0;
 // Mesh Zoom Variables
-float scaleOffset = 0.3; // Scale factor from mouse wheel
+float scaleOffset =0.7; // Scale factor from mouse wheel
 
   // sensor variables
 float horFOVdeg = 45; // horizontal FOV in degrees
@@ -54,11 +60,13 @@ float verFOVdeg = 45; // horizontal FOV in degrees
 int horRes = 8; // horizontal resolution
 int verRes = 8; // vertical resolution
 float horOFFSETdeg = 0; // horizontal offset angle in degrees
-float verOFFSETdeg = 45; // vertical offset angle in degrees
-float zOFFSETmm = 320; // Z height fo sensor
+float verOFFSETdeg = -45; // vertical offset angle in degrees => 45+45/2
+float zOFFSETmm = 315; // Z height fo sensor
+
 float[] coefX = new float[8];
 float[] coefY = new float[8];
 float[] coefZ = new float[8];
+float[] coefDistorsion = new float[8];
 //point3D[] cartesianConv = new point3D[8];
 //point3D[] cloud = new point3D[64]; // Create a table of point cloud in 3D
 float[] pointX = new float[64];
@@ -74,25 +82,32 @@ float[] pointZ = new float[64];
 
 void setup(){
   String[] serials = Serial.list();
-  size(1000,1000, P3D); // Make a 3D capable window //<>//
+  
+  size(700,700, P3D); // Make a 3D capable window
+  transX = width*0.2;
+  transY = height*0.6;
+
+  surface.setTitle("Mecapi VL53L5CX");
+  surface.setResizable(true);
+  //surface.setLocation(100, 100);
+  
   printArray(serials);
   if(serials.length>0)
   {
     for (int i = 0; i < serials.length; i = i+1)
     {
-      if(serials[i].equals("COM9"))
+      if(serials[i].equals(comPort))
       {
-        port = new Serial(this, "COM9", 115200); // CHANGE COM13 TO YOUR SERIAL PORT //<>//
+        port = new Serial(this, comPort, 115200);
         port.clear();
       }
     }
   }
-  //port.bufferUntil(10); // ASCII LineFeed Character
   
   // Fill our list with 0s to avoid a null pointer exception
   // in case the sensor data is not immediately available
   for(int idx = 0; idx < 64; idx++){
-    depths[idx] = 1850; 
+    depths[idx] = 300; // 30cm
   }
  
   // compute cartesian coefficients from sensor parameters
@@ -100,22 +115,30 @@ void setup(){
   // radians !
   float horAngRes = radians(horFOVdeg / (float)horRes);
   float verAngRes = radians(verFOVdeg / (float)verRes);
-  float horAngZero = radians((horFOVdeg / 2) + horOFFSETdeg);
-  float verAngZero = radians((verFOVdeg / 2) + verOFFSETdeg);
+  float horAngZero = radians((horFOVdeg / 2) + horOFFSETdeg) - horAngRes/2;
+  float verAngZero = radians((verFOVdeg / 2) + verOFFSETdeg) - verAngRes/2;
 
-  // compute Horizontal => X and Y
-  for (int i = 0; i < horRes; i++)
-  {
-      angle = (horAngRes * i) - horAngZero;
-      coefX[i] = sin(angle);
-      coefY[i] = cos(angle);
-  }
-  // compute Vertical => Z
+  // compute Vertical => Z and Y (both depend of vertical angle !)
   for (int i = 0; i < verRes; i++)
   {
       angle = verAngZero - (verAngRes * i);
-      coefZ[i] = sin(angle);
+      //angle = (verAngRes * i) - verAngZero;
+      // (tentative de) correction de la distorsion de l'image, à calibrer sur sol plan
+      coefDistorsion[i] = 1 + abs(sin(angle-radians(verOFFSETdeg)))*0.22;
+      coefZ[i] = sin(angle) * coefDistorsion[i]; // coté opposée à l'angle => sinus
+      coefY[i] = cos(angle) * coefDistorsion[i]; // Y en ordonnée, angle par rapport à axe Y => cosinus
   }
+  // compute Horizontal => X
+  for (int i = 0; i < horRes; i++)
+  {
+      //angle = (horAngRes * i) - horAngZero; // premier point à gauche vue de derrière
+      angle = horAngZero - (horAngRes * i); // premier point à droite vue de derrière
+      coefX[i] = sin(angle)  * coefDistorsion[i]; // X en abscisse, angle par rapport à axe Y => sinus
+  }
+}
+
+float Y(float y) // in computer graphic interface, the Y axe is reversed !
+{return -y;
 }
 
 void draw() // main loop
@@ -126,7 +149,7 @@ void draw() // main loop
     buff = (port.readStringUntil(10)); // read the whole line
     if(buff!=null)
     {
-      buff = buff.substring(0, buff.length()-1); // remove the Carriage Return
+      buff = buff.substring(0, buff.length()-2); // remove the Carriage Return
       if (buff != "") {
         //println(buff);
         depths = int(split(buff, ',')); // split at commas into our array
@@ -134,11 +157,11 @@ void draw() // main loop
     }
   }
   
-  colorMode(HSB); // HSB color space makes it easy to map hue
+  colorMode(HSB); // HSB color space makes it easy to map hue //<>//
   lights(); // Add ambient light to scene
   noStroke(); // Draw without stroke
   smooth(); // Draw with anti-aliasing
-  background(0,0,100); // Fill background //<>//
+  background(0,0,120); // Fill background
   
 //size(400,400,P3D);
 //translate(232, 192, 0); 
@@ -146,36 +169,51 @@ void draw() // main loop
 //noFill();
 
   
-textSize(32);
-float rotx = 0-(xRotOffset+xRotPos)+PI/2;
-float roty = 0+(yRotOffset+yRotPos)+PI/4;
-float rotz = 0-zRotOffset-zRotPos-PI/2;
-text("Rot X : " + degrees(rotx), 40, 40);
-text("Rot Y : " + degrees(roty), 40, 80);
-text("Rot Z : " + degrees(rotz), 40, 120);
-text("Zoom : " + scaleOffset, 40, 160);
-
+  textSize(16);
+  float rotx = 0-(xRotOffset+xRotPos)+radians(60);
+  float roty = 0+(yRotOffset+yRotPos);
+  float rotz = 0+zRotOffset+zRotPos+radians(70);
+  text("Rot X : " + degrees(rotx), 10, 20);
+  text("Rot Y : " + degrees(roty), 10, 40);
+  text("Rot Z : " + degrees(rotz), 10, 60);
+  text("Zoom : " + scaleOffset, 10, 80);
+  
+  //pushMatrix();
   // This stuff is all basically to scale and rotate the mesh
   // while keeping it in the center of the scene
-  translate(width/4,height/4);
+  translate(transX,transY);
   rotateX(rotx);
   rotateY(roty);
   rotateZ(rotz);
   scale(scaleOffset);
 
-  //noFill();
-  box(100);
+  // Affichage origine et repère cartésien
+  box(10);
+  textSize(30);
+  text("X+", 50, 0);
+  text("Y+", 0, Y(50));
+  text("Z+", 0, 0, 50);
   
+  // Affichage FOV capteur
+  stroke(0);
+  line(0, 0, 320, -100, Y(100), 0);
+  line(0, 0, 320, 100, Y(100), 0);
+  line(0, 0, 320, -300, Y(800), 0);
+  line(0, 0, 320, 300, Y(800), 0);
+  // affichage projection au sol
   stroke(255);
-  line(0, 0, 0, 100, 100, 100);
-  line(0, 0, 0, 100, -100, 100);
-  line(0, 0, 0, -100, 100, 100);
-  line(0, 0, 0, -100, -100, 100);
-  
-  line(100, 100, 100, 100, -100, 100);
-  line(100, -100, 100, -100, -100, 100);
-  line(-100, -100, 100, -100, 100, 100);
-  line(-100, 100, 100, 100, 100, 100);
+  line(-100, Y(100), 0, 100, Y(100), 0);
+  line(-100, Y(100), 0, -300, Y(800), 0);
+  line(300, Y(800), 0, -300, Y(800), 0);
+  line(300, Y(800), 0, 100, Y(100), 0);
+  // affichage échelle au sol
+  stroke(255);
+  line(-10, Y(200), 0, 10, Y(200), 0); text("200", 0, Y(200));
+  line(-10, Y(300), 0, 10, Y(300), 0); text("300", 0, Y(300));
+  line(-10, Y(400), 0, 10, Y(400), 0); text("400", 0, Y(400));
+  line(-10, Y(500), 0, 10, Y(500), 0); text("500", 0, Y(500));
+  line(-10, Y(600), 0, 10, Y(600), 0); text("600", 0, Y(600));
+  line(-10, Y(700), 0, 10, Y(700), 0); text("700", 0, Y(700));
   noStroke();
 
   // for all points
@@ -185,18 +223,34 @@ text("Zoom : " + scaleOffset, 40, 160);
       // conversion to cartesian coordinates
       int col = i % 8;  // plan horizontal => curseur
       int row = i / 8;  // plan vertical => numéro de ligne
-      pointX[i] = depths[i]*coefX[col]; //<>//
-      pointY[i] = depths[i]*coefY[col];
-      pointZ[i] = depths[i]*coefZ[row] + zOFFSETmm;
+      pointX[i] = depths[i]*coefX[col];
+      pointY[i] = depths[i]*coefY[row]; // row because Y depend of vertical angle !
+      pointZ[i] = depths[i]*coefZ[row] + zOFFSETmm;      
       //cloud[i].radius = 10;
       
-      // displaying
+      // displaying version 1
       pushMatrix();
-      translate(pointX[i], pointY[i], pointZ[i]);
-      
-      sphere(10);
+      translate(pointX[i], Y(pointY[i]), pointZ[i]); // position
+      fill(map(pointZ[i],10,250,200,0),255,255); // couleur
+      if (pointZ[i] < 15) box(depths[i]/40);
+      else sphere(depths[i]/30); // forme et taille
+      textSize(15);
+      fill(255);
+      text((int)pointZ[i], 0, 0, 20);
       popMatrix();
     }
+    //for(int i=0; i<64; i++)
+    //{
+    //  int col = i % 8;  // plan horizontal => curseur
+    //  int row = i / 8;  // plan vertical => numéro de ligne
+    //  // displaying version 2
+    //  beginShape(TRIANGLE_STRIP);
+    //  fill(map(pointZ[i],10,250,200,0),255,255); // couleur
+    //  vertex(pointX[col],Y(pointY[col]), depths[i]);
+    //  vertex(pointX[row], Y(pointY[row]), depths[i+1]);
+    //  endShape();
+    //}
+    fill(255);
   }
   
   // For each row, draw a triangle strip with the z-height of
@@ -215,13 +269,15 @@ text("Zoom : " + scaleOffset, 40, 160);
   //  endShape();
   //}
 
-} //<>//
+}
 
-// Wehn the mouse is pressed, remember where the cursor was
+// When the mouse is pressed, remember where the cursor was
 // so we can calculate how "far" it gets dragged
 void mousePressed() {
   xPress = mouseX;
   yPress = mouseY;
+  transXpos = transX;
+  transYpos = transY;
 }
 
 // Between mouse drag events, draw will still be running, so we need to 
@@ -236,6 +292,11 @@ void mouseDragged() {
   {
     xRotOffset = (mouseY-yPress)/100;
     yRotOffset = (mouseX-xPress)/100;
+  }
+  if(mouseButton == CENTER)
+  {
+    transX = transXpos + (mouseX-xPress);
+    transY = transYpos + (mouseY-yPress);
   }
 }
 
