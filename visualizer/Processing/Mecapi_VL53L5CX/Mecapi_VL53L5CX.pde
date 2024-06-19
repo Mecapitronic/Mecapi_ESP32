@@ -25,7 +25,7 @@ import processing.serial.*;
 
 // Serial Port Variables
 Serial port; // Initialize Serial object
-String comPort = "COM4"; // Serial com port number
+String comPort = "COM3"; // Serial com port number
 
 String buff = ""; // Create a serial buffer
 int[] depths = new int[64]; // Create a list to parse serial into 
@@ -188,7 +188,7 @@ void draw() // main loop
   scale(scaleOffset);
 
   // Affichage origine et repère cartésien
-  box(10);
+  box(5);
   textSize(30);
   text("X+", 50, 0);
   text("Y+", 0, Y(50));
@@ -216,9 +216,17 @@ void draw() // main loop
   line(-10, Y(700), 0, 10, Y(700), 0); text("700", 0, Y(700));
   noStroke();
 
-  // for all points
-  if(depths.length >= 64){
-    for(int i=0; i<64; i++)
+  // traitement du nuage de points
+  if(depths.length >= 64)
+  {
+    // variables pour centre de gravité
+    float center_x = 0;
+    float center_y = 0;
+    float sum_x = 0;
+    float sum_y = 0;
+    int num_points = 0;
+    
+    for(int i=0; i<64; i++) // for all points
     {
       // conversion to cartesian coordinates
       int col = i % 8;  // plan horizontal => curseur
@@ -228,17 +236,39 @@ void draw() // main loop
       pointZ[i] = depths[i]*coefZ[row] + zOFFSETmm;      
       //cloud[i].radius = 10;
       
+      // calcul du centre de gravité (pour tout objet d'au moins 13cm de haut)
+      if (pointZ[i] > 130)
+      {
+        num_points++;
+        sum_x += pointX[i];
+        sum_y += pointY[i];
+      }
+      
       // displaying version 1
       pushMatrix();
       translate(pointX[i], Y(pointY[i]), pointZ[i]); // position
       fill(map(pointZ[i],10,250,200,0),255,255); // couleur
       if (pointZ[i] < 15) box(depths[i]/40);
-      else sphere(depths[i]/30); // forme et taille
+      else sphere(depths[i]/40); // forme et taille
       textSize(15);
       fill(255);
       text((int)pointZ[i], 0, 0, 20);
       popMatrix();
     }
+    
+    // fin calcul centre gravité et affichage
+    center_x = sum_x / num_points;
+    center_y = sum_y / num_points;
+    pushMatrix();
+    translate(center_x, Y(center_y), 0);
+    box(30);
+    fill(255);
+    textSize(25);
+    text((int)sqrt(center_x*center_x + Y(center_y)*Y(center_y)), 15, 0, 0);
+    popMatrix();
+    
+
+    
     //for(int i=0; i<64; i++)
     //{
     //  int col = i % 8;  // plan horizontal => curseur
