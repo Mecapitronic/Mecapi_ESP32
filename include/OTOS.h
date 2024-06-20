@@ -18,7 +18,7 @@ class OpticalTrackingOdometrySensor
     void Update();
 
    private:
-    // SparkFun_
+    QwiicOTOS myOtos;
 };
 
 #endif
