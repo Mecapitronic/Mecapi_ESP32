@@ -1,6 +1,8 @@
 #ifndef VL53L5CX_H
 #define VL53L5CX_H
 
+#ifdef VL53
+
 #include <Arduino.h>
 #include "ESP32_Helper.h"
 
@@ -14,7 +16,7 @@ class VL53L5CX
 {
    public:
     void Initialisation();
-    // void Config();
+    void Config();
     void Update();
 
    private:
@@ -28,4 +30,5 @@ class VL53L5CX
     long measurementStartTime = 0;  // Used to calculate actual output rate
 };
 
+#endif
 #endif
