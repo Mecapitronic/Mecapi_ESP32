@@ -22,7 +22,11 @@ extern Robot robot;
 #ifdef VL53
 #warning "! Compiling for VL53L5CX !"
 #include "VL53L5CX.h"
+#endif
 
+#ifdef SPARKFUN_OTOS
+#warning "! Compiling for QwiicOTOS !"
+#include "OTOS.h"
 #endif
 
 /**

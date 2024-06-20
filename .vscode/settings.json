@@ -32,6 +32,10 @@
         "MECAPITRONIC",
         "neighbourhoods",
         "neighbours",
+        "Odometry",
+        "OTOS",
+        "Qwiic",
+        "SPARKFUN",
         "teleplot"
     ],
     "platformio-ide.disablePIOHomeStartup": true,
