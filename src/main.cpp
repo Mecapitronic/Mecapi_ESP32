@@ -16,6 +16,10 @@ MetaSenseA010 a010;
 VL53L5CX vl53;
 #endif
 
+#ifdef SPARKFUN_OTOS
+OpticalTrackingOdometrySensor otos;
+#endif
+
 PolarPoint MapBoundaries[] = {{0, 0}, {0, 2000}, {3000, 2000}, {3000, 0}};
 
 void setup()
@@ -52,6 +56,10 @@ void setup()
     vl53.Initialisation();
 #endif
 
+#ifdef SPARKFUN_OTOS
+    otos.Initialisation();
+#endif
+
     Serial.println("Creating Tasks");
     /* Task function. */
     /* name of task. */
@@ -69,11 +77,17 @@ void loop()
     //  Do not put code in the loop() when using freeRTOS.
     //  loop() is the only task that is guaranteed to not be ran per tasking iteration.
     //  delay(1000);
+
 #ifdef A010
     a010.Update();
 #endif
+
 #ifdef VL53
     vl53.Update();
+#endif
+
+#ifdef SPARKFUN_OTOS
+    otos.Update();
 #endif
 }
 
