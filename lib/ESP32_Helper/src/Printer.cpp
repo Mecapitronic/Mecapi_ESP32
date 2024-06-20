@@ -266,6 +266,14 @@ namespace Printer
         SERIAL_DEBUG.println(suffix);
     }
 
+    void teleplot(String varName, float var, Level level)
+    {
+        if (!IsPrintable(level))
+            return;
+        String data = ">" + varName + ":" + var;
+        SERIAL_DEBUG.println(data);
+    }
+
     void teleplot(String varName, Point point, Level level)
     {
         if (!IsPrintable(level))

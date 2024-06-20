@@ -69,6 +69,7 @@ namespace Printer
     /**
      * Send data to be viewed on teleplot, eg: trace x and y in a graph
      */
+    void teleplot(String varName, float var, Level level = LEVEL_VERBOSE);
     void teleplot(String varName, Point point, Level level = LEVEL_VERBOSE);
     void teleplot(String varName, Point points[], uint16_t size, Level level = LEVEL_VERBOSE);
 

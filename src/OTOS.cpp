@@ -21,9 +21,9 @@ void OpticalTrackingOdometrySensor::Initialisation()
     Serial.println("Ensure the OTOS is flat and stationary, then enter any key to calibrate the IMU");
 
     // Clear the serial buffer
-    while (Serial.available()) Serial.read();
+    // while (Serial.available()) Serial.read();
     // Wait for user input
-    while (!Serial.available());
+    // while (!Serial.available());
 
     Serial.println("Calibrating IMU...");
 
@@ -46,8 +46,8 @@ void OpticalTrackingOdometrySensor::Initialisation()
     // multiple speeds to get an average, then set the linear scalar to the
     // inverse of the error. For example, if you move the robot 100 inches and
     // the sensor reports 103 inches, set the linear scalar to 100/103 = 0.971
-    myOtos.setLinearScalar(1.0);
-    myOtos.setAngularScalar(1.0);
+    myOtos.setLinearScalar(0.934);
+    myOtos.setAngularScalar(0.990);
 
     // Set the desired units for linear and angular measurements. Can be either
     // meters or inches for linear, and radians or degrees for angular. If not
@@ -69,23 +69,71 @@ void OpticalTrackingOdometrySensor::Config() {}
 
 void OpticalTrackingOdometrySensor::Update()
 {
+    sfeTkError_t error;
     // Get the latest position, which includes the x and y coordinates, plus the
     // heading angle
     sfe_otos_pose2d_t myPosition;
-    myOtos.getPosition(myPosition);
+    error = myOtos.getPosition(myPosition);
+    if (error != 0)
+        print("Error Pos : ", error);
 
-    // Print measurement
-    Serial.println();
-    Serial.println("Position:");
-    Serial.print("X (Meters): ");
-    Serial.println(myPosition.x * 1000);
-    Serial.print("Y (Meters): ");
-    Serial.println(myPosition.y * 1000);
-    Serial.print("Heading (Degrees): ");
-    Serial.println(myPosition.h);
+    // Create structs for velocity, and acceleration
+    sfe_otos_pose2d_t vel;
+    error = myOtos.getVelocity(vel);
+    if (error != 0)
+        print("Error Vel : ", error);
+
+    sfe_otos_pose2d_t acc;
+    error = myOtos.getAcceleration(acc);
+    if (error != 0)
+        print("Error Acc : ", error);
+
+    teleplot("X", myPosition.x * 1000);
+    teleplot("Y", myPosition.y * 1000);
+    teleplot("H", myPosition.h);
+
+    teleplot("VX", vel.x * 1000);
+    teleplot("VY", vel.y * 1000);
+    teleplot("VH", vel.h);
+
+    teleplot("AX", acc.x * 1000);
+    teleplot("AY", acc.y * 1000);
+    teleplot("AH", acc.h);
+
+    /*
+        // Print measurement
+        Serial.println();
+        Serial.println("Position:");
+        Serial.print("X (Meters): ");
+        Serial.println(myPosition.x, 4);
+        Serial.print("Y (Meters): ");
+        Serial.println(myPosition.y, 4);
+        Serial.print("Heading (Degrees): ");
+        Serial.println(myPosition.h, 4);
+
+        // Print velocity
+        Serial.println();
+        Serial.println("Velocity:");
+        Serial.print("X (Meters/sec): ");
+        Serial.println(vel.x, 4);
+        Serial.print("Y (Meters/sec): ");
+        Serial.println(vel.y, 4);
+        Serial.print("Heading (Degrees/sec): ");
+        Serial.println(vel.h, 4);
+
+        // Print acceleration
+        Serial.println();
+        Serial.println("Acceleration:");
+        Serial.print("X (Meters/sec^2): ");
+        Serial.println(acc.x, 4);
+        Serial.print("Y (Meters/sec^2): ");
+        Serial.println(acc.y, 4);
+        Serial.print("Heading (Degrees/sec^2): ");
+        Serial.println(acc.h, 4);
+    */
 
     // Wait a bit so we don't spam the serial port
-    delay(500);
+    delay(100);
 }
 
 #endif
