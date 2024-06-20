@@ -14,6 +14,8 @@ using namespace std;
 
 #define ENUM_STRING(p) #p
 
+// #define private public // troll ...
+
 enum Level
 {
     LEVEL_VERBOSE,
