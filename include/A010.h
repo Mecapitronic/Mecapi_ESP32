@@ -50,7 +50,7 @@
 #define SERIAL_SIZE_RX 16384//4096
 
 /***************** Configuration : REBOOT CAMERA AFTER !! *****************/
-#define BINNING_SIZE 1
+#define BINNING_SIZE 4
 // pixel binning : 1=1x1 (100x100), 2=2x2 (50x50), 4=4x4 (25x25)
 // FIXME: ne fonctionne pas en 100x100
 #define QUANTIZATION_MM 5
@@ -124,8 +124,8 @@ class MetaSenseA010
 {
    public:
     void Initialisation();
-    void InitTmpVariables();
-
+    void Update();
+    void HandleCommand(Command cmd);
     /**
      * @brief Configure A010Config local variable with the given values in parameters
      *
@@ -134,11 +134,8 @@ class MetaSenseA010
      * @param discontinuity (int) the max delta in frame we can lost
      */
     void Config(int min, int max, int discontinuity);
-    void Update();
 
-    /**
-     * Read data from serial and put in a buffer if it comes from the MetaSenseA010
-     */
+    void InitTmpVariables();
     boolean ReadSerial();
     boolean CheckContinuity();
 

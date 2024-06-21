@@ -61,6 +61,7 @@ class Tracker
    public:
     void Initialisation();
     void Update();
+    void HandleCommand(Command cmd);
     void SendToRobot();
     void Teleplot(bool all);
 

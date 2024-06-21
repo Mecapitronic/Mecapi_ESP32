@@ -16,8 +16,9 @@ class VL53L5CX
 {
    public:
     void Initialisation();
-    void Config();
     void Update();
+    void HandleCommand(Command cmd);
+    // void Config();
 
    private:
     SparkFun_VL53L5CX myImager;

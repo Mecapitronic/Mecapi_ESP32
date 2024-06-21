@@ -14,6 +14,40 @@ void Robot::Initialisation()
     dsPicSerial(ENABLE_TRUE);
 }
 
+void Robot::Update()
+{
+    if (ReadSerial())
+    {
+        Analyze();
+    }
+}
+
+void Robot::HandleCommand(Command cmd)
+{
+    if (cmd.cmd == ("RobotXYA"))
+    {
+        // RobotXYA:1000;1500;00000
+        SetPosition(cmd.data[0], cmd.data[1], cmd.data[2]);
+        print("Robot Position : ", position);
+    }
+    else if (cmd.cmd == ("RobotState"))
+    {
+        /*
+            // RobotState:0
+            int cmdLength = 11;
+            int state = atoi(cmd.substring(cmdLength, cmdLength + 1).c_str());
+            robot.dsPicSerial((State)state);
+
+            // TODO : make a function for reading commands
+        */
+    }
+    else if (cmd.cmd == ("RobotPosition"))
+    {
+        // TODO WTF ???
+        teleplot("robot", position, position.angle, LEVEL_WARN);
+    }
+}
+
 void Robot::dsPicSerial(Enable enable)
 {
     dsPicSerialStatus = enable;
@@ -38,23 +72,6 @@ void Robot::dsPicSerial(Enable enable)
     }
 }
 Enable Robot::dsPicSerial() { return dsPicSerialStatus; }
-
-PolarPoint Robot::GetPosition() { return position; }
-
-void Robot::SetPosition(int x, int y, int angle)
-{
-    position.x = x;
-    position.y = y;
-    position.angle = angle;
-}
-
-void Robot::Update()
-{
-    if (ReadSerial())
-    {
-        Analyze();
-    }
-}
 
 boolean Robot::ReadSerial()
 {
@@ -92,6 +109,13 @@ void Robot::Analyze()
     position.y = serialBuffer[4] << 8 | serialBuffer[3];
     position.angle = serialBuffer[6] << 8 | serialBuffer[5];
     int8_t footer = serialBuffer[7];
+}
+
+void Robot::SetPosition(int x, int y, int angle)
+{
+    position.x = x;
+    position.y = y;
+    position.angle = angle;
 }
 
 void Robot::WriteSerial(int n, PolarPoint p)

@@ -6,8 +6,8 @@ void LidarLD06::Initialisation()
     scan.clear();
     clusterCenterPoints.clear();
 
-    // minDistance, maxDistance, minQuality, distanceThreshold, angleThreshold
-    Config(50, 2500, 200, 100, 0.8 * 5);
+    // minDistance, maxDistance, minQuality, distanceThreshold, angleThreshold, tableMargin
+    Config(50, 2500, 200, 100, 0.8 * 5, 80);
     SERIAL_LIDAR.begin(230400);
 
     int pwmChannel = 0;     // Choisit le canal 0
@@ -29,7 +29,66 @@ void LidarLD06::Initialisation()
     ledcWrite(pwmChannel, duty);
 }
 
-void LidarLD06::Config(int min = -1, int max = -1, int quality = -1, int distance = -1, int angle = -1)
+void LidarLD06::Update()
+{
+    clusterCenterPoints.clear();
+    if (ReadSerial())
+    {
+        Analyze();
+        CheckContinuity();
+
+        for (int i = 0; i < LIDAR_DATA_PACKET_SIZE; i++)
+        {
+            // Ignore points outside of the table and outside config
+            if (IsOutsideTable(lidarPacket.dataPoint[i]))
+            {
+                // print("Outside table : ", lidarPacket.dataPoint[i]);
+            }
+            else if (IsOutsideConfig(lidarPacket.dataPoint[i]))
+            {
+                // print("Outside config : ", lidarPacket.dataPoint[i]);
+            }
+            else
+            {
+                AggregatePoint(lidarPacket.dataPoint[i]);
+                scan.push_back(lidarPacket.dataPoint[i]);
+            }
+        }
+
+        CheckCluster(lidarPacket.dataPoint[LIDAR_DATA_PACKET_SIZE - 1]);
+    }
+}
+
+void LidarLD06::HandleCommand(Command cmd)
+{
+    if (cmd.cmd == ("LD06PWM"))
+    {
+        // LD06PWM:25
+        ChangePWM(cmd.data[0]);
+        println("LidarLD06 Change PWM : ", GetPWM());
+    }
+    else if (cmd.cmd == ("LD06Config"))
+    {
+        // LD06Config:50,2500,200,100,4,80
+        // prevent changing config if there is less param than needed.
+        if (cmd.size <= 5)
+            cmd.data[5] = -1;
+        if (cmd.size <= 4)
+            cmd.data[4] = -1;
+        if (cmd.size <= 3)
+            cmd.data[3] = -1;
+        if (cmd.size <= 2)
+            cmd.data[2] = -1;
+        if (cmd.size <= 1)
+            cmd.data[1] = -1;
+        if (cmd.size <= 0)
+            cmd.data[0] = -1;
+        Config(cmd.data[0], cmd.data[1], cmd.data[2], cmd.data[3], cmd.data[4], cmd.data[5]);
+    }
+}
+
+void LidarLD06::Config(int min = -1, int max = -1, int quality = -1, int distance = -1, int angle = -1,
+                       int tableMargin = -1)
 {
     if (min != -1)
     {
@@ -61,9 +120,18 @@ void LidarLD06::Config(int min = -1, int max = -1, int quality = -1, int distanc
         println(" to ", angle, "", LEVEL_INFO);
         lidarConfig.angleThreshold = angle;
     }
-}
+    if (tableMargin != -1)
+    {
+        print("LidarLD06 Config 'Table Margin' from ", lidarConfig.tableMargin, "", LEVEL_INFO);
+        println(" to ", tableMargin, "", LEVEL_INFO);
+        lidarConfig.tableMargin = tableMargin;
+    }
 
-ConfigLidar LidarLD06::GetConfig() { return lidarConfig; }
+    if (min == -1 && max == -1 && quality == -1 && distance == -1 && angle == -1 && tableMargin == -1)
+    {
+        println("LidarLD06 Config : Nothing changed !");
+    }
+}
 
 void LidarLD06::ChangePWM(uint32_t duty_cycle)
 {
@@ -83,36 +151,6 @@ void LidarLD06::ChangePWM(uint32_t duty_cycle)
 uint32_t LidarLD06::GetPWM() { return ledcRead(0) * 100 / ((1 << 8) - 1); }
 
 void LidarLD06::SetRobotPosition(PolarPoint robot) { robotPosition = robot; }
-
-void LidarLD06::Update()
-{
-    clusterCenterPoints.clear();
-    if (ReadSerial())
-    {
-        Analyze();
-        CheckContinuity();
-
-        for (int i = 0; i < LIDAR_DATA_PACKET_SIZE; i++)
-        {
-            // Ignore points outside of the table and outside config
-            if (IsOutsideTable(lidarPacket.dataPoint[i]))
-            {
-                // print("Outside table : ", lidarPacket.dataPoint[i]);
-            }
-            else if (IsOutsideConfig(lidarPacket.dataPoint[i]))
-            {
-                // print("Outside config : ", lidarPacket.dataPoint[i]);
-            }
-            else
-            {
-                AggregatePoint(lidarPacket.dataPoint[i]);
-                scan.push_back(lidarPacket.dataPoint[i]);
-            }
-        }
-
-        CheckCluster(lidarPacket.dataPoint[LIDAR_DATA_PACKET_SIZE - 1]);
-    }
-}
 
 boolean LidarLD06::ReadSerial()
 {
@@ -219,9 +257,8 @@ bool LidarLD06::IsOutsideTable(PolarPoint polarPoint)
     // margin is 0 : we see points until the walls
     // margin is negative : we can see up to the wall plus the margin distance outside the map
     // (ex : for fixed beacon)
-    const float table_margin = 80;
-    return (polarPoint.x < 0 + table_margin || polarPoint.x > 3000 - table_margin || polarPoint.y < 0 + table_margin ||
-            polarPoint.y > 2000 - table_margin);
+    return (polarPoint.x < 0 + lidarConfig.tableMargin || polarPoint.x > 3000 - lidarConfig.tableMargin ||
+            polarPoint.y < 0 + lidarConfig.tableMargin || polarPoint.y > 2000 - lidarConfig.tableMargin);
 }
 
 bool LidarLD06::IsOutsideConfig(PolarPoint polarPoint)
@@ -292,8 +329,11 @@ void LidarLD06::CheckCluster(PolarPoint polarPoint)
             print("Cluster N° ", c.index);
             println(" with Size ", c.data.size(), " will be checked");
 
+            // TODO 0.8 : MUST make this value from angleStep because it change with PWM !!!
+
             // Minimum amount of points needed for a 60 mm balise's diameter //TODO var 60 too permissive ?
             float minPoint = ((70 * 180) / (PI * c.mid.distance)) / 0.8;
+
             // Maximum amount of points needed for a 120 mm balise's diameter //TODO var 120 too permissive ?
             float maxPoint = ((100 * 180) / (PI * c.mid.distance)) / 0.8;
 

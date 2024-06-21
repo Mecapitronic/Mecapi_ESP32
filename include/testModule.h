@@ -7,16 +7,13 @@ using namespace Printer;
 class testModule : public IModule
 {
    public:
+    int test;
 #pragma region IModule
     testModule(void);
-    // ~testModule();
-    // void Initialisation();
-    bool ReadSerial();
-    void SendSerial();
+    void Initialisation();
+    void Update();
     void HandleCommand(Command cmd);
+    void SetConfig(int t);
 #pragma endregion
-
-    void SetConfig();
-    void Analyse();
 };
 #endif

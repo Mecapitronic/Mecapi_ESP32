@@ -20,6 +20,14 @@ void Tracker::Config(float lpf_cutoff_distance, float hpf_cutoff_distance, int c
     println("Confidence Maximum: ", config.confidenceMax, "", LEVEL_INFO);
 }
 
+void Tracker::HandleCommand(Command cmd)
+{
+    if (cmd.cmd == ("Tracker"))
+    {
+        Teleplot(true);
+    }
+}
+
 bool Tracker::PointIsEqual(PolarPoint a, PolarPoint b) { return (a.x == b.x && a.y == b.y); }
 
 void Tracker::Track(vector<PolarPoint>& newPoints)
@@ -181,5 +189,5 @@ void Tracker::Teleplot(bool all)
         }
     }
     // teleplot("mapBoundaries", MapBoundaries, 4, LEVEL_WARN);
-    // teleplot("robot", robot.GetPosition(), LEVEL_WARN);
+    // teleplot("robot", robot.position, LEVEL_WARN);
 }

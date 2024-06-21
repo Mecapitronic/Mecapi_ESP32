@@ -26,12 +26,11 @@ using namespace Printer;
 class Robot  // : public IModule
 {
    public:
-    /**
-     * Robot Init : init all variables and serial communication with PIC
-     */
+    PolarPoint position = {0.0, 0, 0, 0.0, 0.0};
+
     void Initialisation();
     void Update();
-
+    void HandleCommand(Command cmd);
     /**
      * Enable/disable communication to dsPIC : used for debug as it re-route serial to PC
      */
@@ -50,11 +49,6 @@ class Robot  // : public IModule
     void Analyze();
 
     /**
-     * Return robotPosition: last known robot position
-     */
-    PolarPoint GetPosition();
-
-    /**
      * Set the robotPosition with the Cartesian coordinates x, y and angle
      */
     void SetPosition(int x, int y, int angle);
@@ -66,7 +60,6 @@ class Robot  // : public IModule
     void WriteSerial(int n, PolarPoint p);
 
    private:
-    PolarPoint position = {0.0, 0, 0, 0.0, 0.0};
     uint32_t serialBuffer[ROBOT_SERIAL_PACKET_SIZE] = {0};
     uint8_t cursorTmp = 0;
     Enable dsPicSerialStatus = ENABLE_TRUE;

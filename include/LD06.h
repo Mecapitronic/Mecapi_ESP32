@@ -33,6 +33,7 @@ struct ConfigLidar
     int minQuality;         // represents the minimum quality of a point to be accepted as good enough
     int distanceThreshold;  // represents the distance threshold to differentiate two obstacles
     int angleThreshold;     // represents the angle threshold to differentiate two obstacles
+    int tableMargin;        // represent the distance between the edge of the table inside it
 };
 
 struct PacketLidar
@@ -61,8 +62,14 @@ struct Cluster
 class LidarLD06
 {
    public:
+    ConfigLidar lidarConfig = {0, 0, 0, 0, 0, 0};
+    vector<PolarPoint> scan;
+    PolarPoint robotPosition;
+    vector<PolarPoint> clusterCenterPoints;
+
     void Initialisation();
     void Update();
+    void HandleCommand(Command cmd);
 
     /**
      * @brief Configure lidarConfig local variable with the given values in parameters
@@ -72,13 +79,9 @@ class LidarLD06
      * @param quality (int) minimum confidence required to consider the detected point (0-255)
      * @param distance (int) distance threshold (mm) to change cluster
      * @param angle (int) angle threshold (°) to change cluster
+     * @param tableMargin (int) distance inside table at the border (mm)
      */
-    void Config(int min, int max, int quality, int distance, int angle);
-
-    /**
-     * Get LidarLD06 Configuration
-     */
-    ConfigLidar GetConfig();
+    void Config(int min, int max, int quality, int distance, int angle, int tableMargin);
 
     /**
      * @brief Change duty cycle for the PWM
@@ -142,9 +145,9 @@ class LidarLD06
      */
     void AggregatePoint(PolarPoint polarPoint);
 
-    void ObstacleDetected(Cluster& c);
-
     void CheckCluster(PolarPoint polarPoint);
+
+    void ObstacleDetected(Cluster& c);
 
     /**
      * Compute the center of the points aggregated
@@ -153,7 +156,6 @@ class LidarLD06
      */
     void ComputeCenter(Cluster& c);
 
-   private:
     // counter of points while detecting an obstacle from data
     vector<Cluster> cluster;
 
@@ -163,12 +165,5 @@ class LidarLD06
 
     PacketLidar lidarPacket;
     PacketLidar lidarLastPacket;
-    ConfigLidar lidarConfig = {0, 0, 0, 0, 0};
-
-   public:
-    // Data
-    vector<PolarPoint> scan;
-    PolarPoint robotPosition;
-    vector<PolarPoint> clusterCenterPoints;
 };
 #endif  // LD06_H

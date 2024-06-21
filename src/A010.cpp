@@ -44,36 +44,6 @@ void MetaSenseA010::Initialisation()
     //  SERIAL_A010_COPY.begin(115200, SERIAL_8N1, RX1, TX1);
 }
 
-void MetaSenseA010::InitTmpVariables()
-{
-    cursorTmp = 0;
-    indexTmp = 0;
-    packetSize = 0;
-    checksum = 0;
-}
-
-void MetaSenseA010::Config(int min = -1, int max = -1, int discontinuity = -1)
-{
-    if (min != -1)
-    {
-        print("MetaSenseA010 Config 'Distance Min' from ", a010Config.minDistance, "", LEVEL_INFO);
-        println(" to ", min, "", LEVEL_INFO);
-        a010Config.minDistance = min;
-    }
-    if (max != -1)
-    {
-        print("MetaSenseA010 Config 'Distance Max' from ", a010Config.maxDistance, "", LEVEL_INFO);
-        println(" to ", max, "", LEVEL_INFO);
-        a010Config.maxDistance = max;
-    }
-    if (discontinuity != -1)
-    {
-        print("MetaSenseA010 Config 'Discontinuity' from ", a010Config.IDMaxDiscontinuity, "", LEVEL_INFO);
-        println(" to ", discontinuity, "", LEVEL_INFO);
-        a010Config.IDMaxDiscontinuity = discontinuity;
-    }
-}
-
 void MetaSenseA010::Update()
 {
     if (ReadSerial())
@@ -223,6 +193,47 @@ void MetaSenseA010::Update()
             }
         }
     }
+}
+
+void MetaSenseA010::HandleCommand(Command cmd)
+{
+    if (cmd.cmd == ("A010"))
+    {
+        // a010.HandleCommand(cmd);
+        //  String s = cmd.cmd;
+        //  s.remove(0, 4);
+        //  SERIAL_A010.write(s.c_str());
+    }
+}
+
+void MetaSenseA010::Config(int min = -1, int max = -1, int discontinuity = -1)
+{
+    if (min != -1)
+    {
+        print("MetaSenseA010 Config 'Distance Min' from ", a010Config.minDistance, "", LEVEL_INFO);
+        println(" to ", min, "", LEVEL_INFO);
+        a010Config.minDistance = min;
+    }
+    if (max != -1)
+    {
+        print("MetaSenseA010 Config 'Distance Max' from ", a010Config.maxDistance, "", LEVEL_INFO);
+        println(" to ", max, "", LEVEL_INFO);
+        a010Config.maxDistance = max;
+    }
+    if (discontinuity != -1)
+    {
+        print("MetaSenseA010 Config 'Discontinuity' from ", a010Config.IDMaxDiscontinuity, "", LEVEL_INFO);
+        println(" to ", discontinuity, "", LEVEL_INFO);
+        a010Config.IDMaxDiscontinuity = discontinuity;
+    }
+}
+
+void MetaSenseA010::InitTmpVariables()
+{
+    cursorTmp = 0;
+    indexTmp = 0;
+    packetSize = 0;
+    checksum = 0;
 }
 
 bool waitEndOfPacket = true;

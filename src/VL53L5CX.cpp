@@ -4,7 +4,6 @@
 void VL53L5CX::Initialisation()
 {
     println("Init VL53L5CX");
-    Config();
 
     Serial.end();
 
@@ -49,8 +48,6 @@ void VL53L5CX::Initialisation()
 
     measurementStartTime = millis();
 }
-
-void VL53L5CX::Config() {}
 
 void VL53L5CX::Update()
 {
@@ -97,4 +94,15 @@ void VL53L5CX::Update()
 
     // delay(5);  // Small delay between polling
 }
+
+void VL53L5CX::HandleCommand(Command cmd)
+{
+    if (cmd.cmd.startsWith("VL53"))
+    {
+        println("VL53 : ", cmd.size, "");
+    }
+}
+
+// void VL53L5CX::Config() {}
+
 #endif

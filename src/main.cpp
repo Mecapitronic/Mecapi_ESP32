@@ -134,7 +134,7 @@ void Task1code(void *pvParameters)
 #ifdef LD06
             robot.Update();
 
-            ld06.SetRobotPosition(robot.GetPosition());
+            ld06.SetRobotPosition(robot.position);
             ld06.Update();
             // if (ld06.scan.size() > 0)
             //     teleplot("scan", ld06.scan, LEVEL_WARN);
@@ -206,15 +206,14 @@ void Task2code(void *pvParameters)
                 lastSendSerialTime = millis();
                 tracker.Teleplot(false);
 
-                if ((int)lastPosition.x != (int)robot.GetPosition().x ||
-                    (int)lastPosition.y != (int)robot.GetPosition().y ||
-                    (int)(lastPosition.angle / 100) != (int)(robot.GetPosition().angle / 100))
+                if ((int)lastPosition.x != (int)robot.position.x || (int)lastPosition.y != (int)robot.position.y ||
+                    (int)(lastPosition.angle / 100) != (int)(robot.position.angle / 100))
                 {
-                    teleplot("robot", robot.GetPosition(), robot.GetPosition().angle, LEVEL_WARN);
-                    lastPosition = robot.GetPosition();
+                    teleplot("robot", robot.position, robot.position.angle, LEVEL_WARN);
+                    lastPosition = robot.position;
                 }
                 // teleplot("mapBoundaries", MapBoundaries, 4, LEVEL_WARN);
-                // teleplot("robot", robot.GetPosition(), LEVEL_WARN);
+                // teleplot("robot", robot.position, LEVEL_WARN);
             }
 #endif
 
@@ -253,58 +252,22 @@ void Task2code(void *pvParameters)
                 Command cmd = ESP32_Helper::GetCommand();
 
 #ifdef VL53
-                if (cmd.cmd.startsWith("VL53"))
-                {
-                    println("VL53 : ", cmd.size, "");
-                }
+
+                vl53.HandleCommand(cmd);
 #endif
 
 #ifdef LD06
-                if (cmd.cmd == ("LD06PWM"))
-                {
-                    // LD06PWM:25
-                    ld06.ChangePWM(cmd.data[0]);
-                    println("LidarLD06 Change PWM : ", ld06.GetPWM(), "");
-                }
-                else if (cmd.cmd == ("RobotXYA"))
-                {
-                    // RobotXYA:1000;1500;00000
-                    robot.SetPosition(cmd.data[0], cmd.data[1], cmd.data[2]);
-                    print("Robot Position : ", robot.GetPosition());
-                }
-                else if (cmd.cmd == ("RobotState"))
-                {
-                    /*
-                        // RobotState:0
-                        int cmdLength = 11;
-                        int state = atoi(cmd.substring(cmdLength, cmdLength + 1).c_str());
-                        robot.dsPicSerial((State)state);
-
-                        // TODO : make a function for reading commands
-                    */
-                }
-                else if (cmd.cmd == ("RobotPosition"))
-                {
-                    teleplot("robot", robot.GetPosition(), robot.GetPosition().angle, LEVEL_WARN);
-                }
-                else if (cmd.cmd == ("MapBoundaries"))
+                ld06.HandleCommand(cmd);
+                robot.HandleCommand(cmd);
+                tracker.HandleCommand(cmd);
+                if (cmd.cmd == ("MapBoundaries"))
                 {
                     teleplot("mapBoundaries", MapBoundaries, 4, LEVEL_WARN);
-                }
-                else if (cmd.cmd == ("Tracker"))
-                {
-                    tracker.Teleplot(true);
                 }
 #endif
 
 #ifdef A010
-                if (cmd.cmd.startsWith("A010"))
-                {
-                    // a010.HandleCommand(cmd);
-                    //  String s = cmd.cmd;
-                    //  s.remove(0, 4);
-                    //  SERIAL_A010.write(s.c_str());
-                }
+                a010.HandleCommand(cmd);
 #endif
             }
         }

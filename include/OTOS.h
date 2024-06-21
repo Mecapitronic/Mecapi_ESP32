@@ -14,8 +14,9 @@ class OpticalTrackingOdometrySensor
 {
    public:
     void Initialisation();
-    void Config();
     void Update();
+    void HandleCommand(Command cmd);
+    void Config();
 
    private:
     QwiicOTOS myOtos;
