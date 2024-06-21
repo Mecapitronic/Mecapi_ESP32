@@ -65,7 +65,22 @@ void OpticalTrackingOdometrySensor::Initialisation()
     Config();
 }
 
-void OpticalTrackingOdometrySensor::Config() {}
+void OpticalTrackingOdometrySensor::Config()
+{
+    sfeTkError_t error;
+    sfe_otos_signal_process_config_t config;
+    error = myOtos.getSignalProcessConfig(config);
+    if (error != 0)
+        print("Error get Signal Process Config : ", error);
+    else
+    {
+        println("Signal Process Config :");
+        println("enVar : ", config.enVar);
+        println("enRot : ", config.enRot);
+        println("enAcc : ", config.enAcc);
+        println("enLut : ", config.enLut);
+    }
+}
 
 void OpticalTrackingOdometrySensor::Update()
 {
