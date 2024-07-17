@@ -6,3 +6,4 @@
 	path = lib/ESP32_Helper
 	url = https://github.com/Mecapitronic/ESP32_Helper.git
 	branch = main
+	ignore = dirty
