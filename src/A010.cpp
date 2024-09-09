@@ -6,7 +6,7 @@ void MetaSenseA010::Initialisation()
 
     // minDistance, maxDistance
     Config(100, 1500, 2);
-    SERIAL_A010.begin(115200);
+    SERIAL_A010.begin(115200, SERIAL_8N1, SERIAL_A010_RX, SERIAL_A010_TX);
 
     // wait MetaSenseA010 power up
     delay(1000);
@@ -38,7 +38,7 @@ void MetaSenseA010::Initialisation()
     InitTmpVariables();
 
     SERIAL_A010.setRxBufferSize(SERIAL_SIZE_RX);
-    SERIAL_A010.begin(BAUD_RATE_SPEED);
+    SERIAL_A010.begin(BAUD_RATE_SPEED, SERIAL_8N1, SERIAL_A010_RX, SERIAL_A010_TX);
 
     // println("Init MetaSenseA010 COPY");
     //  SERIAL_A010_COPY.begin(115200, SERIAL_8N1, RX1, TX1);

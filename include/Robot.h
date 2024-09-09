@@ -7,12 +7,13 @@
 #ifndef ROBOT_H
 #define ROBOT_H
 
+// Serial 1 : U1TX = GPIO9 ; U1RX = GPIO10
 #define SERIAL_ROBOT Serial1
 
 // we change the UART 1 RX pin from 9 to 2
 // we change the UART 1 TX pin from 10 to 4
-#define RX1 2
-#define TX1 4
+#define SERIAL_ROBOT_RX 2
+#define SERIAL_ROBOT_TX 4
 
 #define ROBOT_SERIAL_PACKET_SIZE 32
 // '!' + "1000,1500,9000" + '\n' :  1 + 2 * 3 + 1;

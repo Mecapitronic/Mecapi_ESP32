@@ -10,6 +10,11 @@
 // Serial 2 : U2TX = GPIO17 ; U2RX = GPIO16
 #define SERIAL_A010 Serial2
 
+// we change the UART 2 RX pin from 16 to ?
+// we change the UART 2 TX pin from 17 to ?
+#define SERIAL_A010_RX 16
+#define SERIAL_A010_TX 17
+
 // Header frame : 2Byte header + 2Byte length +
 // 1Byte command + 1Byte output_mode + 1Byte Sensor Temp + 1Byte Driver Temp +
 // 4Bytes exposure time + 1Byte error code + 1Byte reserved1 + 1Byte res rows + 1Byte res cols +
@@ -41,10 +46,6 @@
 #define A010_END_PACKET_BYTE 0xDD
 
 #define SERIAL_A010_COPY Serial1
-// we change the UART 1 RX pin from 9 to 2
-// we change the UART 1 TX pin from 10 to 4
-#define RX1 2
-#define TX1 4
 
 // Increase the buffer serial to avoid loss packet, 256 by default, should not be under 128
 #define SERIAL_SIZE_RX 16384//4096

@@ -60,11 +60,11 @@ void Robot::dsPicSerial(Enable enable)
             break;
         case ENABLE_TRUE:
             println("dsPic Serial Start", LEVEL_INFO);
-            SERIAL_ROBOT.begin(250000, SERIAL_8N1, RX1, TX1);
+            SERIAL_ROBOT.begin(250000, SERIAL_8N1, SERIAL_ROBOT_RX, SERIAL_ROBOT_TX);
             break;
         case ENABLE_FALSE:
             println("dsPic Serial Debug", LEVEL_INFO);
-            SERIAL_ROBOT.begin(230400, SERIAL_8N1, RX1, TX1);
+            SERIAL_ROBOT.begin(230400, SERIAL_8N1, SERIAL_ROBOT_RX, SERIAL_ROBOT_TX);
             break;
 
         default:
