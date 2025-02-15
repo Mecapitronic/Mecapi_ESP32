@@ -166,4 +166,4 @@ class LidarLD06
     PacketLidar lidarPacket;
     PacketLidar lidarLastPacket;
 };
-#endif  // LD06_H
+#endif

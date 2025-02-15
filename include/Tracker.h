@@ -94,4 +94,4 @@ class Tracker
 
     ConfigTracker config = {0, 0, 0, 0};
 };
-#endif  // TRACKER_H
+#endif

@@ -14,7 +14,7 @@
     "files.trimFinalNewlines": true,
     "git.autofetch": true,
     "terminal.integrated.scrollback": 100000,
-    "C_Cpp.clang_format_fallbackStyle": "{ BasedOnStyle: Google, IndentWidth: 4, ColumnLimit: 120, BreakBeforeBraces: Allman, AllowShortIfStatementsOnASingleLine: false, IncludeBlocks: Merge,SortIncludes: false,NamespaceIndentation: All,IndentCaseLabels: true }",
+    "C_Cpp.clang_format_fallbackStyle": "{ BasedOnStyle: Google, IndentWidth: 4, ColumnLimit: 120, BreakBeforeBraces: Allman, AllowShortIfStatementsOnASingleLine: false, IncludeBlocks: Merge,SortIncludes: false,NamespaceIndentation: All,IndentCaseLabels: true,FixNamespaceComments: false }",
     "[python]": {
         "editor.defaultFormatter": "charliermarsh.ruff",
         "editor.codeActionsOnSave": {

@@ -47,8 +47,11 @@ def packet_available() -> bool:
 def get_packet() -> bytes:
     global serialPort
     if serialPort.in_waiting > 0:
-        packet = serialPort.readline()
-        return packet.replace(b'\r\n',b'\n')
+        try:
+            packet = serialPort.readline()
+            return packet.replace(b'\r\n',b'\n')
+        except serial.SerialException:
+            return None
     return None
 
 
@@ -78,14 +81,18 @@ def main(serial_if: str):
     print(f"Starting listening -> {serial_if}")
     init_serial(serial_if)
     while True:
-        if packet_available():
-            packet = get_packet()
-            decoded_string = packet.decode("utf-8")
-            if decoded_string.startswith(">"):
-                decoded_string = decoded_string.replace(">","",1)
-            else:
-                decoded_string = decoded_string.replace("\n","|np\n")
-            sockUDP.sendto(decoded_string.encode(), teleplotLocal)
+        try:
+            if packet_available():
+                packet = get_packet()
+                decoded_string = packet.decode("utf-8")
+                if decoded_string.startswith(">"):
+                    decoded_string = decoded_string.replace(">","",1)
+                else:
+                    decoded_string = decoded_string.replace("\n","|np\n")
+                sockUDP.sendto(decoded_string.encode(), teleplotLocal)
+        except ConnectionResetError:
+            print(f"Server Error")
+            #continue
 
 if __name__ == "__main__":
     argParser = argparse.ArgumentParser()

@@ -66,4 +66,4 @@ class Robot  // : public IModule
     Enable dsPicSerialStatus = ENABLE_TRUE;
 };
 
-#endif  // ROBOT_H
+#endif

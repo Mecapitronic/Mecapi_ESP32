@@ -29,19 +29,5 @@ extern Robot robot;
 #include "OTOS.h"
 #endif
 
-/**
- * Get data from serial
- * Get robot position from serial
- * Send data in a queue for the other thread to compute
- */
-void Task1code(void *pvParameters);
-
-/**
- * Get data from queue and compute them
- */
-void Task2code(void *pvParameters);
-
-TaskHandle_t Task1;
-TaskHandle_t Task2;
-
-#endif  // MAIN_H
+void functionChrono(int nbrLoop = 1);
+#endif
