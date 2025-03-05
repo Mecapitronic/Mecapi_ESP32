@@ -275,7 +275,7 @@ void draw() // main loop
       //cloud[i].radius = 10;
       
       // calcul du centre de gravité (pour tout objet de 14cm de haut, +ou- 2cm)
-      if ((pointZ[i] > 120) && (pointZ[i] < 160))
+      if ((pointZ[i] > 130) && (pointZ[i] < 150))
       {
         indexPOI[k] = i;
         k++;
@@ -290,50 +290,29 @@ void draw() // main loop
       pushMatrix();
       translate(pointX[i], Y(pointY[i]), pointZ[i]); // position
       fill(map(pointZ[i],10,250,200,0),255,255); // couleur
-      if (pointZ[i] < 20) box(depths[i]/100);
-      else if ((pointZ[i] > 120) && (pointZ[i] < 160)) box(depths[i]/30);
-      else sphere(depths[i]/50); // forme et taille
+      if (pointZ[i] < 15) box(depths[i]/40);
+      else if ((pointZ[i] > 130) && (pointZ[i] < 150)) box(depths[i]/40);
+      else sphere(depths[i]/40); // forme et taille
       textSize(15);
       fill(255);
       text((int)pointZ[i], 0, 0, 20);
       popMatrix();
     } // fin all points
     
-    //  // Exécuter RANSAC pour trouver le meilleur segment
-    //PVector[] rawSegment = ransacSegment();
-    //PVector[] bestSegment = getSmoothedSegment(rawSegment);
-  
-  
-    //// Afficher le segment trouvé
-    //if (bestSegment != null) {
-    //  stroke(0, 0, 255);
-    //  strokeWeight(10);
-    //  line(bestSegment[0].x, bestSegment[0].y, bestSegment[0].z, 
-    //       bestSegment[1].x, bestSegment[1].y, bestSegment[1].z);
-    //}
-    //strokeWeight(1);
-    
-    //// affichage angle et distance
-    //PVector capteur = new PVector(0, 0); // Position du capteur
-    //if (bestSegment != null) {
-    //  int angle = (int) computeAngle(bestSegment[0], bestSegment[1]) -180;
-    //  while (angle <= -180) angle += 360;
-    //  while (angle > 180) angle -= 360;
-    //  int distance = (int) computeDistance(bestSegment[0], bestSegment[1], capteur);
-    
-    //  fill(255);
-    //  textSize(20);
-    //  text("Angle: " + angle + "°", 120, -100);
-    //  text("Distance: " + distance + " mm", 120, -120);
-    //}
-    
-ArrayList<PVector> pointList = new ArrayList<PVector>();
-for (PVector p : points) {
-    pointList.add(p);
-}
-  //drawAllCorners(pointList);
+    // Exécuter RANSAC pour trouver le meilleur segment
+  PVector[] rawSegment = ransacSegment();
+  PVector[] bestSegment = getSmoothedSegment(rawSegment);
 
-  
+
+  // Afficher le segment trouvé
+  if (bestSegment != null) {
+    stroke(0, 0, 255);
+    strokeWeight(10);
+    line(bestSegment[0].x, bestSegment[0].y, bestSegment[0].z, 
+         bestSegment[1].x, bestSegment[1].y, bestSegment[1].z);
+  }
+  strokeWeight(1);
+    
     //// recherche points extrêmes du bord
     //float minX = 1000;
     //float maxX = 0;
@@ -406,129 +385,135 @@ for (PVector p : points) {
 }
 //************************************************************************************************************
 
-void drawAllCorners(ArrayList<PVector> points) {
-    println("Nombre total de points : " + points.size());
+// RANSAC pour trouver le segment le plus fiable
+PVector[] ransacSegment() 
+{
+  int N_ITER = 100;  // Nombre d'itérations RANSAC
+  float h = 140;  // Hauteur cible
+  float distance_threshold = 10;  // Tolérance pour considérer un point comme inlier
+  
+    ArrayList<PVector> filteredPoints = new ArrayList<PVector>();
 
-    // 1️⃣ Filtrer les points pour exclure ceux en dessous de 50 mm
-    ArrayList<PVector> filteredPoints = new ArrayList<>();
-    for (PVector p : points) {
-        if (p.z >= 50) {
-            filteredPoints.add(p);
-        }
+  // Filtrer les points proches de h
+  for (PVector p : points) {
+    if (abs(p.z - h) < distance_threshold) {
+      filteredPoints.add(p);
+    }
+  }
+
+  if (filteredPoints.size() < 2) return null; // Pas assez de points
+
+  PVector bestP1 = null, bestP2 = null;
+  int bestInlierCount = 0;
+  ArrayList<PVector> bestInliers = new ArrayList<PVector>();
+
+  for (int i = 0; i < N_ITER; i++) {
+    // Sélectionner 2 points aléatoires
+    PVector P1 = filteredPoints.get((int) random(filteredPoints.size()));
+    PVector P2 = filteredPoints.get((int) random(filteredPoints.size()));
+
+    if (P1.equals(P2)) continue;
+
+    // Liste des inliers pour cette itération
+    ArrayList<PVector> inliers = new ArrayList<PVector>();
+
+    for (PVector p : filteredPoints) {
+      float d = distancePointSegment(p, P1, P2);
+      if (d < distance_threshold) {
+        inliers.add(p);
+      }
     }
 
-    println("Points après filtrage (z >= 50 mm) : " + filteredPoints.size());
-
-    if (filteredPoints.size() < 3) {
-        println("Pas assez de points après filtrage.");
-        return;
+    // Si ce modèle est meilleur, on le garde
+    if (inliers.size() > bestInlierCount) {
+      bestInlierCount = inliers.size();
+      bestP1 = P1;
+      bestP2 = P2;
+      bestInliers = new ArrayList<PVector>(inliers);  // Sauvegarde des inliers
     }
+  }
 
-    // 2️⃣ Détection des coins
-    ArrayList<PVector> corners = detectCorners(filteredPoints, 120.0);  // Seuil d'angle = 120°
+  if (bestP1 == null || bestP2 == null || bestInliers.size() < 2) return null;
 
-    println("Nombre de coins détectés : " + corners.size());
+  // 1️⃣ Calcul de la droite moyenne en utilisant les inliers
+  PVector avg = new PVector(0, 0, 0);
+  for (PVector p : bestInliers) {
+    avg.add(p);
+  }
+  avg.div(bestInliers.size());
 
-    if (corners.size() < 2) {
-        println("Pas assez de coins pour tracer un segment.");
-        return;
+  // 2️⃣ Trouver la direction principale (régression linéaire en 3D simplifiée)
+  float sumX = 0, sumY = 0, sumXX = 0, sumXY = 0;
+  for (PVector p : bestInliers) {
+    float x = p.x - avg.x;
+    float y = p.y - avg.y;
+    sumX += x;
+    sumY += y;
+    sumXX += x * x;
+    sumXY += x * y;
+  }
+
+  float slope = sumXY / sumXX; // Pente de la droite
+  PVector dir = new PVector(1, slope, 0); // Direction estimée
+  dir.normalize(); // Normalisation
+
+  // 3️⃣ Projection des inliers sur cette droite et prise des extrêmes
+  float minProj = Float.MAX_VALUE, maxProj = -Float.MAX_VALUE;
+  PVector minPoint = null, maxPoint = null;
+
+  for (PVector p : bestInliers) {
+    float proj = (p.x - avg.x) * dir.x + (p.y - avg.y) * dir.y;  // Projection scalaire
+    if (proj < minProj) {
+      minProj = proj;
+      minPoint = p;
     }
-
-    // 3️⃣ Sélection des deux coins les plus proches
-    PVector closestA = null, closestB = null;
-    float minDist = Float.MAX_VALUE;
-
-    for (int i = 0; i < corners.size(); i++) {
-        for (int j = i + 1; j < corners.size(); j++) {
-            float d = corners.get(i).dist(corners.get(j));
-            if (d < minDist) {
-                minDist = d;
-                closestA = corners.get(i);
-                closestB = corners.get(j);
-            }
-        }
+    if (proj > maxProj) {
+      maxProj = proj;
+      maxPoint = p;
     }
+  }
 
-    // 4️⃣ Tracer le segment entre les deux coins les plus proches
-    if (closestA != null && closestB != null) {
-        stroke(255, 0, 0);
-        strokeWeight(5);
-        line(closestA.x, closestA.y, closestA.z, closestB.x, closestB.y, closestB.z);
-        strokeWeight(1);
-    }
-
-    // 5️⃣ Afficher tous les coins en sphères bleues (diamètre 10)
-    drawSpheres(corners);
+  return new PVector[]{minPoint, maxPoint};
 }
 
-// 🛠 Détection des coins basée sur les angles
-ArrayList<PVector> detectCorners(ArrayList<PVector> points, float angleThreshold) {
-    ArrayList<PVector> corners = new ArrayList<>();
+// Distance entre un point et un segment
+float distancePointSegment(PVector P, PVector A, PVector B) {
+  PVector AB = PVector.sub(B, A);
+  PVector AP = PVector.sub(P, A);
 
-    for (int i = 1; i < points.size() - 1; i++) {
-        PVector prev = points.get(i - 1);
-        PVector curr = points.get(i);
-        PVector next = points.get(i + 1);
+  float t = AP.dot(AB) / AB.dot(AB);
+  t = constrain(t, 0, 1);  // Clamping pour rester sur le segment
 
-        float angle = computeAngle(prev, curr, next);
-
-        if (angle < angleThreshold) {  // Si l'angle est aigu, c'est un coin
-            corners.add(curr);
-        }
-    }
-
-    return corners;
-}
-
-// 📐 Calcul de l’angle entre trois points
-float computeAngle(PVector a, PVector b, PVector c) {
-    PVector ab = PVector.sub(a, b);
-    PVector bc = PVector.sub(c, b);
-
-    float angle = degrees(PVector.angleBetween(ab, bc));
-    return angle;
-}
-
-// 🎱 Dessiner des sphères aux positions des coins
-void drawSpheres(ArrayList<PVector> corners) {
-    fill(0, 0, 255);  // Bleu
-    noStroke();
-    for (PVector p : corners) {
-        pushMatrix();
-        translate(p.x, p.y, p.z);
-        sphere(10);  // Taille de la sphère = 10
-        popMatrix();
-    }
-}
-
-
-
-
-
-
-// Fonction pour trouver le point le plus proche du capteur
-PVector getClosestToCapteur(ArrayList<PVector> candidates, PVector capteur) {
-    PVector closest = null;
-    float minDist = Float.MAX_VALUE;
-    for (PVector p : candidates) {
-        float dist = dist(capteur.x, capteur.y, p.x, p.y);
-        if (dist < minDist) {
-            minDist = dist;
-            closest = p;
-        }
-    }
-    return closest;
+  PVector projection = PVector.add(A, PVector.mult(AB, t));
+  return P.dist(projection);
 }
 
 
-float computeDistance(PVector p1, PVector p2, PVector capteur) {
-  float num = abs((p2.y - p1.y) * capteur.x - (p2.x - p1.x) * capteur.y + p2.x * p1.y - p2.y * p1.x);
-  float den = dist(p1.x, p1.y, p2.x, p2.y);
-  return num / den;
-}
+int SMOOTHING_WINDOW = 5;  // Nombre de segments pour le lissage
+ArrayList<PVector[]> previousSegments = new ArrayList<>();
 
-float computeAngle(PVector p1, PVector p2) {
-  return degrees(atan2(p2.y - p1.y, p2.x - p1.x)); // Convertit en degrés
+PVector[] getSmoothedSegment(PVector[] newSegment) {
+  if (newSegment == null) return null;
+
+  // Ajouter le segment courant à l'historique
+  previousSegments.add(newSegment);
+  if (previousSegments.size() > SMOOTHING_WINDOW) {
+    previousSegments.remove(0); // Garde seulement les derniers segments
+  }
+
+  // Moyenne des points extrêmes
+  PVector avgP1 = new PVector(0, 0, 0);
+  PVector avgP2 = new PVector(0, 0, 0);
+
+  for (PVector[] seg : previousSegments) {
+    avgP1.add(seg[0]);
+    avgP2.add(seg[1]);
+  }
+
+  avgP1.div(previousSegments.size());
+  avgP2.div(previousSegments.size());
+
+  return new PVector[]{avgP1, avgP2};
 }
 
 
