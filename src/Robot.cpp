@@ -43,8 +43,6 @@ void Robot::HandleCommand(Command cmd)
     }
     else if (cmd.cmd == ("RobotPosition"))
     {
-        // TODO WTF ???
-        teleplot("robot", position, position.angle, LEVEL_WARN);
     }
 }
 

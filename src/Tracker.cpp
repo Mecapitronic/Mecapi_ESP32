@@ -175,7 +175,8 @@ void Tracker::Teleplot(bool all)
             if (lastSend[index].x != trackedPoints[index].point.x ||
                 lastSend[index].y != trackedPoints[index].point.y || all)
             {
-                teleplot("obs", trackedPoints[index].point, index, LEVEL_WARN);
+                // TODO
+                // teleplot("obs", trackedPoints[index].point, index, LEVEL_WARN);
             }
             lastSend[index] = trackedPoints[index].point;
         }
@@ -183,7 +184,8 @@ void Tracker::Teleplot(bool all)
         {
             if (lastSend[index].x != zero.x || lastSend[index].y != zero.y || all)
             {
-                teleplot("obs", zero, index, LEVEL_WARN);
+                // TODO
+                // teleplot("obs", zero, index, LEVEL_WARN);
             }
             lastSend[index] = zero;
         }

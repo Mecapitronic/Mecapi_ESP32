@@ -4,7 +4,7 @@
 LidarLD06 ld06;
 Robot robot;
 Tracker tracker;
-testModule test;
+// testModule test;
 
 int64_t lastSendRobotTime = millis();
 PolarPoint lastPosition = {0, 0, 0, 0, 0};
@@ -115,7 +115,11 @@ void loop()
             if ((int)lastPosition.x != (int)robot.position.x || (int)lastPosition.y != (int)robot.position.y ||
                 (int)(lastPosition.angle / 100) != (int)(robot.position.angle / 100))
             {
-                teleplot("robot", robot.position, robot.position.angle, LEVEL_WARN);
+                PointF p = PointF(robot.position.x, robot.position.y);
+                teleplot("Position", p);
+                teleplot("Orient", robot.position.angle);
+
+                teleplot("robot", robot.position.angle);
                 lastPosition = robot.position;
             }
             // teleplot("mapBoundaries", MapBoundaries, 4, LEVEL_WARN);
@@ -138,7 +142,8 @@ void loop()
             tracker.HandleCommand(cmd);
             if (cmd.cmd == ("MapBoundaries"))
             {
-                teleplot("mapBoundaries", MapBoundaries, 4, LEVEL_WARN);
+                // TODO
+                // teleplot("mapBoundaries", MapBoundaries, 4, LEVEL_WARN);
             }
 #endif
 
