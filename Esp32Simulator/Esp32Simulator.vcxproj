@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>17.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{CF1C5AFF-3E0C-46DF-98E9-785F68A6CDF0}</ProjectGuid>
+    <RootNamespace>Esp32Simulator</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(Outdir)\</OutDir>
+    <IntDir>$(Configuration)\temp\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_VISUAL_STUDIO;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(ProjectDir)\pthreads\include;..\lib\ESP32_Helper\include;..\lib\ESP32_Helper\src;..\include;..\src;$(ProjectDir)FreeRTOS\Include;$(ProjectDir)FreeRTOS\Configuration Files;$(ProjectDir)FreeRTOS\Source;$(ProjectDir)FreeRTOS\Portable;$(ProjectDir)FreeRTOS\FreeRTOS-Plus-Trace;$(ProjectDir)framework-arduinoespressif32</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(ProjectDir)\pthreads\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>pthreadVC3.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\lib\ESP32_Helper\src\Debugger.cpp" />
+    <ClCompile Include="..\lib\ESP32_Helper\src\ESP32_Helper.cpp" />
+    <ClCompile Include="..\lib\ESP32_Helper\src\Preferences_Helper.cpp" />
+    <ClCompile Include="..\lib\ESP32_Helper\src\Printer.cpp" />
+    <ClCompile Include="..\lib\ESP32_Helper\src\Wifi_Helper.cpp" />
+    <ClCompile Include="..\lib\ESP32_Helper\src\Wifi_No_Helper.cpp" />
+    <ClCompile Include="..\src\main.cpp" />
+    <ClCompile Include="Esp32Simulator.cpp" />
+    <ClCompile Include="framework-arduinoespressif32\stdlib_noniso.c" />
+    <ClCompile Include="framework-arduinoespressif32\WString.cpp" />
+    <ClCompile Include="FreeRTOS\Source\croutine.c" />
+    <ClCompile Include="FreeRTOS\Source\event_groups.c" />
+    <ClCompile Include="FreeRTOS\Source\list.c" />
+    <ClCompile Include="FreeRTOS\Source\Portable\heap_5.c" />
+    <ClCompile Include="FreeRTOS\Source\Portable\port.c" />
+    <ClCompile Include="FreeRTOS\Source\queue.c" />
+    <ClCompile Include="FreeRTOS\Source\stream_buffer.c" />
+    <ClCompile Include="FreeRTOS\Source\tasks.c" />
+    <ClCompile Include="FreeRTOS\Source\timers.c" />
+    <ClCompile Include="Preferences.cpp" />
+    <ClCompile Include="Serial.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\main.h" />
+    <ClInclude Include="..\lib\ESP32_Helper\include\Debugger.h" />
+    <ClInclude Include="..\lib\ESP32_Helper\include\ESP32_Helper.h" />
+    <ClInclude Include="..\lib\ESP32_Helper\include\ModuleTemplate.h" />
+    <ClInclude Include="..\lib\ESP32_Helper\include\Preferences_Helper.h" />
+    <ClInclude Include="..\lib\ESP32_Helper\include\Printer.h" />
+    <ClInclude Include="..\lib\ESP32_Helper\include\Structure.h" />
+    <ClInclude Include="..\lib\ESP32_Helper\include\Wifi_Helper.h" />
+    <ClInclude Include="..\lib\ESP32_Helper\include\Wifi_No_Helper.h" />
+    <ClInclude Include="Arduino.h" />
+    <ClInclude Include="Esp32Simulator.h" />
+    <ClInclude Include="framework-arduinoespressif32\esp_err.h" />
+    <ClInclude Include="framework-arduinoespressif32\esp_idf_version.h" />
+    <ClInclude Include="framework-arduinoespressif32\stdlib_noniso.h" />
+    <ClInclude Include="framework-arduinoespressif32\WString.h" />
+    <ClInclude Include="FreeRTOS\Configuration Files\FreeRTOSConfig.h" />
+    <ClInclude Include="FreeRTOS\Configuration Files\trcConfig.h" />
+    <ClInclude Include="FreeRTOS\Configuration Files\trcKernelPortConfig.h" />
+    <ClInclude Include="FreeRTOS\Configuration Files\trcKernelPortSnapshotConfig.h" />
+    <ClInclude Include="FreeRTOS\Configuration Files\trcSnapshotConfig.h" />
+    <ClInclude Include="FreeRTOS\FreeRTOS-Plus-Trace\trcKernelPort.h" />
+    <ClInclude Include="FreeRTOS\FreeRTOS-Plus-Trace\trcRecorder.h" />
+    <ClInclude Include="FreeRTOS\Include\atomic.h" />
+    <ClInclude Include="FreeRTOS\Include\croutine.h" />
+    <ClInclude Include="FreeRTOS\Include\deprecated_definitions.h" />
+    <ClInclude Include="FreeRTOS\Include\event_groups.h" />
+    <ClInclude Include="FreeRTOS\Include\FreeRTOS.h" />
+    <ClInclude Include="FreeRTOS\Include\list.h" />
+    <ClInclude Include="FreeRTOS\Include\message_buffer.h" />
+    <ClInclude Include="FreeRTOS\Include\mpu_prototypes.h" />
+    <ClInclude Include="FreeRTOS\Include\mpu_wrappers.h" />
+    <ClInclude Include="FreeRTOS\Include\portable.h" />
+    <ClInclude Include="FreeRTOS\Include\portmacro.h" />
+    <ClInclude Include="FreeRTOS\Include\projdefs.h" />
+    <ClInclude Include="FreeRTOS\Include\queue.h" />
+    <ClInclude Include="FreeRTOS\Include\semphr.h" />
+    <ClInclude Include="FreeRTOS\Include\StackMacros.h" />
+    <ClInclude Include="FreeRTOS\Include\stack_macros.h" />
+    <ClInclude Include="FreeRTOS\Include\stream_buffer.h" />
+    <ClInclude Include="FreeRTOS\Include\task.h" />
+    <ClInclude Include="FreeRTOS\Include\timers.h" />
+    <ClInclude Include="Preferences.h" />
+    <ClInclude Include="pthreads\include\pthread.h" />
+    <ClInclude Include="pthreads\include\sched.h" />
+    <ClInclude Include="pthreads\include\semaphore.h" />
+    <ClInclude Include="pthreads\include\_ptw32.h" />
+    <ClInclude Include="Serial.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="pthreads\dll\pthreadVC3.dll">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <FileType>Document</FileType>
+    </CopyFileToFolders>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

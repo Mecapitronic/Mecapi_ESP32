@@ -44,3 +44,8 @@
 *.exe
 *.out
 *.app
+
+# Visual Studio Project
+/Esp32Simulator/Debug/
+!/Esp32Simulator/pthreads/lib/pthreadVC3.lib
+!/Esp32Simulator/pthreads/dll/pthreadVC3.dll

@@ -157,7 +157,7 @@ void loop()
         println(e.what(), LEVEL_ERROR);
     }
 }
-
+/*
 void functionChrono(int nbrLoop)
 {
     unsigned long startChrono = micros();
@@ -183,3 +183,4 @@ void functionChrono(int nbrLoop)
     Serial.print(" ms/func.");
     Serial.println();
 }
+*/
