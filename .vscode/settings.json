@@ -106,5 +106,9 @@
         "author",
         "brief",
         "date",
-    ]
+    ],
+    "sonarlint.connectedMode.project": {
+        "connectionId": "mecapitronic",
+        "projectKey": "Mecapitronic_Mecapi_ESP32"
+    }
 }
