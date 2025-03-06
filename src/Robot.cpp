@@ -5,13 +5,13 @@ void Robot::Initialisation()
     println("Init Robot");
 
     position = {0.0, 0, 0, 1500.0, 1000.0};
-    print("Robot Position : ", position, "", LEVEL_INFO);
+    print("Robot Position : ", position, "", Level::LEVEL_INFO);
     cursorTmp = 0;
     for (size_t i = 0; i < ROBOT_SERIAL_PACKET_SIZE; i++)
     {
         serialBuffer[i] = 0;
     }
-    dsPicSerial(ENABLE_TRUE);
+    dsPicSerial(Enable::ENABLE_TRUE);
 }
 
 void Robot::Update()
@@ -52,16 +52,16 @@ void Robot::dsPicSerial(Enable enable)
     SERIAL_ROBOT.end();
     switch (dsPicSerialStatus)
     {
-        case ENABLE_NONE:
+        case Enable::ENABLE_NONE:
             /* code */
-            println("dsPic Serial Stop", LEVEL_INFO);
+            println("dsPic Serial Stop", Level::LEVEL_INFO);
             break;
-        case ENABLE_TRUE:
-            println("dsPic Serial Start", LEVEL_INFO);
+        case Enable::ENABLE_TRUE:
+            println("dsPic Serial Start", Level::LEVEL_INFO);
             SERIAL_ROBOT.begin(250000, SERIAL_8N1, SERIAL_ROBOT_RX, SERIAL_ROBOT_TX);
             break;
-        case ENABLE_FALSE:
-            println("dsPic Serial Debug", LEVEL_INFO);
+        case Enable::ENABLE_FALSE:
+            println("dsPic Serial Debug", Level::LEVEL_INFO);
             SERIAL_ROBOT.begin(230400, SERIAL_8N1, SERIAL_ROBOT_RX, SERIAL_ROBOT_TX);
             break;
 
@@ -73,7 +73,7 @@ Enable Robot::dsPicSerial() { return dsPicSerialStatus; }
 
 boolean Robot::ReadSerial()
 {
-    if (dsPicSerialStatus != ENABLE_NONE)
+    if (dsPicSerialStatus != Enable::ENABLE_NONE)
     {
         while (SERIAL_ROBOT.available() > 0)
         {
@@ -118,7 +118,7 @@ void Robot::SetPosition(int x, int y, int angle)
 
 void Robot::WriteSerial(int n, PolarPoint p)
 {
-    if (dsPicSerialStatus == ENABLE_TRUE)
+    if (dsPicSerialStatus == Enable::ENABLE_TRUE)
     {
         // Starting char : '!'
         SERIAL_ROBOT.write(0x21);

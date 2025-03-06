@@ -2,7 +2,7 @@
 
 void Tracker::Initialisation()
 {
-    println("Init Tracker", LEVEL_INFO);
+    println("Init Tracker", Level::LEVEL_INFO);
     Config(DEFAULT_LPF_CUTOFF, DEFAULT_HPF_CUTOFF, CONFIDENCE_TRIGGER, CONFIDENCE_MAXIMUM);
     trackedPoints.clear();
 }
@@ -14,10 +14,11 @@ void Tracker::Config(float lpf_cutoff_distance, float hpf_cutoff_distance, int c
     config.confidenceTrigger = confidenceTrigger;
     config.confidenceMax = confidenceMax;
 
-    println("Track new point if nothing close enough: ", config.lpf_cutoff, " mm", LEVEL_INFO);
-    println("Ignore movements under ", config.hpf_cutoff, " mm", LEVEL_INFO);
-    println("Confidence trigger for sending tracking point to robot: ", config.confidenceTrigger, " times", LEVEL_INFO);
-    println("Confidence Maximum: ", config.confidenceMax, "", LEVEL_INFO);
+    println("Track new point if nothing close enough: ", config.lpf_cutoff, " mm", Level::LEVEL_INFO);
+    println("Ignore movements under ", config.hpf_cutoff, " mm", Level::LEVEL_INFO);
+    println("Confidence trigger for sending tracking point to robot: ", config.confidenceTrigger, " times",
+            Level::LEVEL_INFO);
+    println("Confidence Maximum: ", config.confidenceMax, "", Level::LEVEL_INFO);
 }
 
 void Tracker::HandleCommand(Command cmd)
@@ -139,12 +140,12 @@ void Tracker::SendToRobot()
         if (trackedPoints.size() > index && trackedPoints[index].confidence > config.confidenceTrigger)
         {
             robot.WriteSerial(index, trackedPoints[index].point);
-            // teleplot("obs", trackedPoints[index].point, index, LEVEL_WARN);
+            // teleplot("obs", trackedPoints[index].point, index, Level::LEVEL_WARN);
         }
         else
         {
             robot.WriteSerial(index, zero);
-            // teleplot("obs", zero, index, LEVEL_WARN);
+            // teleplot("obs", zero, index, Level::LEVEL_WARN);
         }
     }
     /*
@@ -154,8 +155,8 @@ void Tracker::SendToRobot()
             {
                 robot.WriteSerial(index, trackPoint.point);
                 trackPoint.hasBeenSent = true;
-                teleplot("obs", trackPoint.point, index, LEVEL_WARN);
-                // print("Send N°" + String(index) + " to Robot : ", trackPoint.point, "", LEVEL_WARN);
+                teleplot("obs", trackPoint.point, index, Level::LEVEL_WARN);
+                // print("Send N°" + String(index) + " to Robot : ", trackPoint.point, "", Level::LEVEL_WARN);
             }
             index++;
         }
@@ -176,7 +177,7 @@ void Tracker::Teleplot(bool all)
                 lastSend[index].y != trackedPoints[index].point.y || all)
             {
                 // TODO
-                // teleplot("obs", trackedPoints[index].point, index, LEVEL_WARN);
+                // teleplot("obs", trackedPoints[index].point, index, Level::LEVEL_WARN);
             }
             lastSend[index] = trackedPoints[index].point;
         }
@@ -185,11 +186,11 @@ void Tracker::Teleplot(bool all)
             if (lastSend[index].x != zero.x || lastSend[index].y != zero.y || all)
             {
                 // TODO
-                // teleplot("obs", zero, index, LEVEL_WARN);
+                // teleplot("obs", zero, index, Level::LEVEL_WARN);
             }
             lastSend[index] = zero;
         }
     }
-    // teleplot("mapBoundaries", MapBoundaries, 4, LEVEL_WARN);
-    // teleplot("robot", robot.position, LEVEL_WARN);
+    // teleplot("mapBoundaries", MapBoundaries, 4, Level::LEVEL_WARN);
+    // teleplot("robot", robot.position, Level::LEVEL_WARN);
 }

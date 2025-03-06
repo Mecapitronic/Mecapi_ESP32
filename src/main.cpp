@@ -68,7 +68,7 @@ void loop()
         ld06.SetRobotPosition(robot.position);
         ld06.Update();
         // if (ld06.scan.size() > 0)
-        //     teleplot("scan", ld06.scan, LEVEL_WARN);
+        //     teleplot("scan", ld06.scan, Level::LEVEL_WARN);
         ld06.scan.clear();
 
         tracker.Track(ld06.clusterCenterPoints);
@@ -122,8 +122,8 @@ void loop()
                 teleplot("robot", robot.position.angle);
                 lastPosition = robot.position;
             }
-            // teleplot("mapBoundaries", MapBoundaries, 4, LEVEL_WARN);
-            // teleplot("robot", robot.position, LEVEL_WARN);
+            // teleplot("mapBoundaries", MapBoundaries, 4, Level::LEVEL_WARN);
+            // teleplot("robot", robot.position, Level::LEVEL_WARN);
         }
 #endif
 
@@ -143,7 +143,7 @@ void loop()
             if (cmd.cmd == ("MapBoundaries"))
             {
                 // TODO
-                // teleplot("mapBoundaries", MapBoundaries, 4, LEVEL_WARN);
+                // teleplot("mapBoundaries", MapBoundaries, 4, Level::LEVEL_WARN);
             }
 #endif
 
@@ -158,8 +158,8 @@ void loop()
     }
     catch (std::exception const &e)
     {
-        print("error : ", LEVEL_ERROR);
-        println(e.what(), LEVEL_ERROR);
+        print("error : ", Level::LEVEL_ERROR);
+        println(e.what(), Level::LEVEL_ERROR);
     }
 }
 

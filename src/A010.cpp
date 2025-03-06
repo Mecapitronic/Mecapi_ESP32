@@ -210,20 +210,20 @@ void MetaSenseA010::Config(int min = -1, int max = -1, int discontinuity = -1)
 {
     if (min != -1)
     {
-        print("MetaSenseA010 Config 'Distance Min' from ", a010Config.minDistance, "", LEVEL_INFO);
-        println(" to ", min, "", LEVEL_INFO);
+        print("MetaSenseA010 Config 'Distance Min' from ", a010Config.minDistance, "", Level::LEVEL_INFO);
+        println(" to ", min, "", Level::LEVEL_INFO);
         a010Config.minDistance = min;
     }
     if (max != -1)
     {
-        print("MetaSenseA010 Config 'Distance Max' from ", a010Config.maxDistance, "", LEVEL_INFO);
-        println(" to ", max, "", LEVEL_INFO);
+        print("MetaSenseA010 Config 'Distance Max' from ", a010Config.maxDistance, "", Level::LEVEL_INFO);
+        println(" to ", max, "", Level::LEVEL_INFO);
         a010Config.maxDistance = max;
     }
     if (discontinuity != -1)
     {
-        print("MetaSenseA010 Config 'Discontinuity' from ", a010Config.IDMaxDiscontinuity, "", LEVEL_INFO);
-        println(" to ", discontinuity, "", LEVEL_INFO);
+        print("MetaSenseA010 Config 'Discontinuity' from ", a010Config.IDMaxDiscontinuity, "", Level::LEVEL_INFO);
+        println(" to ", discontinuity, "", Level::LEVEL_INFO);
         a010Config.IDMaxDiscontinuity = discontinuity;
     }
 }
@@ -304,9 +304,9 @@ boolean MetaSenseA010::ReadSerial()
             {
                 // we should never come here !
                 InitTmpVariables();
-                print("cursorTmp > packetSize + 4 + 2", LEVEL_WARN);
-                print("cursorTmp : ", cursorTmp, "", LEVEL_WARN);
-                println("packetSize : ", packetSize, "", LEVEL_WARN);
+                print("cursorTmp > packetSize + 4 + 2", Level::LEVEL_WARN);
+                print("cursorTmp : ", cursorTmp, "", Level::LEVEL_WARN);
+                println("packetSize : ", packetSize, "", Level::LEVEL_WARN);
             }
         }
         else if (cursorTmp == 0)  // First byte of packet
@@ -434,9 +434,9 @@ boolean MetaSenseA010::ReadSerial()
         {
             // we should never come here !
             InitTmpVariables();
-            print("cursorTmp < 0", LEVEL_WARN);
-            print("cursorTmp : ", cursorTmp, "", LEVEL_WARN);
-            println("packetSize : ", packetSize, "", LEVEL_WARN);
+            print("cursorTmp < 0", Level::LEVEL_WARN);
+            print("cursorTmp : ", cursorTmp, "", Level::LEVEL_WARN);
+            println("packetSize : ", packetSize, "", Level::LEVEL_WARN);
         }
     }
     return false;
@@ -458,9 +458,9 @@ boolean MetaSenseA010::CheckContinuity()
 
     if (delta > a010Config.IDMaxDiscontinuity)
     {
-        println("a010Packet.frame_head.frame_id : ", a010Packet.frame_head.frame_id, "", LEVEL_WARN);
-        println("a010LastPacketHeader.frame_id : ", a010LastPacketHeader.frame_id, "", LEVEL_WARN);
-        println("Discontinuity : ", delta, "", LEVEL_WARN);
+        println("a010Packet.frame_head.frame_id : ", a010Packet.frame_head.frame_id, "", Level::LEVEL_WARN);
+        println("a010LastPacketHeader.frame_id : ", a010LastPacketHeader.frame_id, "", Level::LEVEL_WARN);
+        println("Discontinuity : ", delta, "", Level::LEVEL_WARN);
         return false;
     }
     else

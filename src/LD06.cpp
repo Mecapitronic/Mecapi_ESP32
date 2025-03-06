@@ -2,7 +2,7 @@
 
 void LidarLD06::Initialisation()
 {
-    println("Init LidarLD06", LEVEL_INFO);
+    println("Init LidarLD06", Level::LEVEL_INFO);
     scan.clear();
     clusterCenterPoints.clear();
 
@@ -92,38 +92,38 @@ void LidarLD06::Config(int min = -1, int max = -1, int quality = -1, int distanc
 {
     if (min != -1)
     {
-        print("LidarLD06 Config 'Distance Min' from ", lidarConfig.minDistance, "", LEVEL_INFO);
-        println(" to ", min, "", LEVEL_INFO);
+        print("LidarLD06 Config 'Distance Min' from ", lidarConfig.minDistance, "", Level::LEVEL_INFO);
+        println(" to ", min, "", Level::LEVEL_INFO);
         lidarConfig.minDistance = min;
     }
     if (max != -1)
     {
-        print("LidarLD06 Config 'Distance Max' from ", lidarConfig.maxDistance, "", LEVEL_INFO);
-        println(" to ", max, "", LEVEL_INFO);
+        print("LidarLD06 Config 'Distance Max' from ", lidarConfig.maxDistance, "", Level::LEVEL_INFO);
+        println(" to ", max, "", Level::LEVEL_INFO);
         lidarConfig.maxDistance = max;
     }
     if (quality != -1)
     {
-        print("LidarLD06 Config 'Quality' from ", lidarConfig.minQuality, "", LEVEL_INFO);
-        println(" to ", quality, "", LEVEL_INFO);
+        print("LidarLD06 Config 'Quality' from ", lidarConfig.minQuality, "", Level::LEVEL_INFO);
+        println(" to ", quality, "", Level::LEVEL_INFO);
         lidarConfig.minQuality = quality;
     }
     if (distance != -1)
     {
-        print("LidarLD06 Config 'Distance Threshold' from ", lidarConfig.distanceThreshold, "", LEVEL_INFO);
-        println(" to ", distance, "", LEVEL_INFO);
+        print("LidarLD06 Config 'Distance Threshold' from ", lidarConfig.distanceThreshold, "", Level::LEVEL_INFO);
+        println(" to ", distance, "", Level::LEVEL_INFO);
         lidarConfig.distanceThreshold = distance;
     }
     if (angle != -1)
     {
-        print("LidarLD06 Config 'Angle Threshold' from ", lidarConfig.angleThreshold, "", LEVEL_INFO);
-        println(" to ", angle, "", LEVEL_INFO);
+        print("LidarLD06 Config 'Angle Threshold' from ", lidarConfig.angleThreshold, "", Level::LEVEL_INFO);
+        println(" to ", angle, "", Level::LEVEL_INFO);
         lidarConfig.angleThreshold = angle;
     }
     if (tableMargin != -1)
     {
-        print("LidarLD06 Config 'Table Margin' from ", lidarConfig.tableMargin, "", LEVEL_INFO);
-        println(" to ", tableMargin, "", LEVEL_INFO);
+        print("LidarLD06 Config 'Table Margin' from ", lidarConfig.tableMargin, "", Level::LEVEL_INFO);
+        println(" to ", tableMargin, "", Level::LEVEL_INFO);
         lidarConfig.tableMargin = tableMargin;
     }
 
@@ -234,7 +234,7 @@ boolean LidarLD06::CheckContinuity()
 
     if (delta > ANGLE_MAX_DISCONTINUITY)
     {
-        println("Discontinuity : ", (float)delta / 100, " deg", LEVEL_WARN);
+        println("Discontinuity : ", (float)delta / 100, " deg", Level::LEVEL_WARN);
         return false;
     }
     else
@@ -354,34 +354,34 @@ void LidarLD06::CheckCluster(PolarPoint polarPoint)
             else if (c.data.size() > ceil(maxPoint))
             {
                 /*
-                println("Too many points : ", c.data.size(), "", LEVEL_WARN);
-                println(">distance:", c.mid.distance, "", LEVEL_WARN);
-                println(">Min_point:", minPoint, "", LEVEL_WARN);
-                println(">Max_point:", maxPoint, "", LEVEL_WARN);
-                println(">Arc_length:", arc, "", LEVEL_WARN);
-                println(">front:", c.data.front().angle, "", LEVEL_WARN);
-                println(">back:", c.data.back().angle, "", LEVEL_WARN);*/
+                println("Too many points : ", c.data.size(), "", Level::LEVEL_WARN);
+                println(">distance:", c.mid.distance, "", Level::LEVEL_WARN);
+                println(">Min_point:", minPoint, "", Level::LEVEL_WARN);
+                println(">Max_point:", maxPoint, "", Level::LEVEL_WARN);
+                println(">Arc_length:", arc, "", Level::LEVEL_WARN);
+                println(">front:", c.data.front().angle, "", Level::LEVEL_WARN);
+                println(">back:", c.data.back().angle, "", Level::LEVEL_WARN);*/
             }
             else if (c.data.size() < floor(minPoint))
             { /*
-                 println("Not enough points : ", c.data.size(), "", LEVEL_WARN);
-                 println(">distance:", c.mid.distance, "", LEVEL_WARN);
-                 println(">Min_point:", minPoint, "", LEVEL_WARN);
-                 println(">Max_point:", maxPoint, "", LEVEL_WARN);
-                 println(">Arc_length:", arc, "", LEVEL_WARN);
-                 println(">front:", c.data.front().angle, "", LEVEL_WARN);
-                 println(">back:", c.data.back().angle, "", LEVEL_WARN);*/
+                 println("Not enough points : ", c.data.size(), "", Level::LEVEL_WARN);
+                 println(">distance:", c.mid.distance, "", Level::LEVEL_WARN);
+                 println(">Min_point:", minPoint, "", Level::LEVEL_WARN);
+                 println(">Max_point:", maxPoint, "", Level::LEVEL_WARN);
+                 println(">Arc_length:", arc, "", Level::LEVEL_WARN);
+                 println(">front:", c.data.front().angle, "", Level::LEVEL_WARN);
+                 println(">back:", c.data.back().angle, "", Level::LEVEL_WARN);*/
             }
             else
             {
                 /*
-                println(">distance:", c.mid.distance, "", LEVEL_WARN);
-                println(">Min_point:", minPoint, "", LEVEL_WARN);
-                println(">Max_point:", maxPoint, "", LEVEL_WARN);
-                println(">size:", c.data.size(), "", LEVEL_WARN);
-                println(">Arc_length:", arc, "", LEVEL_WARN);
-                println(">front:", c.data.front().angle, "", LEVEL_WARN);
-                println(">back:", c.data.back().angle, "", LEVEL_WARN);*/
+                println(">distance:", c.mid.distance, "", Level::LEVEL_WARN);
+                println(">Min_point:", minPoint, "", Level::LEVEL_WARN);
+                println(">Max_point:", maxPoint, "", Level::LEVEL_WARN);
+                println(">size:", c.data.size(), "", Level::LEVEL_WARN);
+                println(">Arc_length:", arc, "", Level::LEVEL_WARN);
+                println(">front:", c.data.front().angle, "", Level::LEVEL_WARN);
+                println(">back:", c.data.back().angle, "", Level::LEVEL_WARN);*/
                 /*
                 float s = (angle * c.mid.distance) * PI / 180;
                 float theta1 = (60 * 180) / (PI * c.mid.distance);
@@ -402,9 +402,9 @@ void LidarLD06::CheckCluster(PolarPoint polarPoint)
                 */
 
                 print("Obstacle Detected mid Polar: ", c.mid);
-                // teleplot("mid", c.mid, LEVEL_WARN);
+                // teleplot("mid", c.mid, Level::LEVEL_WARN);
                 ObstacleDetected(c);
-                // teleplot("cluster", c.data, LEVEL_WARN);
+                // teleplot("cluster", c.data, Level::LEVEL_WARN);
             }
             // Zeroing the mid point to remove this cluster later
             c.mid = {0, 0};

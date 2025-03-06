@@ -63,7 +63,7 @@ class Robot  // : public IModule
    private:
     uint32_t serialBuffer[ROBOT_SERIAL_PACKET_SIZE] = {0};
     uint8_t cursorTmp = 0;
-    Enable dsPicSerialStatus = ENABLE_TRUE;
+    Enable dsPicSerialStatus = Enable::ENABLE_TRUE;
 };
 
 #endif
