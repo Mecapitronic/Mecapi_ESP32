@@ -51,7 +51,7 @@
 #include "task.h"
 
 /* FreeRTOS+Trace includes. */
-//#include "trcRecorder.h"
+#include "trcRecorder.h"
 
 #define xTaskCreatePinnedToCore(a,b,c,d,e,f,g) xTaskCreate(a,b,c,d,e,f)
 

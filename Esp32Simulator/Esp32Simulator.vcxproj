@@ -65,7 +65,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_VISUAL_STUDIO;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)\pthreads\include;..\lib\ESP32_Helper\include;..\lib\ESP32_Helper\src;..\include;..\src;$(ProjectDir)FreeRTOS\Include;$(ProjectDir)FreeRTOS\Configuration Files;$(ProjectDir)FreeRTOS\Source;$(ProjectDir)FreeRTOS\Portable;$(ProjectDir)FreeRTOS\FreeRTOS-Plus-Trace;$(ProjectDir)framework-arduinoespressif32</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\pthreads\include;..\lib\ESP32_Helper\include;..\lib\ESP32_Helper\src;..\include;..\src;$(ProjectDir)framework-arduinoespressif32;$(ProjectDir)FreeRTOS\Source\include;$(ProjectDir)FreeRTOS\Source\portable\MSVC-MingW;$(ProjectDir)FreeRTOS\Common\Include;$(ProjectDir)FreeRTOS\FreeRTOS-Plus\Source\FreeRTOS-Plus-Trace\Include;$(ProjectDir)FreeRTOS\Trace_Recorder_Configuration;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -85,17 +85,78 @@
     <ClCompile Include="Esp32Simulator.cpp" />
     <ClCompile Include="framework-arduinoespressif32\stdlib_noniso.c" />
     <ClCompile Include="framework-arduinoespressif32\WString.cpp" />
-    <ClCompile Include="FreeRTOS\Source\croutine.c" />
-    <ClCompile Include="FreeRTOS\Source\event_groups.c" />
-    <ClCompile Include="FreeRTOS\Source\list.c" />
-    <ClCompile Include="FreeRTOS\Source\Portable\heap_5.c" />
-    <ClCompile Include="FreeRTOS\Source\Portable\port.c" />
-    <ClCompile Include="FreeRTOS\Source\queue.c" />
-    <ClCompile Include="FreeRTOS\Source\stream_buffer.c" />
-    <ClCompile Include="FreeRTOS\Source\tasks.c" />
-    <ClCompile Include="FreeRTOS\Source\timers.c" />
     <ClCompile Include="Preferences.cpp" />
     <ClCompile Include="Serial.cpp" />
+    <ClCompile Include="FreeRTOS\FreeRTOS-Plus\Source\FreeRTOS-Plus-Trace\trcKernelPort.c" />
+    <ClCompile Include="FreeRTOS\FreeRTOS-Plus\Source\FreeRTOS-Plus-Trace\trcSnapshotRecorder.c" />
+    <ClCompile Include="FreeRTOS\Source\event_groups.c" />
+    <ClCompile Include="FreeRTOS\Source\portable\MemMang\heap_5.c" />
+    <ClCompile Include="FreeRTOS\Source\stream_buffer.c" />
+    <ClCompile Include="FreeRTOS\Source\timers.c" />
+    <ClCompile Include="FreeRTOS\Common\Minimal\AbortDelay.c" />
+    <ClCompile Include="FreeRTOS\Common\Minimal\BlockQ.c" />
+    <ClCompile Include="FreeRTOS\Common\Minimal\blocktim.c" />
+    <ClCompile Include="FreeRTOS\Common\Minimal\countsem.c" />
+    <ClCompile Include="FreeRTOS\Common\Minimal\death.c" />
+    <ClCompile Include="FreeRTOS\Common\Minimal\dynamic.c" />
+    <ClCompile Include="FreeRTOS\Common\Minimal\EventGroupsDemo.c" />
+    <ClCompile Include="FreeRTOS\Common\Minimal\flop.c" />
+    <ClCompile Include="FreeRTOS\Common\Minimal\GenQTest.c" />
+    <ClCompile Include="FreeRTOS\Common\Minimal\integer.c" />
+    <ClCompile Include="FreeRTOS\Common\Minimal\IntSemTest.c" />
+    <ClCompile Include="FreeRTOS\Common\Minimal\MessageBufferAMP.c" />
+    <ClCompile Include="FreeRTOS\Common\Minimal\PollQ.c" />
+    <ClCompile Include="FreeRTOS\Common\Minimal\QPeek.c" />
+    <ClCompile Include="FreeRTOS\Common\Minimal\QueueOverwrite.c" />
+    <ClCompile Include="FreeRTOS\Common\Minimal\QueueSet.c" />
+    <ClCompile Include="FreeRTOS\Common\Minimal\QueueSetPolling.c" />
+    <ClCompile Include="FreeRTOS\Common\Minimal\recmutex.c" />
+    <ClCompile Include="FreeRTOS\Common\Minimal\semtest.c" />
+    <ClCompile Include="FreeRTOS\Common\Minimal\StaticAllocation.c" />
+    <ClCompile Include="FreeRTOS\Common\Minimal\MessageBufferDemo.c" />
+    <ClCompile Include="FreeRTOS\Common\Minimal\StreamBufferDemo.c" />
+    <ClCompile Include="FreeRTOS\Common\Minimal\StreamBufferInterrupt.c" />
+    <ClCompile Include="FreeRTOS\Common\Minimal\TaskNotify.c" />
+    <ClCompile Include="FreeRTOS\Common\Minimal\TaskNotifyArray.c" />
+    <ClCompile Include="FreeRTOS\Common\Minimal\timerdemo.c" />
+    <ClCompile Include="FreeRTOS\Source\list.c">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="FreeRTOS\Source\portable\MSVC-MingW\port.c">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="FreeRTOS\Source\queue.c">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="FreeRTOS\Source\tasks.c">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="FreeRTOS\Run-time-stats-utils.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="FreeRTOS\FreeRTOS-Plus\Source\FreeRTOS-Plus-Trace\Include\trcKernelPort.h" />
+    <ClInclude Include="FreeRTOS\FreeRTOS-Plus\Source\FreeRTOS-Plus-Trace\Include\trcRecorder.h" />
+    <ClInclude Include="FreeRTOS\FreeRTOSConfig.h" />
+    <ClInclude Include="FreeRTOS\Source\include\event_groups.h" />
+    <ClInclude Include="FreeRTOS\Source\include\message_buffer.h" />
+    <ClInclude Include="FreeRTOS\Source\include\stream_buffer.h" />
+    <ClInclude Include="FreeRTOS\Source\include\timers.h" />
+    <ClInclude Include="FreeRTOS\Source\portable\MSVC-MingW\portmacro.h" />
+    <ClInclude Include="FreeRTOS\Source\include\FreeRTOS.h" />
+    <ClInclude Include="FreeRTOS\Source\include\list.h" />
+    <ClInclude Include=".FreeRTOS\Source\include\portable.h" />
+    <ClInclude Include="FreeRTOS\Source\include\projdefs.h" />
+    <ClInclude Include="FreeRTOS\Source\include\queue.h" />
+    <ClInclude Include="FreeRTOS\Source\include\semphr.h" />
+    <ClInclude Include="FreeRTOS\Source\include\task.h" />
+    <ClInclude Include="FreeRTOS\Trace_Recorder_Configuration\trcConfig.h" />
+    <ClInclude Include="FreeRTOS\Trace_Recorder_Configuration\trcKernelPortConfig.h" />
+    <ClInclude Include="FreeRTOS\Trace_Recorder_Configuration\trcKernelPortSnapshotConfig.h" />
+    <ClInclude Include="FreeRTOS\Trace_Recorder_Configuration\trcSnapshotConfig.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\main.h" />
@@ -113,32 +174,6 @@
     <ClInclude Include="framework-arduinoespressif32\esp_idf_version.h" />
     <ClInclude Include="framework-arduinoespressif32\stdlib_noniso.h" />
     <ClInclude Include="framework-arduinoespressif32\WString.h" />
-    <ClInclude Include="FreeRTOS\Configuration Files\FreeRTOSConfig.h" />
-    <ClInclude Include="FreeRTOS\Configuration Files\trcConfig.h" />
-    <ClInclude Include="FreeRTOS\Configuration Files\trcKernelPortConfig.h" />
-    <ClInclude Include="FreeRTOS\Configuration Files\trcKernelPortSnapshotConfig.h" />
-    <ClInclude Include="FreeRTOS\Configuration Files\trcSnapshotConfig.h" />
-    <ClInclude Include="FreeRTOS\FreeRTOS-Plus-Trace\trcKernelPort.h" />
-    <ClInclude Include="FreeRTOS\FreeRTOS-Plus-Trace\trcRecorder.h" />
-    <ClInclude Include="FreeRTOS\Include\atomic.h" />
-    <ClInclude Include="FreeRTOS\Include\croutine.h" />
-    <ClInclude Include="FreeRTOS\Include\deprecated_definitions.h" />
-    <ClInclude Include="FreeRTOS\Include\event_groups.h" />
-    <ClInclude Include="FreeRTOS\Include\FreeRTOS.h" />
-    <ClInclude Include="FreeRTOS\Include\list.h" />
-    <ClInclude Include="FreeRTOS\Include\message_buffer.h" />
-    <ClInclude Include="FreeRTOS\Include\mpu_prototypes.h" />
-    <ClInclude Include="FreeRTOS\Include\mpu_wrappers.h" />
-    <ClInclude Include="FreeRTOS\Include\portable.h" />
-    <ClInclude Include="FreeRTOS\Include\portmacro.h" />
-    <ClInclude Include="FreeRTOS\Include\projdefs.h" />
-    <ClInclude Include="FreeRTOS\Include\queue.h" />
-    <ClInclude Include="FreeRTOS\Include\semphr.h" />
-    <ClInclude Include="FreeRTOS\Include\StackMacros.h" />
-    <ClInclude Include="FreeRTOS\Include\stack_macros.h" />
-    <ClInclude Include="FreeRTOS\Include\stream_buffer.h" />
-    <ClInclude Include="FreeRTOS\Include\task.h" />
-    <ClInclude Include="FreeRTOS\Include\timers.h" />
     <ClInclude Include="Preferences.h" />
     <ClInclude Include="pthreads\include\pthread.h" />
     <ClInclude Include="pthreads\include\sched.h" />

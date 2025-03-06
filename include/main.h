@@ -29,5 +29,9 @@ extern Robot robot;
 #include "OTOS.h"
 #endif
 
+
+void setup(void);
+void loop(void);
+
 //void functionChrono(int nbrLoop = 1);
 #endif
