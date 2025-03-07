@@ -31,8 +31,6 @@ using namespace std;
 #include <stdlib.h>
 #include <conio.h>
 
-#include "FreeRTOS.h"
-
 #include "main.h"
 
 extern "C"

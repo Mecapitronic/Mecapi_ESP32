@@ -85,7 +85,6 @@
     <ClCompile Include="Esp32Simulator.cpp" />
     <ClCompile Include="framework-arduinoespressif32\stdlib_noniso.c" />
     <ClCompile Include="framework-arduinoespressif32\WString.cpp" />
-    <ClCompile Include="FreeRTOS.cpp" />
     <ClCompile Include="Preferences.cpp" />
     <ClCompile Include="Serial.cpp" />
   </ItemGroup>
@@ -105,7 +104,6 @@
     <ClInclude Include="framework-arduinoespressif32\esp_idf_version.h" />
     <ClInclude Include="framework-arduinoespressif32\stdlib_noniso.h" />
     <ClInclude Include="framework-arduinoespressif32\WString.h" />
-    <ClInclude Include="FreeRTOS.h" />
     <ClInclude Include="Preferences.h" />
     <ClInclude Include="pthreads\include\pthread.h" />
     <ClInclude Include="pthreads\include\sched.h" />

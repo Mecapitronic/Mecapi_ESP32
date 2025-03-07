@@ -46,8 +46,6 @@
  * should an assert get hit. */
 #include <intrin.h>
 
-#include "FreeRTOS.h"
-
 #define millis() (uint64_t) (xTaskGetTickCount() * portTICK_PERIOD_MS)
 
 // Get time stamp in milliseconds.
