@@ -1,5 +1,5 @@
-#ifndef _SERIAL_H_
-#define _SERIAL_H_
+#ifndef SERIAL_H
+#define SERIAL_H
 
 #include "Arduino.h"
 

@@ -22,9 +22,6 @@
     <Filter Include="arduinoespressif32">
       <UniqueIdentifier>{e0d68cf9-e62e-4251-a24b-ca2814c4e8cd}</UniqueIdentifier>
     </Filter>
-    <Filter Include="FreeRTOS">
-      <UniqueIdentifier>{1994f60d-1da0-4590-b98e-fd0212597bdb}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Esp32Simulator.cpp" />
@@ -48,33 +45,6 @@
     </ClCompile>
     <ClCompile Include="..\lib\ESP32_Helper\src\Wifi_No_Helper.cpp">
       <Filter>Esp32_Helper</Filter>
-    </ClCompile>
-    <ClCompile Include="FreeRTOS\Source\croutine.c">
-      <Filter>FreeRTOS</Filter>
-    </ClCompile>
-    <ClCompile Include="FreeRTOS\Source\event_groups.c">
-      <Filter>FreeRTOS</Filter>
-    </ClCompile>
-    <ClCompile Include="FreeRTOS\Source\list.c">
-      <Filter>FreeRTOS</Filter>
-    </ClCompile>
-    <ClCompile Include="FreeRTOS\Source\Portable\heap_5.c">
-      <Filter>FreeRTOS</Filter>
-    </ClCompile>
-    <ClCompile Include="FreeRTOS\Source\Portable\port.c">
-      <Filter>FreeRTOS</Filter>
-    </ClCompile>
-    <ClCompile Include="FreeRTOS\Source\queue.c">
-      <Filter>FreeRTOS</Filter>
-    </ClCompile>
-    <ClCompile Include="FreeRTOS\Source\stream_buffer.c">
-      <Filter>FreeRTOS</Filter>
-    </ClCompile>
-    <ClCompile Include="FreeRTOS\Source\tasks.c">
-      <Filter>FreeRTOS</Filter>
-    </ClCompile>
-    <ClCompile Include="FreeRTOS\Source\timers.c">
-      <Filter>FreeRTOS</Filter>
     </ClCompile>
     <ClCompile Include="framework-arduinoespressif32\WString.cpp">
       <Filter>arduinoespressif32</Filter>
@@ -131,84 +101,6 @@
     <ClInclude Include="Arduino.h" />
     <ClInclude Include="Preferences.h">
       <Filter>arduinoespressif32</Filter>
-    </ClInclude>
-    <ClInclude Include="FreeRTOS\Include\atomic.h">
-      <Filter>FreeRTOS</Filter>
-    </ClInclude>
-    <ClInclude Include="FreeRTOS\Include\croutine.h">
-      <Filter>FreeRTOS</Filter>
-    </ClInclude>
-    <ClInclude Include="FreeRTOS\Include\deprecated_definitions.h">
-      <Filter>FreeRTOS</Filter>
-    </ClInclude>
-    <ClInclude Include="FreeRTOS\Include\event_groups.h">
-      <Filter>FreeRTOS</Filter>
-    </ClInclude>
-    <ClInclude Include="FreeRTOS\Include\FreeRTOS.h">
-      <Filter>FreeRTOS</Filter>
-    </ClInclude>
-    <ClInclude Include="FreeRTOS\Include\list.h">
-      <Filter>FreeRTOS</Filter>
-    </ClInclude>
-    <ClInclude Include="FreeRTOS\Include\message_buffer.h">
-      <Filter>FreeRTOS</Filter>
-    </ClInclude>
-    <ClInclude Include="FreeRTOS\Include\mpu_prototypes.h">
-      <Filter>FreeRTOS</Filter>
-    </ClInclude>
-    <ClInclude Include="FreeRTOS\Include\mpu_wrappers.h">
-      <Filter>FreeRTOS</Filter>
-    </ClInclude>
-    <ClInclude Include="FreeRTOS\Include\portable.h">
-      <Filter>FreeRTOS</Filter>
-    </ClInclude>
-    <ClInclude Include="FreeRTOS\Include\portmacro.h">
-      <Filter>FreeRTOS</Filter>
-    </ClInclude>
-    <ClInclude Include="FreeRTOS\Include\projdefs.h">
-      <Filter>FreeRTOS</Filter>
-    </ClInclude>
-    <ClInclude Include="FreeRTOS\Include\queue.h">
-      <Filter>FreeRTOS</Filter>
-    </ClInclude>
-    <ClInclude Include="FreeRTOS\Include\semphr.h">
-      <Filter>FreeRTOS</Filter>
-    </ClInclude>
-    <ClInclude Include="FreeRTOS\Include\StackMacros.h">
-      <Filter>FreeRTOS</Filter>
-    </ClInclude>
-    <ClInclude Include="FreeRTOS\Include\stack_macros.h">
-      <Filter>FreeRTOS</Filter>
-    </ClInclude>
-    <ClInclude Include="FreeRTOS\Include\stream_buffer.h">
-      <Filter>FreeRTOS</Filter>
-    </ClInclude>
-    <ClInclude Include="FreeRTOS\Include\task.h">
-      <Filter>FreeRTOS</Filter>
-    </ClInclude>
-    <ClInclude Include="FreeRTOS\Include\timers.h">
-      <Filter>FreeRTOS</Filter>
-    </ClInclude>
-    <ClInclude Include="FreeRTOS\Configuration Files\FreeRTOSConfig.h">
-      <Filter>FreeRTOS</Filter>
-    </ClInclude>
-    <ClInclude Include="FreeRTOS\Configuration Files\trcConfig.h">
-      <Filter>FreeRTOS</Filter>
-    </ClInclude>
-    <ClInclude Include="FreeRTOS\Configuration Files\trcKernelPortConfig.h">
-      <Filter>FreeRTOS</Filter>
-    </ClInclude>
-    <ClInclude Include="FreeRTOS\Configuration Files\trcKernelPortSnapshotConfig.h">
-      <Filter>FreeRTOS</Filter>
-    </ClInclude>
-    <ClInclude Include="FreeRTOS\Configuration Files\trcSnapshotConfig.h">
-      <Filter>FreeRTOS</Filter>
-    </ClInclude>
-    <ClInclude Include="FreeRTOS\FreeRTOS-Plus-Trace\trcKernelPort.h">
-      <Filter>FreeRTOS</Filter>
-    </ClInclude>
-    <ClInclude Include="FreeRTOS\FreeRTOS-Plus-Trace\trcRecorder.h">
-      <Filter>FreeRTOS</Filter>
     </ClInclude>
     <ClInclude Include="framework-arduinoespressif32\WString.h">
       <Filter>arduinoespressif32</Filter>

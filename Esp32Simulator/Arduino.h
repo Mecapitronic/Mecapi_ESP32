@@ -46,14 +46,7 @@
  * should an assert get hit. */
 #include <intrin.h>
 
- /* FreeRTOS kernel includes. */
 #include "FreeRTOS.h"
-#include "task.h"
-
-/* FreeRTOS+Trace includes. */
-#include "trcRecorder.h"
-
-#define xTaskCreatePinnedToCore(a,b,c,d,e,f,g) xTaskCreate(a,b,c,d,e,f)
 
 #define millis() (uint64_t) (xTaskGetTickCount() * portTICK_PERIOD_MS)
 
