@@ -9,7 +9,7 @@ void MySerial::setRxBufferSize(int size) {};
 void MySerial::setTxBufferSize(int size) {};
 void MySerial::begin(int baud_speed) {};
 void MySerial::print() {};
-void MySerial::print(const char* str) { myprintf(str); };
+void MySerial::print(const char* str) { if(str != NULL) myprintf(str); };
 void MySerial::print(String str) {
 	if (str != "")
 	{
@@ -17,7 +17,7 @@ void MySerial::print(String str) {
 		myprintf(s);
 	}
 };
-void MySerial::print(int i) { myprintf(i); };
+void MySerial::print(int i) { if (i != NULL) myprintf(i); };
 void MySerial::println() { myprintf('\n'); };
 void MySerial::println(const char* str) { print(str); println(); };
 void MySerial::println(String str) { print(str); println(); };

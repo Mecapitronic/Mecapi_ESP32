@@ -2,6 +2,7 @@
 #define SERIAL_H
 
 #include "Arduino.h"
+#include "WString.h"
 #include <iostream>
 
 using namespace std;
