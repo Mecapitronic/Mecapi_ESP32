@@ -82,6 +82,7 @@
     <ClCompile Include="..\lib\ESP32_Helper\src\Wifi_Helper.cpp" />
     <ClCompile Include="..\lib\ESP32_Helper\src\Wifi_No_Helper.cpp" />
     <ClCompile Include="..\src\main.cpp" />
+    <ClCompile Include="Arduino.cpp" />
     <ClCompile Include="Esp32Simulator.cpp" />
     <ClCompile Include="framework-arduinoespressif32\stdlib_noniso.c" />
     <ClCompile Include="framework-arduinoespressif32\WString.cpp" />
@@ -95,7 +96,9 @@
     <ClInclude Include="..\lib\ESP32_Helper\include\ModuleTemplate.h" />
     <ClInclude Include="..\lib\ESP32_Helper\include\Preferences_Helper.h" />
     <ClInclude Include="..\lib\ESP32_Helper\include\Printer.h" />
+    <ClInclude Include="..\lib\ESP32_Helper\include\QueueThread.h" />
     <ClInclude Include="..\lib\ESP32_Helper\include\Structure.h" />
+    <ClInclude Include="..\lib\ESP32_Helper\include\TaskThread.h" />
     <ClInclude Include="..\lib\ESP32_Helper\include\Wifi_Helper.h" />
     <ClInclude Include="..\lib\ESP32_Helper\include\Wifi_No_Helper.h" />
     <ClInclude Include="Arduino.h" />

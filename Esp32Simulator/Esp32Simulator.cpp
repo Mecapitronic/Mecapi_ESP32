@@ -38,7 +38,7 @@ static void* thread_Interruption(void* p_data)
 
 			//mid = chrono::high_resolution_clock::now();
 			//myprintf("interruption 1: %0.3f ms, time calcul: %d ms\n", (mid - start).count() / 1e6, current_time);
-			timerSleep(0.005);
+			//timerSleep(0.005);
 			//end = chrono::high_resolution_clock::now();
 			//myprintf("interruption 1: %0.3f ms, current_time: %d ms\n", (end - start).count() / 1e6, current_time);
 		}
@@ -144,7 +144,7 @@ void AbortSimulator(void)
 	arret = true;
 	int ret = -1;
 	myprintf("Abort des Thread ! \n");
-	timerSleep(1);
+	vTaskDelay(1000);
 	ret = pthread_cancel(pthread_SETUP);
 	ret = pthread_join(pthread_SETUP, NULL);
 	ret = pthread_cancel(pthread_LOOP);
@@ -233,6 +233,8 @@ int Firmware(void)
 	{
 		cin >> in;
 		//SendUART(in.c_str());
+		Serial.incoming = in + '\n';
+		Serial.bytes = in.length()+1;
 	}
 	AbortSimulator();
 #endif

@@ -1,15 +1,23 @@
 #ifndef Arduino_h
 #define Arduino_h
 
+#include <Windows.h>
+#include <chrono>
+
+#include "Serial.h"
 #include "WString.h"
+
+#define vTaskDelay(x) EspClass::timerSleep(x/1000)
+#define delay vTaskDelay
 
 #define PI 3.1415926535897932384626433832795
 #define HALF_PI 1.5707963267948966192313216916398
 #define TWO_PI 6.283185307179586476925286766559
 #define DEG_TO_RAD 0.017453292519943295769236907684886
 #define RAD_TO_DEG 57.295779513082320876798154814105
-#define EULER 2.718281828459045235360287471352
+//#define EULER 2.718281828459045235360287471352
 
+/*
 #define SERIAL  0x0
 #define DISPLAY 0x1
 
@@ -31,8 +39,10 @@
 #ifndef __STRINGIFY
 #define __STRINGIFY(a) #a
 #endif
+*/
 
 // can't define max() / min() because of conflicts with C++
+/*
 #define _min(a,b) ((a)<(b)?(a):(b))  
 #define _max(a,b) ((a)>(b)?(a):(b))
 #define _abs(x) ((x)>0?(x):-(x))  // abs() comes from STL
@@ -41,10 +51,8 @@
 #define radians(deg) ((deg)*DEG_TO_RAD)
 #define degrees(rad) ((rad)*RAD_TO_DEG)
 #define sq(x) ((x)*(x))
+*/
 
-/* Visual studio intrinsics used so the __debugbreak() function is available
- * should an assert get hit. */
-#include <intrin.h>
 
 #define millis() (uint64_t) (xTaskGetTickCount() * portTICK_PERIOD_MS)
 
@@ -75,16 +83,17 @@
 	return ns;
 }*/
 
-#define delay(t) do{}while(0)
 
-#include "..\Serial.h"
-
-/*
-class ESP32
+class EspClass
 {
 public:
-	void restart(void) {};
+	EspClass() {}
+	~EspClass() {}
+	void restart();
+
+	static void timerSleep(double seconds);
 };
-ESP32 ESP;
-*/
+
+extern EspClass ESP;
+
 #endif
