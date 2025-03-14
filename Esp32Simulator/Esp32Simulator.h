@@ -1,15 +1,12 @@
 #ifndef _FIRMWARE_H_
 #define _FIRMWARE_H_
 
-#ifndef _USE_OLD_OSTREAMS
-using namespace std;
-#endif
-
 #ifdef _VISUAL_STUDIO
 #else
 #endif
 
 #define HAVE_STRUCT_TIMESPEC
+#include <time.h>
 
 #pragma comment(lib, "winmm.lib")
 #pragma comment( user, "Compiled on " __DATE__ " at " __TIME__ )
@@ -28,16 +25,14 @@ using namespace std;
 #include <string>
 #include <vector>
 
-#include <time.h>
-
 /* Standard includes. */
 #include <stdio.h>
 #include <stdlib.h>
 #include <conio.h>
 
-/* Visual studio intrinsics used so the __debugbreak() function is available
- * should an assert get hit. */
-#include <intrin.h>
+#ifndef _USE_OLD_OSTREAMS
+using namespace std;
+#endif
 
 #include "main.h"
 
