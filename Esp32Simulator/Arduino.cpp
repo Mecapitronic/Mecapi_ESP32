@@ -40,3 +40,14 @@ void EspClass::timerSleep(double seconds) {
     auto start = high_resolution_clock::now();
     while ((high_resolution_clock::now() - start).count() / 1e9 < seconds);
 }
+
+std::chrono::steady_clock::time_point _start;
+void EspClass::startTime()
+{
+    _start = std::chrono::high_resolution_clock::now();
+}
+unsigned long EspClass::getTime()
+{
+    std::chrono::steady_clock::time_point m = std::chrono::high_resolution_clock::now();
+    return (m - _start).count() / 1e3;
+}

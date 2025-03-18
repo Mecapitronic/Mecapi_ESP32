@@ -7,15 +7,12 @@
 #include "Serial.h"
 #include "WString.h"
 
-#define vTaskDelay(x) EspClass::timerSleep(x/1000)
-#define delay vTaskDelay
-
 #define PI 3.1415926535897932384626433832795
 #define HALF_PI 1.5707963267948966192313216916398
 #define TWO_PI 6.283185307179586476925286766559
 #define DEG_TO_RAD 0.017453292519943295769236907684886
 #define RAD_TO_DEG 57.295779513082320876798154814105
-//#define EULER 2.718281828459045235360287471352
+// #define EULER 2.718281828459045235360287471352
 
 /*
 #define SERIAL  0x0
@@ -43,7 +40,7 @@
 
 // can't define max() / min() because of conflicts with C++
 /*
-#define _min(a,b) ((a)<(b)?(a):(b))  
+#define _min(a,b) ((a)<(b)?(a):(b))
 #define _max(a,b) ((a)>(b)?(a):(b))
 #define _abs(x) ((x)>0?(x):-(x))  // abs() comes from STL
 #define constrain(amt,low,high) ((amt)<(low)?(low):((amt)>(high)?(high):(amt)))
@@ -53,47 +50,54 @@
 #define sq(x) ((x)*(x))
 */
 
-
-#define millis() (uint64_t) (xTaskGetTickCount() * portTICK_PERIOD_MS)
-
 // Get time stamp in milliseconds.
 /*uint64_t millis()
 {
-	uint64_t ms = std::chrono::duration_cast<std::chrono::milliseconds>(
-		std::chrono::high_resolution_clock::now().time_since_epoch())
-		.count();
-	return ms;
+        uint64_t ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+                std::chrono::high_resolution_clock::now().time_since_epoch())
+                .count();
+        return ms;
 }*/
 
 // Get time stamp in microseconds.
 /*uint64_t micros()
 {
-	uint64_t us = std::chrono::duration_cast<std::chrono::microseconds>(
-		std::chrono::high_resolution_clock::now().time_since_epoch())
-		.count();
-	return us;
+        uint64_t us = std::chrono::duration_cast<std::chrono::microseconds>(
+                std::chrono::high_resolution_clock::now().time_since_epoch())
+                .count();
+        return us;
 }*/
 
 // Get time stamp in nanoseconds.
 /*uint64_t nanos()
 {
-	uint64_t ns = std::chrono::duration_cast<std::chrono::nanoseconds>(
-		std::chrono::high_resolution_clock::now().time_since_epoch())
-		.count();
-	return ns;
+        uint64_t ns = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                std::chrono::high_resolution_clock::now().time_since_epoch())
+                .count();
+        return ns;
 }*/
 
+#define vTaskDelay(x) EspClass::timerSleep(x / 1000)
+#define delay vTaskDelay
+
+#define millis() EspClass::getTime() / 1e3
+#define micros() EspClass::getTime()
 
 class EspClass
 {
-public:
-	EspClass() {}
-	~EspClass() {}
-	void restart();
+   public:
+    EspClass() {}
+    ~EspClass() {}
+    void restart();
 
-	static void timerSleep(double seconds);
+    static void timerSleep(double seconds);
+    static void startTime();
+    static unsigned long getTime();
 };
 
 extern EspClass ESP;
+
+void setup();
+void loop();
 
 #endif

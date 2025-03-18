@@ -17,6 +17,7 @@ static void* thread_SETUP(void* p_data)
 {
 	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
 	myprintf("Start thread SETUP\n");
+    EspClass::startTime();
 	setup();
 	myprintf("End thread SETUP\n");
 	return NULL;
