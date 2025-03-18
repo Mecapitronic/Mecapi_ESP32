@@ -65,7 +65,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_VISUAL_STUDIO;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)\pthreads\include;..\lib\ESP32_Helper\include;..\lib\ESP32_Helper\src;..\include;..\src;$(ProjectDir)framework-arduinoespressif32;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)pthreads\include;..\lib\ESP32_Helper\include;..\lib\ESP32_Helper\src;..\include;..\src;$(ProjectDir)framework-arduinoespressif32\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -84,9 +84,9 @@
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="Arduino.cpp" />
     <ClCompile Include="Esp32Simulator.cpp" />
+    <ClCompile Include="framework-arduinoespressif32\Preferences.cpp" />
     <ClCompile Include="framework-arduinoespressif32\stdlib_noniso.c" />
     <ClCompile Include="framework-arduinoespressif32\WString.cpp" />
-    <ClCompile Include="Preferences.cpp" />
     <ClCompile Include="Serial.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -105,9 +105,9 @@
     <ClInclude Include="Esp32Simulator.h" />
     <ClInclude Include="framework-arduinoespressif32\esp_err.h" />
     <ClInclude Include="framework-arduinoespressif32\esp_idf_version.h" />
+    <ClInclude Include="framework-arduinoespressif32\Preferences.h" />
     <ClInclude Include="framework-arduinoespressif32\stdlib_noniso.h" />
     <ClInclude Include="framework-arduinoespressif32\WString.h" />
-    <ClInclude Include="Preferences.h" />
     <ClInclude Include="pthreads\include\pthread.h" />
     <ClInclude Include="pthreads\include\sched.h" />
     <ClInclude Include="pthreads\include\semaphore.h" />
