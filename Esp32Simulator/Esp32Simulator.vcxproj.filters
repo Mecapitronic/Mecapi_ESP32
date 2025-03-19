@@ -51,9 +51,13 @@
     <ClCompile Include="framework-arduinoespressif32\stdlib_noniso.c">
       <Filter>framework-arduinoespressif32</Filter>
     </ClCompile>
-    <ClCompile Include="Serial.cpp" />
-    <ClCompile Include="Arduino.cpp" />
     <ClCompile Include="framework-arduinoespressif32\Preferences.cpp">
+      <Filter>framework-arduinoespressif32</Filter>
+    </ClCompile>
+    <ClCompile Include="framework-arduinoespressif32\Arduino.cpp">
+      <Filter>framework-arduinoespressif32</Filter>
+    </ClCompile>
+    <ClCompile Include="framework-arduinoespressif32\Serial.cpp">
       <Filter>framework-arduinoespressif32</Filter>
     </ClCompile>
   </ItemGroup>
@@ -89,16 +93,12 @@
     <ClInclude Include="..\lib\ESP32_Helper\include\Printer.h">
       <Filter>lib\Esp32_Helper</Filter>
     </ClInclude>
-    <ClInclude Include="..\lib\ESP32_Helper\include\Structure.h">
-      <Filter>lib\Esp32_Helper</Filter>
-    </ClInclude>
     <ClInclude Include="..\lib\ESP32_Helper\include\Wifi_Helper.h">
       <Filter>lib\Esp32_Helper</Filter>
     </ClInclude>
     <ClInclude Include="..\lib\ESP32_Helper\include\Wifi_No_Helper.h">
       <Filter>lib\Esp32_Helper</Filter>
     </ClInclude>
-    <ClInclude Include="Arduino.h" />
     <ClInclude Include="framework-arduinoespressif32\WString.h">
       <Filter>framework-arduinoespressif32</Filter>
     </ClInclude>
@@ -111,7 +111,6 @@
     <ClInclude Include="framework-arduinoespressif32\esp_err.h">
       <Filter>framework-arduinoespressif32</Filter>
     </ClInclude>
-    <ClInclude Include="Serial.h" />
     <ClInclude Include="..\lib\ESP32_Helper\include\QueueThread.h">
       <Filter>lib\Esp32_Helper</Filter>
     </ClInclude>
@@ -119,6 +118,15 @@
       <Filter>lib\Esp32_Helper</Filter>
     </ClInclude>
     <ClInclude Include="framework-arduinoespressif32\Preferences.h">
+      <Filter>framework-arduinoespressif32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib\ESP32_Helper\include\Structure_Helper.h">
+      <Filter>lib\Esp32_Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="framework-arduinoespressif32\Arduino.h">
+      <Filter>framework-arduinoespressif32</Filter>
+    </ClInclude>
+    <ClInclude Include="framework-arduinoespressif32\Serial.h">
       <Filter>framework-arduinoespressif32</Filter>
     </ClInclude>
   </ItemGroup>

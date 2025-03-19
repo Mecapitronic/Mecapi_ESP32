@@ -14,7 +14,7 @@
 #ifndef _PREFERENCES_H_
 #define _PREFERENCES_H_
 
-#include "..\Arduino.h"
+#include "Arduino.h"
 
 #define log_e printf
 #define log_v printf

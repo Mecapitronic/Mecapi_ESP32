@@ -82,12 +82,12 @@
     <ClCompile Include="..\lib\ESP32_Helper\src\Wifi_Helper.cpp" />
     <ClCompile Include="..\lib\ESP32_Helper\src\Wifi_No_Helper.cpp" />
     <ClCompile Include="..\src\main.cpp" />
-    <ClCompile Include="Arduino.cpp" />
     <ClCompile Include="Esp32Simulator.cpp" />
+    <ClCompile Include="framework-arduinoespressif32\Arduino.cpp" />
     <ClCompile Include="framework-arduinoespressif32\Preferences.cpp" />
+    <ClCompile Include="framework-arduinoespressif32\Serial.cpp" />
     <ClCompile Include="framework-arduinoespressif32\stdlib_noniso.c" />
     <ClCompile Include="framework-arduinoespressif32\WString.cpp" />
-    <ClCompile Include="Serial.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\main.h" />
@@ -97,22 +97,22 @@
     <ClInclude Include="..\lib\ESP32_Helper\include\Preferences_Helper.h" />
     <ClInclude Include="..\lib\ESP32_Helper\include\Printer.h" />
     <ClInclude Include="..\lib\ESP32_Helper\include\QueueThread.h" />
-    <ClInclude Include="..\lib\ESP32_Helper\include\Structure.h" />
+    <ClInclude Include="..\lib\ESP32_Helper\include\Structure_Helper.h" />
     <ClInclude Include="..\lib\ESP32_Helper\include\TaskThread.h" />
     <ClInclude Include="..\lib\ESP32_Helper\include\Wifi_Helper.h" />
     <ClInclude Include="..\lib\ESP32_Helper\include\Wifi_No_Helper.h" />
-    <ClInclude Include="Arduino.h" />
     <ClInclude Include="Esp32Simulator.h" />
+    <ClInclude Include="framework-arduinoespressif32\Arduino.h" />
     <ClInclude Include="framework-arduinoespressif32\esp_err.h" />
     <ClInclude Include="framework-arduinoespressif32\esp_idf_version.h" />
     <ClInclude Include="framework-arduinoespressif32\Preferences.h" />
+    <ClInclude Include="framework-arduinoespressif32\Serial.h" />
     <ClInclude Include="framework-arduinoespressif32\stdlib_noniso.h" />
     <ClInclude Include="framework-arduinoespressif32\WString.h" />
     <ClInclude Include="pthreads\include\pthread.h" />
     <ClInclude Include="pthreads\include\sched.h" />
     <ClInclude Include="pthreads\include\semaphore.h" />
     <ClInclude Include="pthreads\include\_ptw32.h" />
-    <ClInclude Include="Serial.h" />
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="pthreads\dll\pthreadVC3.dll">
