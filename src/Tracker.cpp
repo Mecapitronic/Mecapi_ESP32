@@ -7,7 +7,8 @@ void Tracker::Initialisation()
     trackedPoints.clear();
 }
 
-void Tracker::Config(float lpf_cutoff_distance, float hpf_cutoff_distance, int confidenceTrigger, int confidenceMax)
+void Tracker::Config(float lpf_cutoff_distance, float hpf_cutoff_distance, int8_t confidenceTrigger,
+                     int8_t confidenceMax)
 {
     config.lpf_cutoff = lpf_cutoff_distance;
     config.hpf_cutoff = hpf_cutoff_distance;
@@ -166,7 +167,7 @@ void Tracker::SendToRobot()
 PolarPoint lastSend[5] = {{0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}};
 void Tracker::Teleplot(bool all)
 {
-    int index = 0;
+    int8_t index = 0;
     PolarPoint zero = {0, 0, 0, 0, 0};
 
     for (int index = 0; index < 5; index++)

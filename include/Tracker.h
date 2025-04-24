@@ -45,12 +45,12 @@ struct ConfigTracker
      * @brief ConfidenceTrigger : number of time a point has been seen
      * before trigger sending point to robot
      */
-    int confidenceTrigger;
+    int8_t confidenceTrigger;
 
     /**
      * @brief Confidence Maximum : Maximum number of time a point has been seen
      */
-    int confidenceMax;
+    int8_t confidenceMax;
 };
 
 /**
@@ -73,7 +73,7 @@ class Tracker
      * @param confidenceTrigger number of time a point has been seen before trigger sending point to robot
      * @param confidenceMax maximum number of time a point has been seen
      */
-    void Config(float lpf_cutoff_distance, float hpf_cutoff_distance, int confidenceTrigger, int confidenceMax);
+    void Config(float lpf_cutoff_distance, float hpf_cutoff_distance, int8_t confidenceTrigger, int8_t confidenceMax);
 
     /**
      * @brief send new point to tracker
