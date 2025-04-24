@@ -1,61 +1,68 @@
 #include "LD06.h"
 
+using namespace std;
+using namespace Printer;
+
 void LidarLD06::Initialisation()
 {
     println("Init LidarLD06", Level::LEVEL_INFO);
-    scan.clear();
     clusterCenterPoints.clear();
 
     // minDistance, maxDistance, minQuality, distanceThreshold, angleThreshold, tableMargin
     Config(50, 2500, 200, 100, 0.8 * 5, 80);
+    SERIAL_LIDAR.end();
+    SERIAL_LIDAR.setRxBufferSize(1024);
+    SERIAL_LIDAR.setTxBufferSize(1024);
     SERIAL_LIDAR.begin(230400);
 
-    int pwmChannel = 0;     // Choisit le canal 0
-    int frequence = 30000;  // Fréquence PWM de 30 KHz
-    int resolution = 8;     // Résolution de 8 bits, 256 valeurs possibles
-    int pwmPin = PWM_PIN;
+    float pwm = 34;  // Rapport cyclique en %
 
     // Configuration du canal 0 avec la fréquence et la résolution choisie
-    ledcSetup(pwmChannel, frequence, resolution);
+    ledcSetup(PWM_CHANNEL, PWM_FREQUENCE, PWM_RESOLUTION);
 
     // Assigne le canal PWM à la pin choisie
-    ledcAttachPin(pwmPin, pwmChannel);
+    ledcAttachPin(PWM_PIN, PWM_CHANNEL);
 
-    // Créer le rapport cyclique en fonction de la résolution
-    uint32_t pwm = 40;
-    uint32_t max_duty = (1 << resolution) - 1;
-    uint32_t duty = max_duty * pwm / 100;
-
-    ledcWrite(pwmChannel, duty);
+    ChangePWM(pwm);
 }
 
 void LidarLD06::Update()
 {
-    clusterCenterPoints.clear();
-    if (ReadSerial())
+    while (SERIAL_LIDAR.available() > 0)
     {
-        Analyze();
-        CheckContinuity();
-
-        for (int i = 0; i < LIDAR_DATA_PACKET_SIZE; i++)
+        if (ReadSerial())
         {
-            // Ignore points outside of the table and outside config
-            if (IsOutsideTable(lidarPacket.dataPoint[i]))
+            Analyze();
+            if (!CheckPacket())
             {
-                // print("Outside table : ", lidarPacket.dataPoint[i]);
+                // println("LD06 Packet Lost");
+                // lidarPacket.Print();
+                return;
             }
-            else if (IsOutsideConfig(lidarPacket.dataPoint[i]))
-            {
-                // print("Outside config : ", lidarPacket.dataPoint[i]);
-            }
-            else
-            {
-                AggregatePoint(lidarPacket.dataPoint[i]);
-                scan.push_back(lidarPacket.dataPoint[i]);
-            }
-        }
+            CheckContinuity();
 
-        CheckCluster(lidarPacket.dataPoint[LIDAR_DATA_PACKET_SIZE - 1]);
+            // save the last point to compare to the next packet's first point
+            lidarLastPacket = lidarPacket;
+
+            for (int i = 0; i < LIDAR_DATA_PACKET_SIZE; i++)
+            {
+                // Ignore points outside of the table and outside config
+                if (IsOutsideTable(lidarPacket.dataPoint[i]))
+                {
+                    // print("Outside table : ", lidarPacket.dataPoint[i]);
+                }
+                else if (IsOutsideConfig(lidarPacket.dataPoint[i]))
+                {
+                    // print("Outside config : ", lidarPacket.dataPoint[i]);
+                }
+                else
+                {
+                    AggregatePoint(lidarPacket.dataPoint[i]);
+                }
+            }
+            // TODO We won't be able to check the cluster if we have an invalid packet
+            CheckCluster(lidarPacket.dataPoint[LIDAR_DATA_PACKET_SIZE - 1]);
+        }
     }
 }
 
@@ -63,9 +70,20 @@ void LidarLD06::HandleCommand(Command cmd)
 {
     if (cmd.cmd == ("LD06PWM"))
     {
-        // LD06PWM:25
-        ChangePWM(cmd.data[0]);
-        println("LidarLD06 Change PWM : ", GetPWM());
+        // LD06PWM:20
+        // LD06PWM:24
+        // LD06PWM:28
+        // LD06PWM:30
+        // LD06PWM:32
+        // LD06PWM:33
+        // LD06PWM:34
+        // LD06PWM:35
+        // LD06PWM:36
+        // LD06PWM:40
+        // LD06PWM:50
+        if (cmd.size == 1)
+            ChangePWM(cmd.data[0]);
+        println("LidarLD06 PWM : ", GetPWM());
     }
     else if (cmd.cmd == ("LD06Config"))
     {
@@ -133,50 +151,49 @@ void LidarLD06::Config(int min = -1, int max = -1, int quality = -1, int distanc
     }
 }
 
-void LidarLD06::ChangePWM(uint32_t duty_cycle)
+void LidarLD06::ChangePWM(float duty)
 {
-    uint32_t duty = duty_cycle;
     // Limit the min and max
-    if (duty < 20)
-        duty = 20;
-    if (duty > 50)
-        duty = 50;
-    // Créer le rapport cyclique en fonction de la résolution
-    uint32_t max_duty = (1 << 8) - 1;
+    if (duty < 20.0)
+        duty = 20.0;
+    if (duty > 50.0)
+        duty = 50.0;
+    float max_duty = (1 << PWM_RESOLUTION) - 1;
     duty = max_duty * duty / 100;
-
-    ledcWrite(0, duty);
+    ledcWrite(PWM_CHANNEL, (uint32_t)duty);
 }
 
-uint32_t LidarLD06::GetPWM() { return ledcRead(0) * 100 / ((1 << 8) - 1); }
+float LidarLD06::GetPWM()
+{
+    float duty = ledcRead(PWM_CHANNEL);
+    float max_duty = (1 << PWM_RESOLUTION) - 1;
+    return duty * 100 / max_duty;
+}
 
-void LidarLD06::SetRobotPosition(PolarPoint robot) { robotPosition = robot; }
+void LidarLD06::SetRobotPosition(PoseF robot) { robotPosition = robot; }
 
 boolean LidarLD06::ReadSerial()
 {
-    while (SERIAL_LIDAR.available() > 0)
+    // we are building a lidar packet
+    // it always start with 0x54 0x2C and is 47 bytes long
+    uint32_t tmpInt = SERIAL_LIDAR.read();
+    // SERIAL_ROBOT.write(tmpInt);
+    if (tmpInt == 0x54 && cursorTmp == 0)
     {
-        // we are building a lidar packet
-        // it always start with 0x54 0x2C and is 47 bytes long
-        uint32_t tmpInt = SERIAL_LIDAR.read();
-        // SERIAL_ROBOT.write(tmpInt);
-        if (tmpInt == 0x54 && cursorTmp == 0)
-        {
-            serialBuffer[cursorTmp++] = tmpInt;
-        }
-        else if (cursorTmp > 0)
-        {
-            serialBuffer[cursorTmp++] = tmpInt;
+        serialBuffer[cursorTmp++] = tmpInt;
+    }
+    else if (cursorTmp > 0)
+    {
+        serialBuffer[cursorTmp++] = tmpInt;
 
-            if (serialBuffer[1] != 0x2C)
-            {
-                cursorTmp = 0;
-            }
-            if (cursorTmp == LIDAR_SERIAL_PACKET_SIZE)
-            {
-                cursorTmp = 0;
-                return true;
-            }
+        if (serialBuffer[1] != 0x2C)
+        {
+            cursorTmp = 0;
+        }
+        if (cursorTmp == LIDAR_SERIAL_PACKET_SIZE)
+        {
+            cursorTmp = 0;
+            return true;
         }
     }
     return false;
@@ -228,13 +245,42 @@ boolean LidarLD06::CheckContinuity()
     {
         delta += 36000;
     }
-
-    // save the last point to compare to the next packet's first point
-    lidarLastPacket = lidarPacket;
-
     if (delta > ANGLE_MAX_DISCONTINUITY)
     {
-        println("Discontinuity : ", (float)delta / 100, " deg", Level::LEVEL_WARN);
+        println("Discontinuity : ", ((float)delta) / 100, "deg");
+        // lidarLastPacket.Print();
+        // lidarPacket.Print();
+        // println();
+        return false;
+    }
+    else
+    {
+        return true;
+    }
+}
+
+boolean LidarLD06::CheckPacket()
+{
+    // calcul the diff betwen start and end angle with 360 overflow, must not be more than 0.8°, 1° for margin * 100
+    int angleDiff1 = 0;
+    angleDiff1 = lidarPacket.endAngle - lidarPacket.startAngle;
+    if (lidarPacket.endAngle < lidarPacket.startAngle)
+        angleDiff1 += 36000;
+    int angleDiff2 = 0;
+
+    angleDiff2 = lidarPacket.dataPoint[0].angle - lidarPacket.dataPoint[1].angle;
+    if (lidarPacket.dataPoint[0].angle < lidarPacket.dataPoint[1].angle)
+        angleDiff2 += 36000;
+
+    if (/*lidarPacket.timestamp < lidarLastPacket.timestamp ||*/ lidarPacket.startAngle > 360 * 100 ||
+        lidarPacket.endAngle > 360 * 100 || angleDiff1 > 2 * 100 * 11 || angleDiff2 > 2 * 100)
+    {
+        println("Packet Fail");
+        //  print(" : ", angleDiff1, " x0.01 deg");
+        //  println(" : ", angleDiff2, " x0.01 deg");
+        //  lidarLastPacket.Print();
+        // lidarPacket.Print();
+        //  println();
         return false;
     }
     else
@@ -245,10 +291,10 @@ boolean LidarLD06::CheckContinuity()
 
 void LidarLD06::PolarToCartesian(PolarPoint& polarPoint)
 {
-    float angle = polarPoint.angle + robotPosition.angle;
+    float angle = polarPoint.angle + robotPosition.h;
     angle /= 100;
-    polarPoint.x = robotPosition.x + polarPoint.distance * cos(angle * M_PI / 180);
-    polarPoint.y = robotPosition.y + polarPoint.distance * sin(angle * M_PI / 180);
+    polarPoint.x = robotPosition.x + polarPoint.distance * cos(angle * PI / 180);
+    polarPoint.y = robotPosition.y + polarPoint.distance * sin(angle * PI / 180);
 }
 
 bool LidarLD06::IsOutsideTable(PolarPoint polarPoint)
@@ -299,7 +345,7 @@ void LidarLD06::AggregatePoint(PolarPoint polarPoint)
 
     if (!clusterFounded)
     {
-        println("Creating new cluster N°", clusterNum);
+        // println("Creating new cluster N°", clusterNum);
         Cluster aggPoint = {{polarPoint}, polarPoint, clusterNum};
         cluster.push_back(aggPoint);
         clusterNum++;
@@ -308,14 +354,12 @@ void LidarLD06::AggregatePoint(PolarPoint polarPoint)
 
 void LidarLD06::CheckCluster(PolarPoint polarPoint)
 {
-    println("Last Angle : ", polarPoint.angle);
-
-    // TODO to be replaced by : for (auto& c : cluster)
+    // println("Last Angle : ", polarPoint.angle);
     int i = 0;
     for (auto& c : cluster)
     {
-        println("Cluster Angle : ", c.data.back().angle);
-        // the angle are descending
+        // println("Cluster Angle : ", c.data.back().angle);
+        //  the angle are descending
 
         float angle = 0;
         if (c.data.back().angle >= polarPoint.angle)
@@ -326,16 +370,16 @@ void LidarLD06::CheckCluster(PolarPoint polarPoint)
         // Do we consider this cluster finished ?
         if ((int)(angle) > lidarConfig.angleThreshold * 100 * 2)  // TODO : put this into config ?
         {
-            print("Cluster N° ", c.index);
-            println(" with Size ", c.data.size(), " will be checked");
+            // print("Cluster N° ", c.index);
+            // println(" with Size ", c.data.size(), " will be checked");
 
             // TODO 0.8 : MUST make this value from angleStep because it change with PWM !!!
 
             // Minimum amount of points needed for a 60 mm balise's diameter //TODO var 60 too permissive ?
-            float minPoint = ((70 * 180) / (PI * c.mid.distance)) / 0.8;
+            float minPoint = ((60 * 180) / (PI * c.mid.distance)) / 0.8;
 
             // Maximum amount of points needed for a 120 mm balise's diameter //TODO var 120 too permissive ?
-            float maxPoint = ((100 * 180) / (PI * c.mid.distance)) / 0.8;
+            float maxPoint = ((120 * 180) / (PI * c.mid.distance)) / 0.8;
 
             // Arc Length s = 2 π r(θ / 360°)
             float angle = 0;
@@ -349,7 +393,7 @@ void LidarLD06::CheckCluster(PolarPoint polarPoint)
 
             if (c.data.size() < 3)
             {
-                println("Absolutely not enough points !");
+                // println("Absolutely not enough points !");
             }
             else if (c.data.size() > ceil(maxPoint))
             {
@@ -401,8 +445,8 @@ void LidarLD06::CheckCluster(PolarPoint polarPoint)
                 println(" points : ", (float)(theta5 / 0.8));
                 */
 
-                print("Obstacle Detected mid Polar: ", c.mid);
-                // teleplot("mid", c.mid, Level::LEVEL_WARN);
+                // print("Obstacle Detected mid Polar: ", c.mid);
+                //  teleplot("mid", c.mid, Level::LEVEL_WARN);
                 ObstacleDetected(c);
                 // teleplot("cluster", c.data, Level::LEVEL_WARN);
             }

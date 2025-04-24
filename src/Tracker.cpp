@@ -32,7 +32,7 @@ void Tracker::HandleCommand(Command cmd)
 
 bool Tracker::PointIsEqual(PolarPoint a, PolarPoint b) { return (a.x == b.x && a.y == b.y); }
 
-void Tracker::Track(vector<PolarPoint>& newPoints)
+void Tracker::Track(std::vector<PolarPoint>& newPoints)
 {
     for (auto& newPoint : newPoints)
     {
@@ -41,16 +41,16 @@ void Tracker::Track(vector<PolarPoint>& newPoints)
         int matching_point_index = -1;
         // int first_available_slot = -1;  // free slot to add new point
 
-        print("Search point:", newPoint);
+        // println("Search point:", newPoint);
 
         int i = 0;
         for (auto& trackPoint : trackedPoints)
         {
-            print("Compare to:", trackPoint.point);
+            // println("Compare to:", trackPoint.point);
 
             // TODO remove sqrt and use x and y comparison
             float dist = sqrt(pow(newPoint.x - trackPoint.point.x, 2) + pow(newPoint.y - trackPoint.point.y, 2));
-            println("Distance:", dist);
+            // println("Distance:", dist);
 
             // If distance is smaller than lpf_cutoff, assume it's the same point
             if ((dist < config.lpf_cutoff) && (dist < best_match))
@@ -69,7 +69,7 @@ void Tracker::Track(vector<PolarPoint>& newPoints)
             newPointTracker.lastUpdateTime = millis();
             newPointTracker.hasBeenSent = false;  // not yet sent to robot
             newPointTracker.confidence = 1;
-            println("New point detected, add to tracked");
+            // println("New point detected, add to tracked");
             trackedPoints.push_back(newPointTracker);
 
             continue;
@@ -79,7 +79,7 @@ void Tracker::Track(vector<PolarPoint>& newPoints)
         // dans la limite entre 3 et 5 fois max par seconde
         if (best_match < config.hpf_cutoff)
         {
-            println("This is exactly the same point, update only time");
+            // println("This is exactly the same point, update only time");
             trackedPoints[matching_point_index].lastUpdateTime = millis();
             if (trackedPoints[matching_point_index].confidence < config.confidenceMax)
             {
@@ -88,9 +88,9 @@ void Tracker::Track(vector<PolarPoint>& newPoints)
         }
         else
         {
-            print("Updating point ", matching_point_index, " ");
-            print("from ", trackedPoints[matching_point_index].point, "");
-            print("  to ", newPoint, "");
+            // print("Updating point ", matching_point_index, " ");
+            // print("from ", trackedPoints[matching_point_index].point, "");
+            // println("  to ", newPoint, "");
             trackedPoints[matching_point_index].point = newPoint;
             trackedPoints[matching_point_index].hasBeenSent = false;
             trackedPoints[matching_point_index].lastUpdateTime = millis();
@@ -141,12 +141,12 @@ void Tracker::SendToRobot()
         if (trackedPoints.size() > index && trackedPoints[index].confidence > config.confidenceTrigger)
         {
             robot.WriteSerial(index, trackedPoints[index].point);
-            // teleplot("obs", trackedPoints[index].point, index, Level::LEVEL_WARN);
+            teleplot("obs", trackedPoints[index].point);
         }
         else
         {
             robot.WriteSerial(index, zero);
-            // teleplot("obs", zero, index, Level::LEVEL_WARN);
+            // teleplot("obs", zero);
         }
     }
     /*
@@ -157,7 +157,7 @@ void Tracker::SendToRobot()
                 robot.WriteSerial(index, trackPoint.point);
                 trackPoint.hasBeenSent = true;
                 teleplot("obs", trackPoint.point, index, Level::LEVEL_WARN);
-                // print("Send N°" + String(index) + " to Robot : ", trackPoint.point, "", Level::LEVEL_WARN);
+                // println("Send N°" + String(index) + " to Robot : ", trackPoint.point, "", Level::LEVEL_WARN);
             }
             index++;
         }
@@ -178,7 +178,9 @@ void Tracker::Teleplot(bool all)
                 lastSend[index].y != trackedPoints[index].point.y || all)
             {
                 // TODO
-                // teleplot("obs", trackedPoints[index].point, index, Level::LEVEL_WARN);
+                teleplot("obs", trackedPoints[index].point);
+                if (all)
+                    println("obs " + index, trackedPoints[index].point);
             }
             lastSend[index] = trackedPoints[index].point;
         }
@@ -187,7 +189,7 @@ void Tracker::Teleplot(bool all)
             if (lastSend[index].x != zero.x || lastSend[index].y != zero.y || all)
             {
                 // TODO
-                // teleplot("obs", zero, index, Level::LEVEL_WARN);
+                teleplot("obs", zero);
             }
             lastSend[index] = zero;
         }

@@ -7,10 +7,10 @@ Tracker tracker;
 // testModule test;
 
 int64_t lastSendRobotTime = millis();
-PolarPoint lastPosition = {0, 0, 0, 0, 0};
+PoseF lastPosition = {0.0, 0.0, 0.0};
 PolarPoint lastTrackerSend[5] = {{0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}};
 int64_t lastSendSerialTime = millis();
-
+Point MapBoundaries[] = {{0, 0}, {0, 2000}, {3000, 2000}, {3000, 0}};
 #endif
 
 #ifdef A010
@@ -22,11 +22,11 @@ MetaSenseA010 a010;
 VL53L5CX vl53;
 #endif
 
-#ifdef SPARKFUN_OTOS
-OpticalTrackingOdometrySensor otos;
-#endif
 
-PolarPoint MapBoundaries[] = {{0, 0}, {0, 2000}, {3000, 2000}, {3000, 0}};
+// we could make them not global and only in setup
+TaskThread Task1;
+TaskThread Task2;
+TaskThread Task3;
 
 void setup()
 {
@@ -52,30 +52,39 @@ void setup()
     vl53.Initialisation();
 #endif
 
-#ifdef SPARKFUN_OTOS
-    otos.Initialisation();
-#endif
-    // functionChrono();
+    println("Creating Tasks");
+    Task1 = TaskThread(TaskSerial, "TaskSerial", 20000, 1, 1);
+    Task2 = TaskThread(TaskTeleplot, "TaskTeleplot", 20000, 10, 0);
+    Task3 = TaskThread(TaskCommand, "TaskCommand", 20000, 5, 0);
 }
 
+// task running on core 1
 void loop()
 {
-    try
+    TaskThread::DeleteTask(NULL);
+}
+
+// Note the 1 Tick delay, this is need so the watchdog doesn't get confused
+void TaskSerial(void *pvParameters)
+{
+    Serial.println("Start TaskSerial1");
+
+    while (1)
     {
 #ifdef LD06
         robot.Update();
+        ld06.SetRobotPosition(robot.GetPosition());
 
-        ld06.SetRobotPosition(robot.position);
+        ld06.clusterCenterPoints.clear();
         ld06.Update();
-        // if (ld06.scan.size() > 0)
-        //     teleplot("scan", ld06.scan, Level::LEVEL_WARN);
-        ld06.scan.clear();
 
         tracker.Track(ld06.clusterCenterPoints);
         tracker.Update();
 
         if (millis() - lastSendRobotTime > 200)
         {
+            ld06.lidarPacket.Print();
+            println("Step : ", float(ld06.lidarPacket.dataPoint[0].angle - ld06.lidarPacket.dataPoint[1].angle) / 100);
             lastSendRobotTime = millis();
             tracker.SendToRobot();
         }
@@ -101,40 +110,36 @@ void loop()
 #ifdef VL53
         vl53.Update();
 #endif
+        vTaskDelay(1);  // smallest 1 Tick delay
+    }
+}
 
-#ifdef SPARKFUN_OTOS
-        otos.Update();
-#endif
-
+void TaskTeleplot(void *pvParameters)
+{
+    Serial.println("Start TaskTeleplot");
+    while (1)
+    {
+        
 #ifdef LD06
-        if (millis() - lastSendSerialTime > 100)
-        {
-            lastSendSerialTime = millis();
-            tracker.Teleplot(false);
-
-            if ((int)lastPosition.x != (int)robot.position.x || (int)lastPosition.y != (int)robot.position.y ||
-                (int)(lastPosition.angle / 100) != (int)(robot.position.angle / 100))
-            {
-                PointF p = PointF(robot.position.x, robot.position.y);
-                teleplot("Position", p);
-                teleplot("Orient", robot.position.angle);
-
-                teleplot("robot", robot.position.angle);
-                lastPosition = robot.position;
-            }
-            // teleplot("mapBoundaries", MapBoundaries, 4, Level::LEVEL_WARN);
-            // teleplot("robot", robot.position, Level::LEVEL_WARN);
-        }
+        tracker.Teleplot(false);
+        PoseF p = robot.GetPosition();
+        teleplot("LD06Pos", p);
+        teleplot("LD06Orient", p.h);
 #endif
 
+        vTaskDelay(500);  // let other task to run
+    }
+}
+
+void TaskCommand(void *pvParameters)
+{
+    Serial.println("Start TaskCommand");
+    while (1)
+    {
         if (ESP32_Helper::HasWaitingCommand())
         {
             Command cmd = ESP32_Helper::GetCommand();
 
-#ifdef VL53
-
-            vl53.HandleCommand(cmd);
-#endif
 
 #ifdef LD06
             ld06.HandleCommand(cmd);
@@ -142,8 +147,10 @@ void loop()
             tracker.HandleCommand(cmd);
             if (cmd.cmd == ("MapBoundaries"))
             {
-                // TODO
-                // teleplot("mapBoundaries", MapBoundaries, 4, Level::LEVEL_WARN);
+                teleplot("mapBoundaries", MapBoundaries[0]);
+                teleplot("mapBoundaries", MapBoundaries[1]);
+                teleplot("mapBoundaries", MapBoundaries[2]);
+                teleplot("mapBoundaries", MapBoundaries[3]);
             }
 #endif
 
@@ -151,15 +158,13 @@ void loop()
             a010.HandleCommand(cmd);
 #endif
 
-#ifdef SPARKFUN_OTOS
-            otos.HandleCommand(cmd);
+#ifdef VL53
+
+            vl53.HandleCommand(cmd);
 #endif
+
         }
-    }
-    catch (std::exception const &e)
-    {
-        print("error : ", Level::LEVEL_ERROR);
-        println(e.what(), Level::LEVEL_ERROR);
+        vTaskDelay(100);  // let other task to run
     }
 }
 

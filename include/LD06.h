@@ -8,6 +8,10 @@
 
 #pragma region DEFINE
 #define PWM_PIN 23
+#define PWM_CHANNEL 0        // Choisit le canal 0
+#define PWM_FREQUENCE 30000  // Fréquence PWM de 30 KHz
+#define PWM_RESOLUTION 8     // Résolution de 8 bits, 256 valeurs possibles
+
 // Serial 2 : U2TX = GPIO17 (Not Used for LidarLD06 LD06); U2RX = GPIO16
 #define SERIAL_LIDAR Serial2
 // 47 = 1(Start) + 1(Datalen) + 2(Speed) + 2(StartAngle) + 36(12 * 3 DataByte) + 2(EndAngle) + 2(TimeStamp) + 1(CRC)
@@ -46,6 +50,36 @@ struct PacketLidar
     int endAngle;
     int timestamp;
     byte crcCheck;
+
+    void Print()
+    {
+        // Printer::println("Header : ", header);
+        Printer::println("Data Length : ", dataLength);
+        Printer::println("Radar Speed : ", radarSpeed);
+        Printer::println("Start Angle : ", startAngle, " deg");
+        Printer::println("End Angle : ", endAngle, " deg");
+        /*for (size_t i = 0; i < dataLength; i++)
+        {
+            Printer::print("Data Point ", i);
+            Printer::print(" : ", dataPoint[i].angle / 100, " deg ");
+            Printer::print("Distance : ", dataPoint[i].distance, " mm ");
+            Printer::println("Confidence : ", dataPoint[i].confidence);
+        }*/
+        int i = 0;
+        Printer::print("Data Point ", i);
+        Printer::print(" : ", dataPoint[i].angle / 100, " deg ");
+        Printer::print("Distance : ", dataPoint[i].distance, " mm ");
+        Printer::println("Confidence : ", dataPoint[i].confidence);
+        i = dataLength - 1;
+        Printer::print("Data Point ", i);
+        Printer::print(" : ", dataPoint[i].angle / 100, " deg ");
+        Printer::print("Distance : ", dataPoint[i].distance, " mm ");
+        Printer::println("Confidence : ", dataPoint[i].confidence);
+
+        Printer::print("Timestamp : ", timestamp);
+        // Printer::print("CRC Check : ", crcCheck);
+        Printer::println();
+    }
 };
 
 /**
@@ -54,7 +88,7 @@ struct PacketLidar
  */
 struct Cluster
 {
-    vector<PolarPoint> data;
+    std::vector<PolarPoint> data;
     PolarPoint mid;
     int index;
 };
@@ -63,9 +97,8 @@ class LidarLD06
 {
    public:
     ConfigLidar lidarConfig = {0, 0, 0, 0, 0, 0};
-    vector<PolarPoint> scan;
-    PolarPoint robotPosition;
-    vector<PolarPoint> clusterCenterPoints;
+    PoseF robotPosition;
+    std::vector<PolarPoint> clusterCenterPoints;
 
     void Initialisation();
     void Update();
@@ -86,22 +119,22 @@ class LidarLD06
     /**
      * @brief Change duty cycle for the PWM
      *
-     * @param duty_cycle (int) the duty cycle of PWM in percentage (20% to 50%)
+     * @param duty_cycle (float) the duty cycle of PWM in percentage (20% to 50%)
      * @details Scan rate around 5.0  HZ when PWM duty at 21 %
      * @details Scan rate around 6.1  HZ when PWM duty at 25 %
      * @details Scan rate around 10.1 HZ when PWM duty at 39 %
      * @details Scan rate around 13.2 HZ when PWM duty at 50 %
      *
      */
-    void ChangePWM(uint32_t duty_cycle);
+    void ChangePWM(float duty_cycle);
 
     /**
      * @brief Return the duty cycle of the PWM
      *
-     * @return uint32_t the duty cycle
+     * @return float the duty cycle
      */
-    uint32_t GetPWM();
-    void SetRobotPosition(PolarPoint robot);
+    float GetPWM();
+    void SetRobotPosition(PoseF robot);
 
    private:
     /**
@@ -119,6 +152,7 @@ class LidarLD06
      * Check between 2 lidar packet received if there is no packet loss
      */
     boolean CheckContinuity();
+    boolean CheckPacket();
 
     /**
      * convert detected position from polar coordinates to cartesian coordinates
@@ -157,12 +191,14 @@ class LidarLD06
     void ComputeCenter(Cluster& c);
 
     // counter of points while detecting an obstacle from data
-    vector<Cluster> cluster;
+    std::vector<Cluster> cluster;
 
     // why are you using uint32 instead of chars?
     uint32_t serialBuffer[LIDAR_SERIAL_PACKET_SIZE] = {0};
     uint8_t cursorTmp = 0;
 
+    // TODO : Public To be removed !
+   public:
     PacketLidar lidarPacket;
     PacketLidar lidarLastPacket;
 };

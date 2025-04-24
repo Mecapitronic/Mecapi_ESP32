@@ -80,7 +80,7 @@ class Tracker
      * automatically detects if the point is new,
      * in that case add it to list of tracked points
      */
-    void Track(vector<PolarPoint>& newPoints);
+    void Track(std::vector<PolarPoint>& newPoints);
 
     bool PointIsEqual(PolarPoint a, PolarPoint b);
 
@@ -90,7 +90,7 @@ class Tracker
      * the list is updated with new data
      * and cleaned up if some points are not updated for a long time
      */
-    vector<PointTracker> trackedPoints;
+    std::vector<PointTracker> trackedPoints;
 
     ConfigTracker config = {0, 0, 0, 0};
 };
