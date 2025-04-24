@@ -4,9 +4,16 @@ EspClass ESP;
 
 void EspClass::restart(void)
 {
+
 }
 
-void EspClass::timerSleep(double seconds) {
+void EspClass::timerSleepMs(double milliSeconds)
+{
+    EspClass::timerSleep(milliSeconds / 1000);
+}
+
+void EspClass::timerSleep(double seconds)
+{
     using namespace std::chrono;
 
     static HANDLE timer = CreateWaitableTimer(NULL, FALSE, NULL);

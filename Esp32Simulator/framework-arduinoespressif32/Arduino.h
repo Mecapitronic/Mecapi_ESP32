@@ -84,8 +84,8 @@
         return ns;
 }*/
 
-#define vTaskDelay(x) EspClass::timerSleep(x / 1000)
-#define delay vTaskDelay
+#define vTaskDelay(x) EspClass::timerSleepMs(x)
+#define delay(x) EspClass::timerSleepMs(x)
 
 typedef uint32_t TickType_t;
 
@@ -100,6 +100,7 @@ class EspClass
     void restart();
 
     static void timerSleep(double seconds);
+    static void timerSleepMs(double milliSeconds);
     static void startTime();
     static unsigned long getTime();
 };
