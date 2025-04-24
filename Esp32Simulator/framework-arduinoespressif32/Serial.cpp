@@ -5,9 +5,11 @@ MySerial::MySerial() {};
 MySerial::~MySerial() {};
 
 void MySerial::end() {};
+void MySerial::flush() {};
 void MySerial::setRxBufferSize(int size) {};
 void MySerial::setTxBufferSize(int size) {};
 void MySerial::begin(int baud_speed) {};
+void MySerial::begin(unsigned long baud, uint32_t config, int8_t rxPin, int8_t txPin) {};
 void MySerial::print() {};
 void MySerial::print(const char* str) { if(str != NULL) myprintf(str); };
 void MySerial::print(String str) {
@@ -40,4 +42,11 @@ void MySerial::write(const char* str, int length)
 	} 
 };
 
+void MySerial::write(int n)
+{
+	myprintf(n);
+}
+
 MySerial Serial = MySerial();
+MySerial Serial1 = MySerial();
+MySerial Serial2 = MySerial();

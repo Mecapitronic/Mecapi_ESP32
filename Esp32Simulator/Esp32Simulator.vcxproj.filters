@@ -60,6 +60,30 @@
     <ClCompile Include="framework-arduinoespressif32\Serial.cpp">
       <Filter>framework-arduinoespressif32</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\A010.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\LD06.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Robot.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\test.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\testModule.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Tracker.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\VL53L5CX.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="framework-arduinoespressif32\esp32-hal-ledc.cpp">
+      <Filter>framework-arduinoespressif32</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pthreads\include\pthread.h">
@@ -128,6 +152,45 @@
     </ClInclude>
     <ClInclude Include="framework-arduinoespressif32\Serial.h">
       <Filter>framework-arduinoespressif32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\A010.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\frame_struct.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\LD06.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Robot.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\testModule.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Tracker.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\VL53L5CX.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="framework-arduinoespressif32\esp32-hal-ledc.h">
+      <Filter>framework-arduinoespressif32</Filter>
+    </ClInclude>
+    <ClInclude Include="framework-arduinoespressif32\ledc.h">
+      <Filter>framework-arduinoespressif32</Filter>
+    </ClInclude>
+    <ClInclude Include="framework-arduinoespressif32\soc_caps.h">
+      <Filter>framework-arduinoespressif32</Filter>
+    </ClInclude>
+    <ClInclude Include="framework-arduinoespressif32\ledc_types.h">
+      <Filter>framework-arduinoespressif32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib\ESP32_Helper\include\Teleplot.h">
+      <Filter>lib\Esp32_Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib\ESP32_Helper\include\TimerThread.h">
+      <Filter>lib\Esp32_Helper</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
