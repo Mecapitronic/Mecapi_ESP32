@@ -6,10 +6,8 @@ Robot robot;
 Tracker tracker;
 // testModule test;
 
-int64_t lastSendRobotTime = millis();
 PoseF lastPosition = {0.0, 0.0, 0.0};
 PolarPoint lastTrackerSend[5] = {{0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}};
-int64_t lastSendSerialTime = millis();
 Point MapBoundaries[] = {{0, 0}, {0, 2000}, {3000, 2000}, {3000, 0}};
 #endif
 
@@ -68,7 +66,8 @@ void loop()
 void TaskSerial(void *pvParameters)
 {
     Serial.println("Start TaskSerial1");
-
+    Timeout toSendRobot;
+    toSendRobot.Start(200);
     while (1)
     {
 #ifdef LD06
@@ -81,11 +80,8 @@ void TaskSerial(void *pvParameters)
         tracker.Track(ld06.clusterCenterPoints);
         tracker.Update();
 
-        if (millis() - lastSendRobotTime > 200)
+        if (toSendRobot.IsTimeOut())
         {
-            ld06.lidarPacket.Print();
-            println("Step : ", float(ld06.lidarPacket.dataPoint[0].angle - ld06.lidarPacket.dataPoint[1].angle) / 100);
-            lastSendRobotTime = millis();
             tracker.SendToRobot();
         }
 #endif
@@ -119,14 +115,14 @@ void TaskTeleplot(void *pvParameters)
     Serial.println("Start TaskTeleplot");
     while (1)
     {
-        
 #ifdef LD06
+        // ld06.lidarPacket.Print();
+        // println("Step : ", float(ld06.lidarPacket.dataPoint[0].angle - ld06.lidarPacket.dataPoint[1].angle) / 100);
         tracker.Teleplot(false);
         PoseF p = robot.GetPosition();
         teleplot("LD06Pos", p);
         teleplot("LD06Orient", p.h);
 #endif
-
         vTaskDelay(500);  // let other task to run
     }
 }
@@ -139,8 +135,6 @@ void TaskCommand(void *pvParameters)
         if (ESP32_Helper::HasWaitingCommand())
         {
             Command cmd = ESP32_Helper::GetCommand();
-
-
 #ifdef LD06
             ld06.HandleCommand(cmd);
             robot.HandleCommand(cmd);
@@ -162,7 +156,6 @@ void TaskCommand(void *pvParameters)
 
             vl53.HandleCommand(cmd);
 #endif
-
         }
         vTaskDelay(100);  // let other task to run
     }

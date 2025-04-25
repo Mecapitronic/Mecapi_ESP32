@@ -87,7 +87,7 @@ void LidarLD06::HandleCommand(Command cmd)
     }
     else if (cmd.cmd == ("LD06Config"))
     {
-        // LD06Config:50,2500,200,100,4,80
+        // LD06Config:50;2500;200;100;4;80
         // prevent changing config if there is less param than needed.
         if (cmd.size <= 5)
             cmd.data[5] = -1;

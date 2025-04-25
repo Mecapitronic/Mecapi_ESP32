@@ -39,7 +39,7 @@ void Robot::Update()
         }
 
         // Check packet length
-        if (readBuffer.size() == readBufferMax - 1)
+        if (readBuffer.size() == readBufferMax)
         {
             // Check end of packet
             if (c != 0x0A)  // 0x0A = '\n'
@@ -56,6 +56,7 @@ void Robot::Update()
                 position.h = radians(deg / 100.0);
                 // int8_t footer = readBuffer[7];
                 println("Robot Position : ", position);
+                readBuffer.clear();
             }
         }
     }
