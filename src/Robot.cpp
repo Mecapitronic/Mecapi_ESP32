@@ -16,7 +16,11 @@ void Robot::Initialisation()
     // + 1 in case ...
     readBuffer.reserve(readBufferMax + 1);
     readBuffer.clear();
-    SERIAL_ROBOT.begin(230400, SERIAL_8N1, SERIAL_ROBOT_RX, SERIAL_ROBOT_TX);
+    SERIAL_ROBOT.end();
+    SERIAL_ROBOT.setPins(SERIAL_ROBOT_RX, SERIAL_ROBOT_TX);
+    SERIAL_ROBOT.setRxBufferSize(1024);
+    SERIAL_ROBOT.setTxBufferSize(1024);
+    SERIAL_ROBOT.begin(230400);
 }
 
 void Robot::Update()

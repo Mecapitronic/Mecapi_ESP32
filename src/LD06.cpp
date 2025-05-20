@@ -11,6 +11,7 @@ void LidarLD06::Initialisation()
     // minDistance, maxDistance, minQuality, distanceThreshold, angleThreshold, tableMargin
     Config(50, 2500, 200, 100, 0.8 * 5, 80);
     SERIAL_LIDAR.end();
+    SERIAL_LIDAR.setPins(SERIAL_LIDAR_RX, SERIAL_LIDAR_TX);
     SERIAL_LIDAR.setRxBufferSize(1024);
     SERIAL_LIDAR.setTxBufferSize(1024);
     SERIAL_LIDAR.begin(230400);
