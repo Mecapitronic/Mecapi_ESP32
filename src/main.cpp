@@ -29,6 +29,7 @@ TaskThread Task3;
 void setup()
 {
     ESP32_Helper::Initialisation();
+    Wifi_Helper::SetLocalIP("192.168.137.111");
 
 #ifdef LD06
     robot.Initialisation();
