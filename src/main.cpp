@@ -20,7 +20,6 @@ MetaSenseA010 a010;
 VL53L5CX vl53;
 #endif
 
-
 // we could make them not global and only in setup
 TaskThread Task1;
 TaskThread Task2;
@@ -29,6 +28,60 @@ TaskThread Task3;
 void setup()
 {
     ESP32_Helper::Initialisation();
+
+#ifdef AX12
+    int8_t index = 2;
+    int8_t found_dynamixel = 0;
+    int8_t protocol = 1;
+    // for (int8_t protocol = 1; protocol < 3; protocol++)
+    {
+        // Set Port Protocol Version. This has to match with DYNAMIXEL protocol version.
+        dxl.setPortProtocolVersion((float)protocol);
+        print("SCAN PROTOCOL ");
+        println(protocol);
+
+        // for (index = 0; index < MAX_BAUD; index++)
+        {
+            // Set Port baudrate.
+            print("SCAN BAUDRATE ");
+            println(baud[index]);
+            dxl.begin(baud[index]);
+            for (int id = 0; id < DXL_BROADCAST_ID; id++)
+            {
+                // iterate until all ID in each baudrate is scanned.
+                if (dxl.ping(id))
+                {
+                    print("ID : ");
+                    print(id);
+                    print(", Model Number: ");
+                    println(dxl.getModelNumber(id));
+                    found_dynamixel++;
+                }
+            }
+        }
+    }
+
+    print("Total ");
+    print(found_dynamixel);
+    println(" DYNAMIXEL(s) found!");
+
+    // Set Port baudrate to 57600bps. This has to match with DYNAMIXEL baudrate.
+    dxl.begin(1000000);
+    // Set Port Protocol Version. This has to match with DYNAMIXEL protocol version.
+    dxl.setPortProtocolVersion(1.0);
+    // Get DYNAMIXEL information
+    dxl.ping(DXL_ID);
+
+    // Turn off torque when configuring items in EEPROM area
+    dxl.torqueOff(DXL_ID);
+    dxl.setOperatingMode(DXL_ID, OP_POSITION);
+    dxl.torqueOn(DXL_ID);
+
+    // Limit the maximum velocity in Position Control Mode. Use 0 for Max speed
+    dxl.writeControlTableItem(ControlTableItem::PROFILE_VELOCITY, DXL_ID, 30);
+    dxl.writeControlTableItem(ControlTableItem::PROFILE_ACCELERATION, DXL_ID, 50);
+    dxl.ledOn(DXL_ID);
+#endif
 
 #ifdef LD06
     robot.Initialisation();
@@ -70,6 +123,42 @@ void TaskSerial(void *pvParameters)
     toSendRobot.Start(200);
     while (1)
     {
+#ifdef AX12
+        // Please refer to e-Manual(http://emanual.robotis.com/docs/en/parts/interface/dynamixel_shield/)
+        dxl.setGoalPosition(DXL_ID, 0, UNIT_DEGREE);
+
+        static int i_present_position = 0;
+        static float f_present_position = 0.0;
+
+        // Check if DYNAMIXEL is in motion
+        while (abs(0 - f_present_position) > 2)
+        {
+            i_present_position = dxl.getPresentPosition(DXL_ID);
+            println("Position(raw) : ", i_present_position);
+            f_present_position = dxl.getPresentPosition(DXL_ID, UNIT_DEGREE);
+            println("Position(degree) : ", f_present_position);
+            // println("Velocity : ", dxl.getPresentVelocity(DXL_ID, UNIT_RPM));
+            // println("Current : ", dxl.getPresentCurrent(DXL_ID, UNIT_MILLI_AMPERE));
+            // println("PWM : ", dxl.getPresentPWM(DXL_ID));
+        }
+        delay(1000);
+
+        // Set Goal Position in DEGREE value
+        dxl.setGoalPosition(DXL_ID, 180, UNIT_DEGREE);
+
+        while (abs(180.0 - f_present_position) > 2.0)
+        {
+            i_present_position = dxl.getPresentPosition(DXL_ID);
+            println("Position(raw) : ", i_present_position);
+            f_present_position = dxl.getPresentPosition(DXL_ID, UNIT_DEGREE);
+            println("Position(degree) : ", f_present_position);
+            // println("velocity : ", dxl.getPresentVelocity(DXL_ID, UNIT_RPM));
+            // println("current : ", dxl.getPresentCurrent(DXL_ID, UNIT_MILLI_AMPERE));
+            // println("PWM : ", dxl.getPresentPWM(DXL_ID));
+        }
+        delay(1000);
+#endif
+
 #ifdef LD06
         robot.Update();
         ld06.SetRobotPosition(robot.GetPosition());
