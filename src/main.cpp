@@ -80,7 +80,11 @@ void setup()
     // Limit the maximum velocity in Position Control Mode. Use 0 for Max speed
     dxl.writeControlTableItem(ControlTableItem::PROFILE_VELOCITY, DXL_ID, 30);
     dxl.writeControlTableItem(ControlTableItem::PROFILE_ACCELERATION, DXL_ID, 50);
-    dxl.ledOn(DXL_ID);
+
+    // Limit the angle range of the motor, 0 in both for speed control mode
+    // dxl.writeControlTableItem(ControlTableItem::CW_ANGLE_LIMIT, DXL_ID, 0);   // 0
+    // dxl.writeControlTableItem(ControlTableItem::CCW_ANGLE_LIMIT, DXL_ID, 1023);  // 1023
+
 #endif
 
 #ifdef LD06
@@ -124,38 +128,40 @@ void TaskSerial(void *pvParameters)
     while (1)
     {
 #ifdef AX12
-        // Please refer to e-Manual(http://emanual.robotis.com/docs/en/parts/interface/dynamixel_shield/)
-        dxl.setGoalPosition(DXL_ID, 0, UNIT_DEGREE);
-
         static int i_present_position = 0;
         static float f_present_position = 0.0;
 
+        // Please refer to e-Manual(http://emanual.robotis.com/docs/en/parts/interface/dynamixel_shield/)
+        dxl.setGoalPosition(DXL_ID, 0, UNIT_DEGREE);
+        dxl.ledOn(DXL_ID);
         // Check if DYNAMIXEL is in motion
-        while (abs(0 - f_present_position) > 2)
+        while (abs(0 - f_present_position) > 2.0)
         {
             i_present_position = dxl.getPresentPosition(DXL_ID);
-            println("Position(raw) : ", i_present_position);
+            println("1. Position(raw) : ", i_present_position);
             f_present_position = dxl.getPresentPosition(DXL_ID, UNIT_DEGREE);
-            println("Position(degree) : ", f_present_position);
+            println("1. Position(degree) : ", f_present_position);
             // println("Velocity : ", dxl.getPresentVelocity(DXL_ID, UNIT_RPM));
             // println("Current : ", dxl.getPresentCurrent(DXL_ID, UNIT_MILLI_AMPERE));
             // println("PWM : ", dxl.getPresentPWM(DXL_ID));
         }
+        dxl.ledOff(DXL_ID);
         delay(1000);
 
         // Set Goal Position in DEGREE value
-        dxl.setGoalPosition(DXL_ID, 180, UNIT_DEGREE);
-
-        while (abs(180.0 - f_present_position) > 2.0)
+        dxl.setGoalPosition(DXL_ID, 270, UNIT_DEGREE);
+        dxl.ledOn(DXL_ID);
+        while (abs(270.0 - f_present_position) > 2.0)
         {
             i_present_position = dxl.getPresentPosition(DXL_ID);
-            println("Position(raw) : ", i_present_position);
+            println("2. Position(raw) : ", i_present_position);
             f_present_position = dxl.getPresentPosition(DXL_ID, UNIT_DEGREE);
-            println("Position(degree) : ", f_present_position);
+            println("2. Position(degree) : ", f_present_position);
             // println("velocity : ", dxl.getPresentVelocity(DXL_ID, UNIT_RPM));
             // println("current : ", dxl.getPresentCurrent(DXL_ID, UNIT_MILLI_AMPERE));
             // println("PWM : ", dxl.getPresentPWM(DXL_ID));
         }
+        dxl.ledOff(DXL_ID);
         delay(1000);
 #endif
 
