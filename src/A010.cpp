@@ -509,16 +509,16 @@ void MetaSenseA010::ComputeCartesianCoefficient(uint16_t horRes, uint16_t verRes
 
 void MetaSenseA010::logCartesianCoefficient()
 {
-    SERIAL_DEBUG.println("***");
+    println("***");
     for (int16_t i = 0; i < PICTURE_SIZE; i++)
     {
         int row = i % PICTURE_RES;
         int col = i / PICTURE_RES;
         String color = "65520";
         String data = String(coefX[row]) + " " + String(coefY[row]) + " " + String(coefZ[col]) + " " + color;
-        SERIAL_DEBUG.println(data);
+        println(data);
     }
-    SERIAL_DEBUG.println("---");
+    println("---");
 }
 
 void MetaSenseA010::logHeader()

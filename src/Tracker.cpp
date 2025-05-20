@@ -141,7 +141,7 @@ void Tracker::SendToRobot()
         if (trackedPoints.size() > index && trackedPoints[index].confidence > config.confidenceTrigger)
         {
             robot.WriteSerial(index, trackedPoints[index].point);
-            teleplot("obs", trackedPoints[index].point);
+            // teleplot("obs", trackedPoints[index].point);
         }
         else
         {
@@ -177,19 +177,15 @@ void Tracker::Teleplot(bool all)
             if (lastSend[index].x != trackedPoints[index].point.x ||
                 lastSend[index].y != trackedPoints[index].point.y || all)
             {
-                // TODO
-                teleplot("obs", trackedPoints[index].point);
-                if (all)
-                    println("obs " + index, trackedPoints[index].point);
+                teleplot("LD06obs", trackedPoints[index].point);
             }
             lastSend[index] = trackedPoints[index].point;
         }
         else
         {
-            if (lastSend[index].x != zero.x || lastSend[index].y != zero.y || all)
+            if (all)
             {
-                // TODO
-                teleplot("obs", zero);
+                teleplot("LD06obs", zero);
             }
             lastSend[index] = zero;
         }

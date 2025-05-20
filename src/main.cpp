@@ -68,7 +68,7 @@ void TaskSerial(void *pvParameters)
 {
     Serial.println("Start TaskSerial1");
     Timeout toSendRobot;
-    toSendRobot.Start(200);
+    toSendRobot.Start(100);
     while (1)
     {
 #ifdef LD06
