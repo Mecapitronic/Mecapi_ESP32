@@ -6,6 +6,8 @@
 #ifndef LD06_H
 #define LD06_H
 
+#include "ESP32_Helper.h"
+
 #pragma region DEFINE
 #define PWM_PIN 23
 #define PWM_CHANNEL 0        // Choisit le canal 0
@@ -22,13 +24,11 @@
 // Maximum angle between Lidar LD06 packet admissible = angle * 100
 #define ANGLE_MAX_DISCONTINUITY 160
 
-// angular offset between robot and lidar
+// angular offset between robot and lidar, in 0,1°
 // if the lidar and the robot have different origins
 // positive in trigonometric way
-#define LIDAR_ROBOT_ANGLE_OFFSET 0
+#define LIDAR_ROBOT_ANGLE_OFFSET_DEG 90
 #pragma endregion
-
-#include "ESP32_Helper.h"
 
 using namespace Printer;
 
@@ -136,7 +136,6 @@ class LidarLD06
      * @return float the duty cycle
      */
     float GetPWM();
-    void SetRobotPosition(PoseF robot);
 
    private:
     /**

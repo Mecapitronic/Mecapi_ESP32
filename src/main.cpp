@@ -20,7 +20,6 @@ MetaSenseA010 a010;
 VL53L5CX vl53;
 #endif
 
-
 // we could make them not global and only in setup
 TaskThread Task1;
 TaskThread Task2;
@@ -58,10 +57,7 @@ void setup()
 }
 
 // task running on core 1
-void loop()
-{
-    TaskThread::DeleteTask(NULL);
-}
+void loop() { TaskThread::DeleteTask(NULL); }
 
 // Note the 1 Tick delay, this is need so the watchdog doesn't get confused
 void TaskSerial(void *pvParameters)
@@ -73,7 +69,7 @@ void TaskSerial(void *pvParameters)
     {
 #ifdef LD06
         robot.Update();
-        ld06.SetRobotPosition(robot.GetPosition());
+        ld06.robotPosition = robot.position;
 
         ld06.clusterCenterPoints.clear();
         ld06.Update();

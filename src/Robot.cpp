@@ -1,11 +1,5 @@
 #include "Robot.h"
 
-// '!' + "1000,1500,9000" + '\n' :  1 + 2 * 3 + 1;
-// 21 e8 03 dc 05 28 23 0A
-const int8_t readBufferMax = 8;
-std::vector<char> readBuffer;
-PoseF position = {0.0, 0.0, 0.0};
-
 void Robot::Initialisation()
 {
     println("Init Robot");
@@ -56,8 +50,7 @@ void Robot::Update()
                 // int8_t header = readBuffer[0];
                 position.x = readBuffer[2] << 8 | readBuffer[1];
                 position.y = readBuffer[4] << 8 | readBuffer[3];
-                float deg = readBuffer[6] << 8 | readBuffer[5];
-                position.h = radians(deg / 100.0);
+                position.h = readBuffer[6] << 8 | readBuffer[5];
                 // int8_t footer = readBuffer[7];
                 // println("Robot Position : ", position);
                 readBuffer.clear();
@@ -68,28 +61,24 @@ void Robot::Update()
 
 void Robot::HandleCommand(Command cmd)
 {
-    if (cmd.cmd == ("RXYA") && cmd.size == 3)
+    if (cmd.cmd == ("RXYA"))
     {
-        // RobotXYA:1000;1500;00000
-        SetPosition(cmd.data[0], cmd.data[1], cmd.data[2]);
+        if (cmd.size == 3)
+        {
+            // RobotXYA:1000;1500;900
+            position.x = cmd.data[0];
+            position.y = cmd.data[1];
+            position.h = cmd.data[2];
+        }
         println("Robot Position : ", position);
     }
     else if (cmd.cmd == ("RPos"))
     {
         println("Robot Position : ", position);
         teleplot("Position", position);
-        teleplot("Orient", position.h);
+        teleplot("Orient", position.h / 100);
     }
 }
-
-void Robot::SetPosition(float x, float y, float angle)
-{
-    position.x = x;
-    position.y = y;
-    position.h = angle;
-}
-
-PoseF Robot::GetPosition() { return position; }
 
 void Robot::WriteSerial(int n, PolarPoint p)
 {

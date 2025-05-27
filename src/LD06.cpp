@@ -89,6 +89,7 @@ void LidarLD06::HandleCommand(Command cmd)
     else if (cmd.cmd == ("LD06Config"))
     {
         // LD06Config:50;2500;200;100;4;80
+        // LD06Config:50;1000;200;100;4;80
         // LD06Config:50;500;200;100;4;80
         // prevent changing config if there is less param than needed.
         if (cmd.size <= 5)
@@ -178,8 +179,6 @@ float LidarLD06::GetPWM()
     return duty * 100 / max_duty;
 }
 
-void LidarLD06::SetRobotPosition(PoseF robot) { robotPosition = robot; }
-
 boolean LidarLD06::ReadSerial()
 {
     // we are building a lidar packet
@@ -234,7 +233,7 @@ void LidarLD06::Analyze()
     // compute lidar result with previously defined angle step
     for (int i = 0; i < LIDAR_DATA_PACKET_SIZE; i++)
     {
-        int rawDeg = lidarPacket.startAngle + i * angleStep + LIDAR_ROBOT_ANGLE_OFFSET;
+        int rawDeg = lidarPacket.startAngle + i * angleStep - LIDAR_ROBOT_ANGLE_OFFSET_DEG * 100;
         // Raw angle are inverted
         lidarPacket.dataPoint[i].angle = 360 * 100 - (rawDeg <= 360 * 100 ? rawDeg : rawDeg - 360 * 100);
         lidarPacket.dataPoint[i].confidence = (serialBuffer[8 + i * 3]);
@@ -485,7 +484,7 @@ void LidarLD06::ComputeCenter(Cluster& c)
     //c.mid.angle = c.mid.angle / c.data.size();
     //c.mid.distance = c.mid.distance / c.data.size();
     //PolarToCartesian(c.mid);
-    
+
     // c.mid.x = mid.x / c.data.size();
     // c.mid.y = mid.y / c.data.size();
 }
