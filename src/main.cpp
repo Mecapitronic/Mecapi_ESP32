@@ -110,15 +110,24 @@ void TaskSerial(void *pvParameters)
 void TaskTeleplot(void *pvParameters)
 {
     Serial.println("Start TaskTeleplot");
+    // Variables pour stocker les dernières valeurs envoyées
+    static PoseF lastSentPos = {0.0, 0.0, 0.0};
     while (1)
     {
 #ifdef LD06
         // ld06.lidarPacket.Print();
         // println("Step : ", float(ld06.lidarPacket.dataPoint[0].angle - ld06.lidarPacket.dataPoint[1].angle) / 100);
         tracker.Teleplot(false);
-        PoseF p = robot.GetPosition();
-        teleplot("LD06Pos", p);
-        teleplot("LD06Orient", degrees(p.h));
+
+        // N'envoyer que si la position a changé
+        if (robot.position.x != lastSentPos.x || robot.position.y != lastSentPos.y || robot.position.h != lastSentPos.h)
+        {
+            teleplot("LD06Pos", robot.position);
+            teleplot("LD06Orient", robot.position.h / 100);
+            lastSentPos = robot.position;
+        }
+        tracker.Teleplot(false);
+        // teleplot("LD06Obstacle", ld06.clusterCenterPoints.size());
 #endif
         vTaskDelay(500);  // let other task to run
     }
@@ -132,6 +141,24 @@ void TaskCommand(void *pvParameters)
         if (ESP32_Helper::HasWaitingCommand())
         {
             Command cmd = ESP32_Helper::GetCommand();
+            if (cmd.cmd == "Com")
+            {
+                if (cmd.data[0] == 1)
+                {
+                    Printer::EnablePrinter(Enable::ENABLE_TRUE);
+                    Wifi_Helper::EnableWifi(Enable::ENABLE_TRUE);
+                    Printer::teleplotUDPEnable = Enable::ENABLE_TRUE;
+                    println("Enable Com");
+                }
+                else
+                {
+                    println("Disable Com");
+                    Printer::EnablePrinter(Enable::ENABLE_FALSE);
+                    Wifi_Helper::EnableWifi(Enable::ENABLE_FALSE);
+                    Printer::teleplotUDPEnable = Enable::ENABLE_FALSE;
+                }
+                return;
+            }
 #ifdef LD06
             ld06.HandleCommand(cmd);
             robot.HandleCommand(cmd);
