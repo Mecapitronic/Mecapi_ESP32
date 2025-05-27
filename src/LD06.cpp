@@ -36,7 +36,7 @@ void LidarLD06::Update()
             if (!CheckCRC())
             {
                 println("LD06 CRC Error");
-                lidarPacket.Print();
+                // lidarPacket.Print();
                 continue;
             }
             Analyze();
@@ -282,8 +282,6 @@ boolean LidarLD06::CheckCRC()
     }
     if (computed_crc != serialBuffer[LIDAR_SERIAL_PACKET_SIZE - 1])
     {
-        println("LidarLD06 CRC Check Failed");
-        // lidarPacket.Print();
         return false;
     }
     return true;
