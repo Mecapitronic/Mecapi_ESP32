@@ -13,9 +13,13 @@ Choose which sensor to simulate, then execute :
 
 `./Serial_Packet_Simulator.py COM6 ld06 2`
 
--   First argument is the serial port : "/dev/ttyUSB" or COM6, or rfc2217://localhost:4000, or \\\\.\\CNCA0
--   Second argument is the type of sensor, for now : ld06 or a010
--   Third argument is the number of sample file to send, example : data_ld06_1.txt
+-   First argument is the serial port :
+    - `/dev/ttyUSB` for hardware connexion on Linux 
+    - `COM6` for hardware connexion on Windows 
+    - `rfc2217://localhost:4000`" for Wokwi simulator 
+    - `\\\\.\\CNCA0` to use virtual port when using a port bridge
+-   Second argument is the type of sensor, for now : `ld06` or `a010`
+-   Third argument is the number of sample file to send, example : `data_ld06_1.txt`
     <br />
     (See config at end for VSCode Debug)<br />
 
@@ -45,9 +49,10 @@ Data must be formatted as a packet par line like this
 00 FF DD
 ```
 
-## VS Code Debug Config at /.vscode/launch.json
+## VS Code Debug Config at `/.vscode/launch.json`
 
-```{
+```json
+{
     "version": "0.2.0",
     "configurations": [
         {
