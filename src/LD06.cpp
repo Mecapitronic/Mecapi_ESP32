@@ -33,6 +33,12 @@ void LidarLD06::Update()
     {
         if (ReadSerial())
         {
+            if (!CheckCRC())
+            {
+                println("LD06 CRC Error");
+                lidarPacket.Print();
+                continue;
+            }
             Analyze();
             if (!CheckPacket())
             {
@@ -266,9 +272,27 @@ boolean LidarLD06::CheckContinuity()
     }
 }
 
+boolean LidarLD06::CheckCRC()
+{
+    // check CRC before hand. CRC is the last byte of the packet
+    uint8_t computed_crc = 0;
+    for (int i = 0; i < LIDAR_SERIAL_PACKET_SIZE - 1; i++)
+    {
+        computed_crc = CrcTable[computed_crc ^ serialBuffer[i]];
+    }
+    if (computed_crc != serialBuffer[LIDAR_SERIAL_PACKET_SIZE - 1])
+    {
+        println("LidarLD06 CRC Check Failed");
+        // lidarPacket.Print();
+        return false;
+    }
+    return true;
+}
+
 boolean LidarLD06::CheckPacket()
 {
-    // calcul the diff betwen start and end angle with 360 overflow, must not be more than 0.8°, 1° for margin * 100
+    // calcul the diff between start and end angle with 360 overflow, must not be more than 0.8°, 1° for margin *
+    // 100
     int angleDiff1 = 0;
     angleDiff1 = lidarPacket.endAngle - lidarPacket.startAngle;
     if (lidarPacket.endAngle < lidarPacket.startAngle)
