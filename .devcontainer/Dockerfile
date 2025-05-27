@@ -60,8 +60,4 @@ RUN python3 -c "$(curl -fsSL https://raw.githubusercontent.com/platformio/platfo
 RUN python3 -m pip install pyserial
 
 # visualizer dependencies
-RUN wget http://py.processing.org/processing.py-linux64.tgz -O /tmp/processing.tgz \
-    && tar -xzf /tmp/processing.tgz -C /tmp \
-    && sudo mv /tmp/processing*/processing-py.jar /usr/bin/ \
-    && rm -rf /tmp/processing* \
-    && echo 'alias processing="java -jar /usr/bin/processing-py.jar"' >> /home/$USERNAME/.bashrc
+RUN python3 -m pip install py5
