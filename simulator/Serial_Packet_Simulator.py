@@ -98,7 +98,7 @@ def main(serial_if: str, file: Path):
 def data_file_name(args: argparse.Namespace) -> Path:
     return (
         Path(args.sensor_type.upper())
-        / f"data_{args.sensor_type}_{str(args.file_number)}.txt"
+        / f"data_{args.sensor_type.lower()}_{str(args.file_number)}.txt"
     )
 
 
