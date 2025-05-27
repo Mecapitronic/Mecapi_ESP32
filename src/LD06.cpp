@@ -105,6 +105,12 @@ void LidarLD06::HandleCommand(Command cmd)
             cmd.data[0] = -1;
         Config(cmd.data[0], cmd.data[1], cmd.data[2], cmd.data[3], cmd.data[4], cmd.data[5]);
     }
+    else if (cmd.cmd == "LD06Packet")
+    {
+        // LD06Packet
+        println("LD06Packet");
+        lidarLastPacket.Print();
+    }
 }
 
 void LidarLD06::Config(int min = -1, int max = -1, int quality = -1, int distance = -1, int angle = -1,
