@@ -59,7 +59,7 @@ void Robot::Update()
                 float deg = readBuffer[6] << 8 | readBuffer[5];
                 position.h = radians(deg / 100.0);
                 // int8_t footer = readBuffer[7];
-                println("Robot Position : ", position);
+                // println("Robot Position : ", position);
                 readBuffer.clear();
             }
         }

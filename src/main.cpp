@@ -122,7 +122,7 @@ void TaskTeleplot(void *pvParameters)
         tracker.Teleplot(false);
         PoseF p = robot.GetPosition();
         teleplot("LD06Pos", p);
-        teleplot("LD06Orient", p.h);
+        teleplot("LD06Orient", degrees(p.h));
 #endif
         vTaskDelay(500);  // let other task to run
     }
@@ -154,7 +154,6 @@ void TaskCommand(void *pvParameters)
 #endif
 
 #ifdef VL53
-
             vl53.HandleCommand(cmd);
 #endif
         }
