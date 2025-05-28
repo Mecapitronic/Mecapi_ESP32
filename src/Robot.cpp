@@ -73,7 +73,7 @@ void Robot::HandleCommand(Command cmd)
     {
         if (cmd.size == 3)
         {
-            // RobotXYA:1000;1500;900
+            // RobotXYA:1000;1500;9000
             position.x = cmd.data[0];
             position.y = cmd.data[1];
             position.h = cmd.data[2];

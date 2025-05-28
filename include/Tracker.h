@@ -14,17 +14,17 @@ using namespace Printer;
 #define DEFAULT_HPF_CUTOFF 50.0
 
 // number of time a point has been seen before trigger sending point to robot
-#define CONFIDENCE_TRIGGER 5
+#define CONFIDENCE_TRIGGER 3
 
 // maximum number of time a point has been seen
-#define CONFIDENCE_MAXIMUM 30
+#define CONFIDENCE_MAXIMUM 10
 
 /**
  * amount of time needed to decrement the confidence of a point from tracker
  * if it is not detected in this time
  * we make 10 turns each second, 1 turn every 100ms
  */
-#define IS_TOO_OLD 200  // TODO : adjust this to 200 ?
+#define IS_TOO_OLD 200
 
 struct ConfigTracker
 {
