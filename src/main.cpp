@@ -53,7 +53,7 @@ void setup()
     println("Creating Tasks");
     Task1 = TaskThread(TaskSerial, "TaskSerial", 20000, 15, 1);
     Task2 = TaskThread(TaskTeleplot, "TaskTeleplot", 20000, 10, 0);
-    Task3 = TaskThread(TaskCommand, "TaskCommand", 20000, 5, 0);
+    Task3 = TaskThread(TaskCommand, "TaskCommand", 20000, 10, 0);
 }
 
 // task running on core 1
