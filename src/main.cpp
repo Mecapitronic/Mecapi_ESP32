@@ -118,8 +118,10 @@ void TaskTeleplot(void *pvParameters)
     Serial.println("Start TaskTeleplot");
     // Variables pour stocker les dernières valeurs envoyées
     static PoseF lastSentPos = {0.0, 0.0, 0.0};
+    Chrono chrono("Teleplot", 1000);
     while (true)
     {
+        chrono.Start();
 #ifdef LD06
         // ld06.lidarPacket.Print();
         // println("Step : ", float(ld06.lidarPacket.dataPoint[0].angle - ld06.lidarPacket.dataPoint[1].angle) / 100);
@@ -134,6 +136,10 @@ void TaskTeleplot(void *pvParameters)
         }
         // teleplot("LD06Obstacle", ld06.clusterCenterPoints.size());
 #endif
+        if (chrono.Check())
+        {
+            println("Chrono " + chrono.name + " : ", chrono.elapsedTime / chrono.loopNbr, " µs/loop");
+        }
         vTaskDelay(500);  // let other task to run
     }
 }
@@ -141,8 +147,10 @@ void TaskTeleplot(void *pvParameters)
 void TaskCommand(void *pvParameters)
 {
     Serial.println("Start TaskCommand");
+    Chrono chrono("HandleCommand", 1000);
     while (true)
     {
+        chrono.Start();
         if (ESP32_Helper::HasWaitingCommand())
         {
             Command cmd = ESP32_Helper::GetCommand();
@@ -185,6 +193,10 @@ void TaskCommand(void *pvParameters)
 #ifdef VL53
             vl53.HandleCommand(cmd);
 #endif
+        }
+        if (chrono.Check())
+        {
+            println("Chrono " + chrono.name + " : ", chrono.elapsedTime / chrono.loopNbr, " µs/loop");
         }
         vTaskDelay(10);  // let other task to run
     }
