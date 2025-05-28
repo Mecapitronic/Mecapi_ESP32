@@ -64,7 +64,7 @@ void TaskSerial(void *pvParameters)
 {
     Serial.println("Start TaskSerial1");
     Timeout toSendRobot;
-    toSendRobot.Start(100);
+    toSendRobot.Start(50);
     while (1)
     {
 #ifdef LD06
@@ -126,7 +126,6 @@ void TaskTeleplot(void *pvParameters)
             teleplot("LD06Orient", robot.position.h / 100);
             lastSentPos = robot.position;
         }
-        tracker.Teleplot(false);
         // teleplot("LD06Obstacle", ld06.clusterCenterPoints.size());
 #endif
         vTaskDelay(500);  // let other task to run
@@ -141,7 +140,7 @@ void TaskCommand(void *pvParameters)
         if (ESP32_Helper::HasWaitingCommand())
         {
             Command cmd = ESP32_Helper::GetCommand();
-            if (cmd.cmd == "Com")
+            if (cmd.cmd == "Com" && cmd.size == 1)
             {
                 if (cmd.data[0] == 1)
                 {
@@ -165,6 +164,7 @@ void TaskCommand(void *pvParameters)
             tracker.HandleCommand(cmd);
             if (cmd.cmd == ("MapBoundaries"))
             {
+                println("Teleplot MapBoundaries");
                 teleplot("mapBoundaries", MapBoundaries[0]);
                 teleplot("mapBoundaries", MapBoundaries[1]);
                 teleplot("mapBoundaries", MapBoundaries[2]);
@@ -180,7 +180,7 @@ void TaskCommand(void *pvParameters)
             vl53.HandleCommand(cmd);
 #endif
         }
-        vTaskDelay(100);  // let other task to run
+        vTaskDelay(10);  // let other task to run
     }
 }
 
