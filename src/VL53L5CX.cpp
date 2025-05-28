@@ -27,7 +27,7 @@ void VL53L5CX::Initialisation()
     if (startup == false)
     {
         Serial.println(F("Sensor not found - check your wiring. Freezing"));
-        while (1);
+        while (true);
     }
 
     Serial.print("Firmware transfer time: ");

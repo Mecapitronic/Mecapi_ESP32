@@ -51,7 +51,7 @@ void setup()
 #endif
 
     println("Creating Tasks");
-    Task1 = TaskThread(TaskSerial, "TaskSerial", 20000, 1, 1);
+    Task1 = TaskThread(TaskSerial, "TaskSerial", 20000, 15, 1);
     Task2 = TaskThread(TaskTeleplot, "TaskTeleplot", 20000, 10, 0);
     Task3 = TaskThread(TaskCommand, "TaskCommand", 20000, 5, 0);
 }
@@ -65,8 +65,10 @@ void TaskSerial(void *pvParameters)
     Serial.println("Start TaskSerial1");
     Timeout toSendRobot;
     toSendRobot.Start(50);
-    while (1)
+    Chrono chrono("Lidar", 1000);
+    while (true)
     {
+        chrono.Start();
 #ifdef LD06
         robot.Update();
         ld06.robotPosition = robot.position;
@@ -103,6 +105,10 @@ void TaskSerial(void *pvParameters)
 #ifdef VL53
         vl53.Update();
 #endif
+        if (chrono.Check())
+        {
+            println("Chrono " + chrono.name + " : ", chrono.elapsedTime / chrono.loopNbr, " µs/loop");
+        }
         vTaskDelay(1);  // smallest 1 Tick delay
     }
 }
@@ -112,7 +118,7 @@ void TaskTeleplot(void *pvParameters)
     Serial.println("Start TaskTeleplot");
     // Variables pour stocker les dernières valeurs envoyées
     static PoseF lastSentPos = {0.0, 0.0, 0.0};
-    while (1)
+    while (true)
     {
 #ifdef LD06
         // ld06.lidarPacket.Print();
@@ -135,7 +141,7 @@ void TaskTeleplot(void *pvParameters)
 void TaskCommand(void *pvParameters)
 {
     Serial.println("Start TaskCommand");
-    while (1)
+    while (true)
     {
         if (ESP32_Helper::HasWaitingCommand())
         {
