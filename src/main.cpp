@@ -49,7 +49,6 @@ void setup()
 #ifdef VL53
     vl53.Initialisation();
 #endif
-
     println("Creating Tasks");
     Task1 = TaskThread(TaskSerial, "TaskSerial", 20000, 15, 1);
     Task2 = TaskThread(TaskTeleplot, "TaskTeleplot", 20000, 10, 0);
@@ -105,7 +104,7 @@ void TaskSerial(void *pvParameters)
 #ifdef VL53
         vl53.Update();
 #endif
-        if (chrono.Check())
+        if (chrono.Check() && Chrono::print)
         {
             println("Chrono " + chrono.name + " : ", chrono.elapsedTime / chrono.loopNbr, " µs/loop");
         }
@@ -118,29 +117,37 @@ void TaskTeleplot(void *pvParameters)
     Serial.println("Start TaskTeleplot");
     // Variables pour stocker les dernières valeurs envoyées
     static PoseF lastSentPos = {0.0, 0.0, 0.0};
+    Timeout toSendTeleplot;
+    toSendTeleplot.Start(500);
     Chrono chrono("Teleplot", 1000);
     while (true)
     {
         chrono.Start();
-#ifdef LD06
-        // ld06.lidarPacket.Print();
-        // println("Step : ", float(ld06.lidarPacket.dataPoint[0].angle - ld06.lidarPacket.dataPoint[1].angle) / 100);
-        tracker.Teleplot(false);
 
-        // N'envoyer que si la position a changé
-        if (robot.position.x != lastSentPos.x || robot.position.y != lastSentPos.y || robot.position.h != lastSentPos.h)
+        if (toSendTeleplot.IsTimeOut())
         {
-            teleplot("LD06Pos", robot.position);
-            teleplot("LD06Orient", robot.position.h / 100);
-            lastSentPos = robot.position;
-        }
-        // teleplot("LD06Obstacle", ld06.clusterCenterPoints.size());
+#ifdef LD06
+            // ld06.lidarPacket.Print();
+            // println("Step : ", float(ld06.lidarPacket.dataPoint[0].angle - ld06.lidarPacket.dataPoint[1].angle) /
+            // 100);
+            tracker.Teleplot(false);
+
+            // N'envoyer que si la position a changé
+            if (robot.position.x != lastSentPos.x || robot.position.y != lastSentPos.y ||
+                robot.position.h != lastSentPos.h)
+            {
+                teleplot("LD06Pos", robot.position);
+                teleplot("LD06Orient", robot.position.h / 100);
+                lastSentPos = robot.position;
+            }
+            // teleplot("LD06Obstacle", ld06.clusterCenterPoints.size());
 #endif
-        if (chrono.Check())
+        }
+        if (chrono.Check() && Chrono::print)
         {
             println("Chrono " + chrono.name + " : ", chrono.elapsedTime / chrono.loopNbr, " µs/loop");
         }
-        vTaskDelay(500);  // let other task to run
+        vTaskDelay(10);  // let other task to run
     }
 }
 
@@ -194,7 +201,7 @@ void TaskCommand(void *pvParameters)
             vl53.HandleCommand(cmd);
 #endif
         }
-        if (chrono.Check())
+        if (chrono.Check() && Chrono::print)
         {
             println("Chrono " + chrono.name + " : ", chrono.elapsedTime / chrono.loopNbr, " µs/loop");
         }
