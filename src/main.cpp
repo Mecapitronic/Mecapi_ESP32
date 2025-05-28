@@ -104,9 +104,9 @@ void TaskSerial(void *pvParameters)
 #ifdef VL53
         vl53.Update();
 #endif
-        if (chrono.Check() && Chrono::print)
+        if (chrono.Check())  // && chrono.IsPrintEnable())
         {
-            println("Chrono " + chrono.name + " : ", chrono.elapsedTime / chrono.loopNbr, " µs/loop");
+            // println("Chrono " + chrono.name + " : ", chrono.elapsedTime / chrono.loopNbr, " µs/loop");
         }
         vTaskDelay(1);  // smallest 1 Tick delay
     }
@@ -143,9 +143,9 @@ void TaskTeleplot(void *pvParameters)
             // teleplot("LD06Obstacle", ld06.clusterCenterPoints.size());
 #endif
         }
-        if (chrono.Check() && Chrono::print)
+        if (chrono.Check())  // && chrono.IsPrintEnable())
         {
-            println("Chrono " + chrono.name + " : ", chrono.elapsedTime / chrono.loopNbr, " µs/loop");
+            // println("Chrono " + chrono.name + " : ", chrono.elapsedTime / chrono.loopNbr, " µs/loop");
         }
         vTaskDelay(10);  // let other task to run
     }
@@ -201,9 +201,9 @@ void TaskCommand(void *pvParameters)
             vl53.HandleCommand(cmd);
 #endif
         }
-        if (chrono.Check() && Chrono::print)
+        if (chrono.Check())  // && chrono.IsPrintEnable())
         {
-            println("Chrono " + chrono.name + " : ", chrono.elapsedTime / chrono.loopNbr, " µs/loop");
+            // println("Chrono " + chrono.name + " : ", chrono.elapsedTime / chrono.loopNbr, " µs/loop");
         }
         vTaskDelay(10);  // let other task to run
     }
