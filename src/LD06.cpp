@@ -9,7 +9,7 @@ void LidarLD06::Initialisation()
     clusterCenterPoints.clear();
 
     // minDistance, maxDistance, minQuality, distanceThreshold, angleThreshold, tableMargin
-    Config(50, 2500, 200, 100, 0.8 * 5, 80);
+    Config(50, 1000, 200, 100, 0.8 * 5, 80);
     SERIAL_LIDAR.end();
     SERIAL_LIDAR.setPins(SERIAL_LIDAR_RX, SERIAL_LIDAR_TX);
     SERIAL_LIDAR.setRxBufferSize(1024);
@@ -503,9 +503,9 @@ void LidarLD06::ComputeCenter(Cluster& c)
         // c.mid.y += c.data[d].y;
     }
 
-    //c.mid.angle = c.mid.angle / c.data.size();
-    //c.mid.distance = c.mid.distance / c.data.size();
-    //PolarToCartesian(c.mid);
+    // c.mid.angle = c.mid.angle / c.data.size();
+    // c.mid.distance = c.mid.distance / c.data.size();
+    // PolarToCartesian(c.mid);
 
     // c.mid.x = mid.x / c.data.size();
     // c.mid.y = mid.y / c.data.size();

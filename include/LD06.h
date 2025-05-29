@@ -32,6 +32,10 @@
 
 using namespace Printer;
 
+/**
+ * @struct ConfigLidar
+ * @brief Represent LD06 Lidar configuration to send to device
+ */
 struct ConfigLidar
 {
     int minDistance;        // represents the minimum distance of point from robot to be accepted
