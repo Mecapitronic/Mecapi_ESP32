@@ -268,9 +268,15 @@ boolean LidarLD06::CheckContinuity()
         // {
         //     previous_time = time
         // }
-
-        // we don't care about time
-        discontinuity_flood++;
+        if (!Wifi_Helper::IsOTARunning())
+        {
+            // we don't care about time
+            discontinuity_flood++;
+        }
+        else
+        {
+            discontinuity_flood = 0;
+        }
 
         println("Discontinuity : ", ((float)delta) / 100, "deg");
         println("Discontinuity Flood : ", discontinuity_flood);
@@ -279,7 +285,7 @@ boolean LidarLD06::CheckContinuity()
         // println();
 
         // in case of too many discontinuities we reset the ESP
-        if (discontinuity_flood > discontinuity_flood_threshold)
+        if (discontinuity_flood > discontinuity_flood_threshold && !Wifi_Helper::IsOTARunning())
         {
             println("Rebooting...");
             ESP.restart();
