@@ -191,6 +191,12 @@ void TaskCommand(void *pvParameters)
                 teleplot("mapBoundaries", MapBoundaries[2]);
                 teleplot("mapBoundaries", MapBoundaries[3]);
             }
+
+            // in case of too many discontinuities we reset the ESP
+            if (ld06.discontinuity_flood > ld06.discontinuity_flood_threshold)
+            {
+                esp_restart();
+            }
 #endif
 
 #ifdef A010

@@ -258,8 +258,20 @@ boolean LidarLD06::CheckContinuity()
     {
         delta += 36000;
     }
+
     if (delta > ANGLE_MAX_DISCONTINUITY)
     {
+        // // if we have too much  discontinuities in a short time we reset the ESP32
+
+        // TickType_t currentTime = xTaskGetTickCount() * configTICK_RATE_HZ;
+        // if (previousTime < DISCONTINUITY_FLOOD_THRESHOLD_TIME)
+        // {
+        //     previous_time = time
+        // }
+
+        // we don't care about time
+        discontinuity_flood++;
+
         println("Discontinuity : ", ((float)delta) / 100, "deg");
         // lidarLastPacket.Print();
         // lidarPacket.Print();
@@ -268,6 +280,7 @@ boolean LidarLD06::CheckContinuity()
     }
     else
     {
+        discontinuity_flood--;
         return true;
     }
 }

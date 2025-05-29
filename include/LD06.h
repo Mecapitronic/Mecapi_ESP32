@@ -23,6 +23,8 @@
 #define LIDAR_DATA_PACKET_SIZE 12
 // Maximum angle between Lidar LD06 packet admissible = angle * 100. Here 16° (2 packets)
 #define ANGLE_MAX_DISCONTINUITY 160
+// maximum time between two discontinuity detected to be considered to be flood
+#define DISCONTINUITY_FLOOD_THRESHOLD_TIME 10
 
 // angular offset between robot and lidar, in 0,1°
 // if the lidar and the robot have different origins
@@ -105,6 +107,9 @@ class LidarLD06
     ConfigLidar lidarConfig = {0, 0, 0, 0, 0, 0};
     PoseF robotPosition;
     std::vector<PolarPoint> clusterCenterPoints;
+    uint8_t discontinuity_flood = 0;
+    // how many is too many ?
+    static const uint8_t discontinuity_flood_threshold = 15;
 
     void Initialisation();
     void Update();
