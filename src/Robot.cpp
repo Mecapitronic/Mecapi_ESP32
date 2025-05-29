@@ -47,10 +47,17 @@ void Robot::Update()
             }
             else
             {
+                // vérifions que la position du robot donnée par le ESP32S3
+                // soit bien dans les limites de la table de jeu
+                PoseF tempPosition;
                 // int8_t header = readBuffer[0];
-                position.x = readBuffer[2] << 8 | readBuffer[1];
-                position.y = readBuffer[4] << 8 | readBuffer[3];
+                tempPosition.x = readBuffer[2] << 8 | readBuffer[1];
+                tempPosition.y = readBuffer[4] << 8 | readBuffer[3];
                 position.h = readBuffer[6] << 8 | readBuffer[5];
+                if (tempPosition.x > 0 && tempPosition.x < 3000 && tempPosition.y > 0 && tempPosition.y < 2000)
+                {
+                    position = tempPosition;
+                }
                 // int8_t footer = readBuffer[7];
                 // println("Robot Position : ", position);
                 readBuffer.clear();
