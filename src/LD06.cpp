@@ -273,14 +273,22 @@ boolean LidarLD06::CheckContinuity()
         discontinuity_flood++;
 
         println("Discontinuity : ", ((float)delta) / 100, "deg");
+        println("Discontinuity Flood : ", discontinuity_flood);
         // lidarLastPacket.Print();
         // lidarPacket.Print();
         // println();
+
+        // in case of too many discontinuities we reset the ESP
+        if (discontinuity_flood > discontinuity_flood_threshold)
+        {
+            println("Rebooting...");
+            ESP.restart();
+            // esp_restart();
+        }
         return false;
     }
     else
     {
-        discontinuity_flood--;
         return true;
     }
 }
