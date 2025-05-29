@@ -53,7 +53,7 @@ void Robot::Update()
                 // int8_t header = readBuffer[0];
                 tempPosition.x = readBuffer[2] << 8 | readBuffer[1];
                 tempPosition.y = readBuffer[4] << 8 | readBuffer[3];
-                position.h = readBuffer[6] << 8 | readBuffer[5];
+                tempPosition.h = readBuffer[6] << 8 | readBuffer[5];
                 if (tempPosition.x > 0 && tempPosition.x < 3000 && tempPosition.y > 0 && tempPosition.y < 2000)
                 {
                     position = tempPosition;
@@ -63,14 +63,14 @@ void Robot::Update()
                 readBuffer.clear();
             }
         }
-        if (readBuffer.size() == readBufferCmd && c == 0x0A)
-        {
-            Command cmdTmp;
-            cmdTmp.cmd = readBuffer[1] + readBuffer[2] + readBuffer[3];
-            cmdTmp.size = 1;
-            cmdTmp.data[0] = readBuffer[4];
-            ESP32_Helper::HandleCommand(cmdTmp);
-        }
+        // if (readBuffer.size() == readBufferCmd && c == 0x0A)
+        // {
+        //     Command cmdTmp;
+        //     cmdTmp.cmd = readBuffer[1] + readBuffer[2] + readBuffer[3];
+        //     cmdTmp.size = 1;
+        //     cmdTmp.data[0] = readBuffer[4];
+        //     ESP32_Helper::HandleCommand(cmdTmp);
+        // }
     }
 }
 

@@ -26,7 +26,7 @@ class Robot
     // 21 e8 03 dc 05 28 23 0A
     const int8_t readBufferMax = 8;
     // '!' + "cmd" + "data" + '\n' : 1 + 3 + 1 + 1
-    const int8_t readBufferCmd = 6;
+    // const int8_t readBufferCmd = 6;
     std::vector<char> readBuffer;
 
    public:
