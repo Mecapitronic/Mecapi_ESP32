@@ -9,7 +9,7 @@ void LidarLD06::Initialisation()
     clusterCenterPoints.clear();
 
     // minDistance, maxDistance, minQuality, distanceThreshold, angleThreshold, tableMargin
-    Config(50, 1000, 200, 100, 0.8 * 5, 80);
+    Config(50, 1500, 200, 100, 0.8 * 5, 70);
     SERIAL_LIDAR.end();
     SERIAL_LIDAR.setPins(SERIAL_LIDAR_RX, SERIAL_LIDAR_TX);
     SERIAL_LIDAR.setRxBufferSize(1024);
@@ -35,18 +35,18 @@ void LidarLD06::Update()
         {
             if (!CheckCRC())
             {
-                println("LD06 CRC Error");
+                //println("LD06 CRC Error");
                 // lidarPacket.Print();
                 continue;
             }
             Analyze();
             if (!CheckPacket())
             {
-                // println("LD06 Packet Lost");
+                //println("LD06 Packet Lost");
                 // lidarPacket.Print();
-                return;
+                continue;
             }
-            CheckContinuity();
+            // CheckContinuity();
 
             // save the last point to compare to the next packet's first point
             lidarLastPacket = lidarPacket;
@@ -424,19 +424,22 @@ void LidarLD06::CheckCluster(PolarPoint polarPoint)
             angle = fabsf(c.data.back().angle + 360 * 100 - polarPoint.angle);
 
         // Do we consider this cluster finished ?
-        if ((int)(angle) > lidarConfig.angleThreshold * 100 * 2)  // TODO : put this into config ?
+        // TODO : put this into config ?
+        if ((int)(angle) > lidarConfig.angleThreshold * 100 * 2)
         {
             // print("Cluster N° ", c.index);
             // println(" with Size ", c.data.size(), " will be checked");
 
             // TODO 0.8 : MUST make this value from angleStep because it change with PWM !!!
 
-            // Minimum amount of points needed for a 60 mm balise's diameter //TODO var 60 too permissive ?
+            // Minimum amount of points needed for a 60 mm balise's diameter
+            // TODO var 60 too permissive ?
             float minPoint = ((60 * 180) / (PI * c.mid.distance)) / 0.8;
-
-            // Maximum amount of points needed for a 120 mm balise's diameter //TODO var 120 too permissive ?
+            //Printer::teleplot("minPoint", minPoint);
+            // Maximum amount of points needed for a 120 mm balise's diameter
+            // TODO var 120 too permissive ?
             float maxPoint = ((120 * 180) / (PI * c.mid.distance)) / 0.8;
-
+            //Printer::teleplot("maxPoint", maxPoint);
             // Arc Length s = 2 π r(θ / 360°)
             float angle = 0;
             if (c.data.front().angle >= c.data.back().angle)
@@ -444,7 +447,9 @@ void LidarLD06::CheckCluster(PolarPoint polarPoint)
             else
                 angle = fabsf(c.data.front().angle + 360 * 100 - c.data.back().angle) / 100;
             float arc = (angle * c.mid.distance) * PI / 180;
+            //Printer::teleplot("arc", arc);
 
+            //Printer::teleplot("size", c.data.size());
             // At 300mm we need 20 points, at 1000mm we need 10 points, at 1500mm 5 points
 
             if (c.data.size() < 3)
@@ -462,7 +467,7 @@ void LidarLD06::CheckCluster(PolarPoint polarPoint)
                 println(">front:", c.data.front().angle, "", Level::LEVEL_WARN);
                 println(">back:", c.data.back().angle, "", Level::LEVEL_WARN);*/
             }
-            else if (c.data.size() < floor(minPoint))
+            else if (c.data.size() < floor(minPoint) || c.data.size() < 4)
             { /*
                  println("Not enough points : ", c.data.size(), "", Level::LEVEL_WARN);
                  println(">distance:", c.mid.distance, "", Level::LEVEL_WARN);
