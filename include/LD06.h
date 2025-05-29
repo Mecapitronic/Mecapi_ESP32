@@ -109,7 +109,7 @@ class LidarLD06
     std::vector<PolarPoint> clusterCenterPoints;
     uint8_t discontinuity_flood = 0;
     // how many is too many ?
-    const uint8_t discontinuity_flood_threshold = 15;
+    const uint8_t discontinuity_flood_threshold = 30;
 
     void Initialisation();
     void Update();

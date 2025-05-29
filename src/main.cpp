@@ -63,7 +63,7 @@ void TaskSerial(void *pvParameters)
 {
     Serial.println("Start TaskSerial1");
     Timeout toSendRobot;
-    toSendRobot.Start(50);
+    toSendRobot.Start(20);
     Chrono chrono("Lidar", 1000);
     while (true)
     {
