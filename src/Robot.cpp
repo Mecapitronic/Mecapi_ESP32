@@ -8,7 +8,7 @@ void Robot::Initialisation()
     println("Robot Position : ", position, "", Level::LEVEL_INFO);
 
     // + 1 in case ...
-    readBuffer.reserve(readBufferMax + 1);
+    readBuffer.reserve(robot_position_message_size + 1);
     readBuffer.clear();
     SERIAL_ROBOT.end();
     SERIAL_ROBOT.setPins(SERIAL_ROBOT_RX, SERIAL_ROBOT_TX);
@@ -24,20 +24,45 @@ void Robot::Update()
         char c = SERIAL_ROBOT.read();
 
         // Check Overflow
-        if (readBuffer.size() >= readBufferMax)
+        if (readBuffer.size() >= robot_position_message_size)
             readBuffer.clear();
 
         readBuffer.push_back(c);
 
         // Check start of packet
-        if (readBuffer[0] != 0x21)  // 0x21 = '!'
+        if (readBuffer[0] != 0x21 || readBuffer[0] != '?')  // 0x21 = '!'
         {
             readBuffer.clear();
             continue;
         }
 
+        // match has started, we need to register the clock
+        if (readBuffer[0] == '?' && readBuffer.size() == match_started_message_size)
+        {
+            // Check end of packet
+            if (c != 0x0A)  // 0x0A = '\n'
+            {
+                readBuffer.clear();
+                continue;
+            }
+
+            if (match_start_time != 0)
+            {
+                println("Match already started at ", match_start_time, "", Level::LEVEL_WARN);
+                println("the robot probably reset on its own :'(", Level::LEVEL_ERROR);
+                readBuffer.clear();
+            }
+            else if (match_start_time > 100)
+            {
+                println("the match seems to have ended and the robot restarted", Level::LEVEL_WARN);
+                // #undefined_behavior
+            }
+            {
+                match_start_time = readBuffer[2] << 8 | readBuffer[1];
+            }
+        }
         // Check packet length
-        if (readBuffer.size() == readBufferMax)
+        else if (readBuffer[0] == '!' && readBuffer.size() == robot_position_message_size)
         {
             // Check end of packet
             if (c != 0x0A)  // 0x0A = '\n'
@@ -72,6 +97,14 @@ void Robot::Update()
         //     ESP32_Helper::HandleCommand(cmdTmp);
         // }
     }
+}
+
+void Robot::sendMatchStartTime()
+{
+    SERIAL_ROBOT.write('?');
+    SERIAL_ROBOT.write(match_start_time % 256);
+    SERIAL_ROBOT.write(match_start_time >> 8);
+    SERIAL_ROBOT.write("\n");
 }
 
 void Robot::HandleCommand(Command cmd)

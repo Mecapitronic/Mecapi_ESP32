@@ -63,7 +63,9 @@ void TaskSerial(void *pvParameters)
 {
     Serial.println("Start TaskSerial1");
     Timeout toSendRobot;
+    Timeout sendClockToRobot;
     toSendRobot.Start(20);
+    sendClockToRobot.Start(1000);  // every second
     Chrono chrono("Lidar", 1000);
     while (true)
     {
@@ -81,6 +83,11 @@ void TaskSerial(void *pvParameters)
         if (toSendRobot.IsTimeOut())
         {
             tracker.SendToRobot();
+        }
+
+        if (sendClockToRobot.IsTimeOut() && robot.match_start_time != 0)
+        {
+            robot.sendMatchStartTime()
         }
 #endif
 

@@ -24,10 +24,13 @@ class Robot
    private:
     // '!' + "1000,1500,9000" + '\n' :  1 + 2 * 3 + 1;
     // 21 e8 03 dc 05 28 23 0A
-    const int8_t readBufferMax = 8;
+    const uint8_t robot_position_message_size = 8;
+    const uint8_t match_started_message_size = 4;  // '?' + time(int) + '\n'
+
     // '!' + "cmd" + "data" + '\n' : 1 + 3 + 1 + 1
     // const int8_t readBufferCmd = 6;
     std::vector<char> readBuffer;
+    int match_start_time = 0;
 
    public:
     PoseF position = {0.0, 0.0, 0.0};
@@ -35,6 +38,7 @@ class Robot
     void Initialisation();
     void Update();
     void HandleCommand(Command cmd);
+    void sendMatchStartTime();
 
     /**
      * Send data to robot : send obstacle position given in args
