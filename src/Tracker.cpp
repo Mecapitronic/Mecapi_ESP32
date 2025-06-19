@@ -3,30 +3,62 @@
 void Tracker::Initialisation()
 {
     println("Init Tracker", Level::LEVEL_INFO);
-    Config(DEFAULT_LPF_CUTOFF, DEFAULT_HPF_CUTOFF, CONFIDENCE_TRIGGER, CONFIDENCE_MAXIMUM);
+    Config(DEFAULT_LPF_CUTOFF, DEFAULT_HPF_CUTOFF, CONFIDENCE_TRIGGER, CONFIDENCE_MAXIMUM, POINT_SEND_TO_ROBOT_MAXIMUM);
     trackedPoints.clear();
 }
 
-void Tracker::Config(float lpf_cutoff_distance, float hpf_cutoff_distance, int8_t confidenceTrigger,
-                     int8_t confidenceMax)
+void Tracker::Config(float lpf_cutoff_distance = -1, float hpf_cutoff_distance = -1, int8_t confidenceTrigger = -1,
+                     int8_t confidenceMax = -1, int8_t maxPointToSendToRobot = -1)
 {
-    config.lpf_cutoff = lpf_cutoff_distance;
-    config.hpf_cutoff = hpf_cutoff_distance;
-    config.confidenceTrigger = confidenceTrigger;
-    config.confidenceMax = confidenceMax;
-
-    println("Track new point if nothing close enough: ", config.lpf_cutoff, " mm", Level::LEVEL_INFO);
-    println("Ignore movements under ", config.hpf_cutoff, " mm", Level::LEVEL_INFO);
-    println("Confidence trigger for sending tracking point to robot: ", config.confidenceTrigger, " times",
-            Level::LEVEL_INFO);
-    println("Confidence Maximum: ", config.confidenceMax, "", Level::LEVEL_INFO);
+    if (lpf_cutoff_distance != -1)
+    {
+        config.lpf_cutoff = lpf_cutoff_distance;
+        println("Track new point if nothing close enough: ", config.lpf_cutoff, " mm", Level::LEVEL_INFO);
+    }
+    if (hpf_cutoff_distance != -1)
+    {
+        config.hpf_cutoff = hpf_cutoff_distance;
+        println("Update point only if moved more than: ", config.hpf_cutoff, " mm", Level::LEVEL_INFO);
+    }
+    if (confidenceTrigger != -1)
+    {
+        config.confidenceTrigger = confidenceTrigger;
+        println("Confidence trigger for sending tracking point to robot: ", config.confidenceTrigger, " times",
+                Level::LEVEL_INFO);
+    }
+    if (confidenceMax != -1)
+    {
+        config.confidenceMax = confidenceMax;
+        println("Confidence Maximum: ", config.confidenceMax, "", Level::LEVEL_INFO);
+    }
+    if (maxPointToSendToRobot != -1)
+    {
+        config.maxPointToSendToRobot = maxPointToSendToRobot;
+        println("Max points to send to robot: ", config.maxPointToSendToRobot, "", Level::LEVEL_INFO);
+    }
 }
 
 void Tracker::HandleCommand(Command cmd)
 {
-    if (cmd.cmd == ("Tracker"))
+    if (cmd.cmd == ("TrackerTeleplot"))
     {
         Teleplot(true);
+    }
+    else if (cmd.cmd == ("TrackerConfig"))
+    {
+        // TrackerConfig:300;50;3;10;5
+        // prevent changing config if there is less param than needed.
+        if (cmd.size <= 4)
+            cmd.data[4] = -1;
+        if (cmd.size <= 3)
+            cmd.data[3] = -1;
+        if (cmd.size <= 2)
+            cmd.data[2] = -1;
+        if (cmd.size <= 1)
+            cmd.data[1] = -1;
+        if (cmd.size <= 0)
+            cmd.data[0] = -1;
+        Config(cmd.data[0], cmd.data[1], cmd.data[2], cmd.data[3], cmd.data[4]);
     }
 }
 
