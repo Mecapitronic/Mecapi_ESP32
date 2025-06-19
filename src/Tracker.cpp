@@ -136,6 +136,10 @@ void Tracker::SendToRobot()
     int index = 0;
     PolarPoint zero = {0, 0, 0, 0, 0};
 
+    // First we sort by distance to get closer obstacle first
+    std::sort(trackedPoints.begin(), trackedPoints.end(),
+              [](const PointTracker& a, const PointTracker& b) { return a.point.distance < b.point.distance; });
+
     for (int index = 0; index < 5; index++)
     {
         if (trackedPoints.size() > index && trackedPoints[index].confidence > config.confidenceTrigger)
