@@ -172,7 +172,7 @@ void Tracker::SendToRobot()
     std::sort(trackedPoints.begin(), trackedPoints.end(),
               [](const PointTracker& a, const PointTracker& b) { return a.point.distance < b.point.distance; });
 
-    for (int index = 0; index < 5; index++)
+    for (int index = 0; index < config.maxPointToSendToRobot; index++)
     {
         if (trackedPoints.size() > index && trackedPoints[index].confidence > config.confidenceTrigger)
         {
@@ -188,7 +188,8 @@ void Tracker::SendToRobot()
     /*
         for (auto& trackPoint : trackedPoints)
         {
-            if (index < 5 && !trackPoint.hasBeenSent && trackPoint.confidence > config.confidenceTrigger)
+            if (index < config.maxPointToSendToRobot && !trackPoint.hasBeenSent && trackPoint.confidence >
+       config.confidenceTrigger)
             {
                 robot.WriteSerial(index, trackPoint.point);
                 trackPoint.hasBeenSent = true;
@@ -206,7 +207,7 @@ void Tracker::Teleplot(bool all)
     int8_t index = 0;
     PolarPoint zero = {0, 0, 0, 0, 0};
 
-    for (int index = 0; index < 5; index++)
+    for (int index = 0; index < config.maxPointToSendToRobot; index++)
     {
         if (trackedPoints.size() > index && trackedPoints[index].confidence > config.confidenceTrigger)
         {
