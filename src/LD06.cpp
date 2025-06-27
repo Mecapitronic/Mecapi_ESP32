@@ -129,36 +129,48 @@ void LidarLD06::Config(int min = -1, int max = -1, int quality = -1, int distanc
         println(" to ", min, "", Level::LEVEL_INFO);
         lidarConfig.minDistance = min;
     }
+    else
+        println("LidarLD06 Config 'Distance Min' ", lidarConfig.minDistance, "", Level::LEVEL_INFO);
     if (max != -1)
     {
         print("LidarLD06 Config 'Distance Max' from ", lidarConfig.maxDistance, "", Level::LEVEL_INFO);
         println(" to ", max, "", Level::LEVEL_INFO);
         lidarConfig.maxDistance = max;
     }
+    else
+        println("LidarLD06 Config 'Distance Max' ", lidarConfig.maxDistance, "", Level::LEVEL_INFO);
     if (quality != -1)
     {
         print("LidarLD06 Config 'Quality' from ", lidarConfig.minQuality, "", Level::LEVEL_INFO);
         println(" to ", quality, "", Level::LEVEL_INFO);
         lidarConfig.minQuality = quality;
     }
+    else
+        println("LidarLD06 Config 'Quality' ", lidarConfig.minQuality, "", Level::LEVEL_INFO);
     if (distance != -1)
     {
         print("LidarLD06 Config 'Distance Threshold' from ", lidarConfig.distanceThreshold, "", Level::LEVEL_INFO);
         println(" to ", distance, "", Level::LEVEL_INFO);
         lidarConfig.distanceThreshold = distance;
     }
+    else
+        println("LidarLD06 Config 'Distance Threshold' ", lidarConfig.distanceThreshold, "", Level::LEVEL_INFO);
     if (angle != -1)
     {
         print("LidarLD06 Config 'Angle Threshold' from ", lidarConfig.angleThreshold, "", Level::LEVEL_INFO);
         println(" to ", angle, "", Level::LEVEL_INFO);
         lidarConfig.angleThreshold = angle;
     }
+    else
+        println("LidarLD06 Config 'Angle Threshold' ", lidarConfig.angleThreshold, "", Level::LEVEL_INFO);
     if (tableMargin != -1)
     {
         print("LidarLD06 Config 'Table Margin' from ", lidarConfig.tableMargin, "", Level::LEVEL_INFO);
         println(" to ", tableMargin, "", Level::LEVEL_INFO);
         lidarConfig.tableMargin = tableMargin;
     }
+    else
+        println("LidarLD06 Config 'Table Margin' ", lidarConfig.tableMargin, "", Level::LEVEL_INFO);
 
     if (min == -1 && max == -1 && quality == -1 && distance == -1 && angle == -1 && tableMargin == -1)
     {
